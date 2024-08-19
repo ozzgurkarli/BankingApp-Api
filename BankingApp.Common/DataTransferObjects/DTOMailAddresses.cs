@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankingApp.Entity.Entities
+namespace BankingApp.Common.DataTransferObjects
 {
-    public class MailAddresses: BaseEntity
+    public class DTOMailAddresses : BaseDTO
     {
-        public required virtual Customer Customer { get; set; }
+        [StringLength(12)]
+        public required string CustomerNo { get; set; }
 
         public required string MailAddress { get; set; }
 

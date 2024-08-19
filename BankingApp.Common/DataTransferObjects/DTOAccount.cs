@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankingApp.Entity.Entities
+namespace BankingApp.Common.DataTransferObjects
 {
-    public class Account: BaseEntity
+    public class DTOAccount : BaseDTO
     {
-        public required virtual Customer Customer { get; set; }
+        [StringLength(12)]
+        public required string CustomerNo { get; set; }
 
         [StringLength(16)]
         public required string AccountNo { get; set; }
@@ -23,6 +23,6 @@ namespace BankingApp.Entity.Entities
 
         public required string Branch { get; set; }
 
-        public virtual List<TransactionHistory>? TransactionHistory { get; set; }
+        public virtual List<DTOTransactionHistory>? TransactionHistory { get; set; }
     }
 }

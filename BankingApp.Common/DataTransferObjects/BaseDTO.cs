@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankingApp.Entity.Entities
+namespace BankingApp.Common.DataTransferObjects
 {
-    public class BaseEntity
+    public class BaseDTO
     {
         public int Id { get; set; }
 
-        public DateTime RecordDate { get; set; } = DateTime.Now;
+        public required DateTime RecordDate { get; set; } = DateTime.Now;
 
         public required string RecordScreen { get; set; } = "ADMIN";
     }

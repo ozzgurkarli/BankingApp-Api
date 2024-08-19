@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mail;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankingApp.Entity.Entities
+namespace BankingApp.Common.DataTransferObjects
 {
-    public class Customer: BaseEntity
+    public class DTOCustomer : BaseDTO
     {
-        [Range(100000000000, 999999999999)]
-        public new Int64 Id { get; set; }
+        [StringLength(12)]
+        public required string CustomerNo { get; set; }
 
         [StringLength(11)]
         public required string IdentityNo { get; set; }
@@ -27,14 +29,14 @@ namespace BankingApp.Entity.Entities
 
         public int CreditScore { get; set; }
 
-        public virtual required List<MailAddresses> MailAddresses { get; set; }
+        public List<DTOMailAddresses>? MailAddresses { get; set; }
 
-        public virtual required List<Account> Accounts { get; set; }
+        public required List<DTOAccount> Accounts { get; set; }
 
-        public virtual string? Profession { get; set; }
+        public string? Profession { get; set; }
 
-        public virtual List<Credit>? Credits { get; set; }
+        public List<DTOCredit>? Credits { get; set; }
 
-        public virtual List<CreditCard>? CreditCards { get; set; }
+        public List<DTOCreditCard>? CreditCards { get; set; }
     }
 }
