@@ -12,7 +12,7 @@ namespace BankingApp.Common.DataTransferObjects
     public class DTOCustomer : BaseDTO
     {
         [StringLength(12)]
-        public required string CustomerNo { get; set; }
+        public string? CustomerNo { get; set; }
 
         [StringLength(11)]
         public required string IdentityNo { get; set; }
@@ -29,14 +29,8 @@ namespace BankingApp.Common.DataTransferObjects
 
         public int CreditScore { get; set; }
 
-        public List<DTOMailAddresses>? MailAddresses { get; set; }
+        public string? PrimaryMailAddress { get; set; }
 
-        public required List<DTOAccount> Accounts { get; set; }
-
-        public string? Profession { get; set; }
-
-        public List<DTOCredit>? Credits { get; set; }
-
-        public List<DTOCreditCard>? CreditCards { get; set; }
+        public int Profession { get; set; }
     }
 }

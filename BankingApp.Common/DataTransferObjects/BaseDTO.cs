@@ -10,8 +10,8 @@ namespace BankingApp.Common.DataTransferObjects
     {
         public int Id { get; set; }
 
-        public required DateTime RecordDate { get; set; } = DateTime.Now;
+        public DateTime RecordDate { get; set; } = DateTime.Now;
 
-        public required string RecordScreen { get; set; } = "ADMIN";
+        public string RecordScreen { get; set; } = "ADMIN";
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BankingApp.Common.DataTransferObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace BankingApp.Common.Interfaces
 {
     public partial interface IService
     {
+        public MessageContainer AddMailAddressWithTemporaryPassword(MessageContainer reqMessage);
     }
 }

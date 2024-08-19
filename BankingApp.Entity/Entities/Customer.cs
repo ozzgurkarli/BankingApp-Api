@@ -13,11 +13,11 @@ namespace BankingApp.Entity.Entities
         public new Int64 Id { get; set; }
 
         [StringLength(11)]
-        public required string IdentityNo { get; set; }
+        public string IdentityNo { get; set; }
 
-        public required string Name { get; set; }
+        public string Name { get; set; }
 
-        public required string Surname { get; set; }
+        public string Surname { get; set; }
 
         public bool Gender { get; set; }
 
@@ -27,11 +27,11 @@ namespace BankingApp.Entity.Entities
 
         public int CreditScore { get; set; }
 
-        public virtual required List<MailAddresses> MailAddresses { get; set; }
+        public virtual List<MailAddresses>? MailAddresses { get; set; }
 
-        public virtual required List<Account> Accounts { get; set; }
+        public virtual List<Account>? Accounts { get; set; }
 
-        public virtual string? Profession { get; set; }
+        public virtual int Profession { get; set; }
 
         public virtual List<Credit>? Credits { get; set; }
 
