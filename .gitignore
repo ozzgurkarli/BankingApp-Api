@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /BankingApp.Api/Program.cs
 /BankingApp.Api/Properties/launchSettings.json
 /BankingApp.Entity/Config/BankingDbContext.cs
+/BankingApp.Common/Constants/ENV.cs

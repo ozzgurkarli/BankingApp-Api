@@ -12,6 +12,6 @@ namespace BankingApp.Entity.Entities
 
         public DateTime RecordDate { get; set; } = DateTime.Now;
 
-        public required string RecordScreen { get; set; } = "ADMIN";
+        public string RecordScreen { get; set; } = "ADMIN";
     }
 }
