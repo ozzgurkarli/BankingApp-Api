@@ -10,18 +10,18 @@ namespace BankingApp.Common.DataTransferObjects
     public class DTOAccount : BaseDTO
     {
         [StringLength(12)]
-        public required string CustomerNo { get; set; }
+        public string? CustomerNo { get; set; }
 
         [StringLength(16)]
-        public required string AccountNo { get; set; }
+        public string? AccountNo { get; set; }
 
         public decimal Balance { get; set; }
 
-        public required string Currency { get; set; }
+        public string? Currency { get; set; }
 
         public bool Active { get; set; }
 
-        public required string Branch { get; set; }
+        public string? Branch { get; set; }
 
         public virtual List<DTOTransactionHistory>? TransactionHistory { get; set; }
     }

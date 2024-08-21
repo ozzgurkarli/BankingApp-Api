@@ -12,11 +12,11 @@ namespace BankingApp.Entity
     {
         public readonly BankingDbContext database = new BankingDbContext();
 
-        public Customer Add(Customer item)
+        public async Task<Customer> Add(Customer item)
         {
-            item = database.Add(item).Entity;
+            item = database.AddAsync(item).Result.Entity;
 
-            database.SaveChanges();
+            await database.SaveChangesAsync();
 
             return item;
         }

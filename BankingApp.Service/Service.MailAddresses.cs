@@ -15,7 +15,7 @@ namespace BankingApp.Service
 {
     public partial class Service: IService
     {
-        public MessageContainer AddMailAddressWithTemporaryPassword(MessageContainer reqMessage)
+        public async Task<MessageContainer> AddMailAddressWithTemporaryPassword(MessageContainer reqMessage)
         {
             EMailAddresses eMailAddress = new EMailAddresses();
             DTOCustomer dtoCustomer = reqMessage.Get<DTOCustomer>("Customer");
@@ -24,10 +24,19 @@ namespace BankingApp.Service
 
             eMailAddress.Add(Mapper.Map<MailAddresses>(dtoMailAddress));
             sendMail(new List<string> { dtoMailAddress.MailAddress }, "ParBank Geçici Parola", $"Merhaba {dtoCustomer.Name},<br><br>Bankamıza hoşgeldin. ParBank uygulamasına ilk girişinde kullanabileceğin geçici parola: <strong>{dtoLogin.Password}</strong><br><br>İyi Günler Dileriz.");
+            
+            return new MessageContainer();
+        }
 
-            MessageContainer responseMailAddress = new MessageContainer();
-            responseMailAddress.Add(dtoLogin);
-            return responseMailAddress;
+        public MessageContainer SelectMailAddressByMailAddress(MessageContainer requestMessage)
+        {
+            EMailAddresses eMailAddress = new EMailAddresses();
+            DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
+
+            MessageContainer reqService = new MessageContainer();
+            reqService.Add(Mapper.Map<DTOMailAddresses>(eMailAddress.SelectByMailAddress(Mapper.Map<MailAddresses>(dtoMailAddress))));
+
+            return reqService;
         }
 
         private void sendMail(List<string> toList, string subject, string body)
@@ -49,7 +58,7 @@ namespace BankingApp.Service
             }
             catch (Exception)
             {
-                throw;
+                throw new Exception("Mail gönderilemedi. ozzgur.par@outlook.com adresiyle iletişime geçin.");
             }
         }
     }

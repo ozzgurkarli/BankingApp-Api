@@ -1,5 +1,6 @@
 ﻿using BankingApp.Entity.Config;
 using BankingApp.Entity.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +13,17 @@ namespace BankingApp.Entity
     {
         public readonly BankingDbContext database = new BankingDbContext();
 
-        public Login Add(Login item)
+        public async Task<Login> Add(Login item)
         {
-            item = database.Add(item).Entity;
-            database.SaveChanges();
+            await database.AddAsync(item);
+            database.SaveChangesAsync();
 
             return item;
+        }
+
+        public Task<Login> Select(Login item)
+        {
+            return database.Login.FirstOrDefaultAsync(x => x.IdentityNo.Equals(item.IdentityNo));
         }
     }
 }

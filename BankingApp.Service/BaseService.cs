@@ -31,6 +31,26 @@ namespace BankingApp.Service
             CreateMap<Login, DTOLogin>();
             #endregion login
 
+            #region account
+            CreateMap<DTOAccount, Account>().AfterMap((src, dest) =>
+            {
+                dest.AccountNo ??= string.Empty;
+
+                if (dest.Customer != null)
+                {
+                    dest.Customer.Id = Convert.ToInt64(src.CustomerNo);
+                }
+                else
+                {
+                    dest.Customer = new Customer { Id = Convert.ToInt64(src.CustomerNo) };
+                }
+            });
+            CreateMap<Account, DTOAccount>().AfterMap((src, dest) =>
+            {
+                dest.CustomerNo = src.Customer.Id.ToString();
+            });
+            #endregion account
+
             #region mailaddresses
             CreateMap<DTOMailAddresses, MailAddresses>()
                 .AfterMap((src, dest) =>
@@ -44,8 +64,12 @@ namespace BankingApp.Service
                         dest.Customer = new Customer { Id = Convert.ToInt64(src.CustomerNo) };
                     }
                 });
-            CreateMap<MailAddresses, DTOMailAddresses>();
+            CreateMap<MailAddresses, DTOMailAddresses>().AfterMap((src, dest) =>
+            {
+                dest.CustomerNo = src.Customer.Id.ToString();
+            });
             #endregion mailaddresses
         }
+
     }
 }

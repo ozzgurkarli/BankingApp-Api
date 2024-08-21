@@ -9,6 +9,8 @@ namespace BankingApp.Common.Interfaces
 {
     public partial interface IService
     {
-        public MessageContainer AddMailAddressWithTemporaryPassword(MessageContainer reqMessage);
+        public Task<MessageContainer> AddMailAddressWithTemporaryPassword(MessageContainer reqMessage);
+
+        public MessageContainer SelectMailAddressByMailAddress(MessageContainer requestMessage);
     }
 }

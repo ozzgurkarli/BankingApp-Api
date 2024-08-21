@@ -14,6 +14,6 @@ namespace BankingApp.Common.Interfaces
             return new T();
         }
 
-        public MessageContainer CreateCustomer(MessageContainer requestMessage);
+        public Task<MessageContainer> CreateCustomer(MessageContainer requestMessage);
     }
 }

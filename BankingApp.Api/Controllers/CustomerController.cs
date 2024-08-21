@@ -10,21 +10,32 @@ namespace BankingApp.Api.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
-        private readonly IService _myService;
+        private readonly IService _proxy;
 
-        public CustomerController(IService myService)
+        public CustomerController(IService proxy)
         {
-            _myService = myService;
+            _proxy = proxy;
         }
         [HttpPost("Create")]
         public async Task<IActionResult> Post(DTOCustomer customer)
         {
             MessageContainer message = new MessageContainer();
+            message.Add(new DTOMailAddresses { MailAddress = customer.PrimaryMailAddress!, CustomerNo = "1" });
+            message.Add(new DTOLogin { IdentityNo = customer.IdentityNo! });
+
+            try
+            {
+                await _proxy.RegisterCheckDataAlreadyInUse(message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            message.Clear();
             message.Add(customer);
 
-            message = _myService.CreateCustomer(message);
-
-            return Ok(message);
+            return Ok(await _proxy.CreateCustomer(message));
         }
     }
 }

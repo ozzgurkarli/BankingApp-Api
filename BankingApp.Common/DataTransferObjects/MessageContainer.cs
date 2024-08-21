@@ -12,7 +12,7 @@ namespace BankingApp.Common.DataTransferObjects
 
         public void Add(object content)
         {
-            Contents.Add(string.Empty, content);
+            Contents.Add(content.GetType().FullName!, content);
         }
 
         public void Add(string key, object content)

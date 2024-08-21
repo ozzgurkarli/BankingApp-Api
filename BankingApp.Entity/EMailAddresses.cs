@@ -13,13 +13,18 @@ namespace BankingApp.Entity
     {
         public readonly BankingDbContext database = new BankingDbContext();
 
-        public MailAddresses Add(MailAddresses item)
+        public async Task<MailAddresses> Add(MailAddresses item)
         {
             database.Entry(item.Customer).State = EntityState.Unchanged;
-            item = database.Add(item).Entity;
-            database.SaveChanges();
+            await database.AddAsync(item);
+            database.SaveChangesAsync();
 
             return item;
+        }
+
+        public Task<MailAddresses> SelectByMailAddress(MailAddresses item)
+        {
+            return database.MailAddress.FirstOrDefaultAsync(x => x.MailAddress.Equals(item.MailAddress));
         }
     }
 }

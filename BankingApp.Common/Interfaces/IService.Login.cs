@@ -10,5 +10,7 @@ namespace BankingApp.Common.Interfaces
     public partial interface IService
     {
         public MessageContainer RegisterCustomer(MessageContainer requestMessage);
+
+        public Task<MessageContainer> RegisterCheckDataAlreadyInUse(MessageContainer requestMessage);
     }
 }

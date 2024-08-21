@@ -28,5 +28,29 @@ namespace BankingApp.Service
 
             return random.Next(100000, 1000000);
         }
+
+        public async Task<MessageContainer> RegisterCheckDataAlreadyInUse(MessageContainer requestMessage)
+        {
+            EMailAddresses eMailAddress = new EMailAddresses();
+            ELogin eLogin = new ELogin();
+
+            DTOLogin dtoLogin = requestMessage.Get<DTOLogin>();
+            DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
+            
+            dtoMailAddress = Mapper.Map<DTOMailAddresses>(await eMailAddress.SelectByMailAddress(Mapper.Map<MailAddresses>(dtoMailAddress)));
+            dtoLogin = Mapper.Map<DTOLogin>(await eLogin.Select(Mapper.Map<Login>(dtoLogin)));
+
+
+            if (dtoMailAddress != null)
+            {
+                throw new Exception("Bu mail adresi kullanılıyor");
+            }
+            else if(dtoLogin != null)
+            {
+                throw new Exception("Müşteri zaten kayıtlı.");
+            }
+
+            return new MessageContainer();
+        }
     }
 }
