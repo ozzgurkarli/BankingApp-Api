@@ -46,5 +46,18 @@ namespace BankingApp.Service
 
             return reqService;
         }
+
+        public async Task<MessageContainer> GetCustomerByIdentityNo(MessageContainer requestMessage)
+        {
+            MessageContainer response = new MessageContainer();
+            ECustomer eCustomer = new ECustomer();
+            DTOCustomer dtoCustomer = requestMessage.Get<DTOCustomer>();
+
+            dtoCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetByIdentityNo(Mapper.Map<Customer>(dtoCustomer)));
+
+            response.Add(dtoCustomer);
+
+            return response;
+        }
     }
 }

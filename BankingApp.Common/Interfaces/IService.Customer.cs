@@ -15,5 +15,7 @@ namespace BankingApp.Common.Interfaces
         }
 
         public Task<MessageContainer> CreateCustomer(MessageContainer requestMessage);
+
+        public Task<MessageContainer> GetCustomerByIdentityNo(MessageContainer requestMessage);
     }
 }

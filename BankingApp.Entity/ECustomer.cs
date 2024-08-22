@@ -1,5 +1,6 @@
 ﻿using BankingApp.Entity.Config;
 using BankingApp.Entity.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,11 @@ namespace BankingApp.Entity
             await database.SaveChangesAsync();
 
             return item;
+        }
+
+        public async Task<Customer> GetByIdentityNo(Customer item)
+        {
+            return await database.Customer.FirstOrDefaultAsync(x => x.IdentityNo.Equals(item.IdentityNo));
         }
     }
 }

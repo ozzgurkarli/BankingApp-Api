@@ -13,11 +13,11 @@ namespace BankingApp.Entity.Entities
         public new Int64 Id { get; set; }
 
         [StringLength(11)]
-        public string IdentityNo { get; set; }
+        public string? IdentityNo { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string Surname { get; set; }
+        public string? Surname { get; set; }
 
         public bool Gender { get; set; }
 

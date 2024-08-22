@@ -21,9 +21,21 @@ namespace BankingApp.Entity
             return item;
         }
 
-        public Task<Login> Select(Login item)
+        public async Task<Login> Update(Login item)
         {
-            return database.Login.FirstOrDefaultAsync(x => x.IdentityNo.Equals(item.IdentityNo));
+            Login temp = database.Login.FirstOrDefault(x=> x.IdentityNo.Equals(item.IdentityNo));
+
+            temp.Password = item.Password;
+
+            database.Update(temp);
+            await database.SaveChangesAsync();
+
+            return temp;
+        }
+
+        public async Task<Login> Select(Login item)
+        {
+            return await database.Login.FirstOrDefaultAsync(x => x.IdentityNo.Equals(item.IdentityNo));
         }
     }
 }

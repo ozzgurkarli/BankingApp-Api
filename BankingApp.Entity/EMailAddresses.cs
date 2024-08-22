@@ -22,9 +22,14 @@ namespace BankingApp.Entity
             return item;
         }
 
-        public Task<MailAddresses> SelectByMailAddress(MailAddresses item)
+        public Task<MailAddresses> GetByMailAddress(MailAddresses item)
         {
             return database.MailAddress.FirstOrDefaultAsync(x => x.MailAddress.Equals(item.MailAddress));
+        }
+
+        public async Task<MailAddresses> GetPrimaryAddressByCustomerNo(MailAddresses item)
+        {
+            return await database.MailAddress.FirstOrDefaultAsync(x => x.Customer.Id.Equals(item.Customer.Id) && x.Primary);
         }
     }
 }

@@ -10,9 +10,9 @@ namespace BankingApp.Common.DataTransferObjects
     public class DTOMailAddresses : BaseDTO
     {
         [StringLength(12)]
-        public required string CustomerNo { get; set; }
+        public string? CustomerNo { get; set; }
 
-        public required string MailAddress { get; set; }
+        public string? MailAddress { get; set; }
 
         public bool Primary { get; set; }
     }

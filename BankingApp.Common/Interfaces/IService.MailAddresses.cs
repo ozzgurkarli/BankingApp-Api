@@ -12,5 +12,7 @@ namespace BankingApp.Common.Interfaces
         public Task<MessageContainer> AddMailAddressWithTemporaryPassword(MessageContainer reqMessage);
 
         public MessageContainer SelectMailAddressByMailAddress(MessageContainer requestMessage);
+
+        public Task<MessageContainer> GetPrimaryMailAddressByCustomerNo(MessageContainer requestMessage);
     }
 }
