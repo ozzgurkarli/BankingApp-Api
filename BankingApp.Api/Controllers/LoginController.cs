@@ -29,10 +29,12 @@ namespace BankingApp.Api.Controllers
         }
 
         [HttpPut("UpdatePassword")]
-        public async Task<IActionResult> UpdatePassword([FromBody] MessageContainer requestMessage)
+        public async Task<IActionResult> UpdatePassword([FromBody] DTOLogin dtoLogin)
         {
+            MessageContainer requestMessage = new MessageContainer();
             MessageContainer response = new MessageContainer();
 
+            requestMessage.Add(dtoLogin);
             response = await _proxy.UpdatePassword(requestMessage);
 
             return Ok(response);
