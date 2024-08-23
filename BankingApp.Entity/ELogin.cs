@@ -26,6 +26,7 @@ namespace BankingApp.Entity
             Login temp = database.Login.FirstOrDefault(x=> x.IdentityNo.Equals(item.IdentityNo));
 
             temp.Password = item.Password;
+            temp.Temporary = item.Temporary;
 
             database.Update(temp);
             await database.SaveChangesAsync();

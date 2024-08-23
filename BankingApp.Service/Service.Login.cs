@@ -35,7 +35,10 @@ namespace BankingApp.Service
             MessageContainer responseTask = new MessageContainer();
             ELogin eLogin = new ELogin();
 
-            DTOLogin dtoLogin = Mapper.Map<DTOLogin>(await eLogin.Update(Mapper.Map<Login>(requestMessage.Get<DTOLogin>())));
+            DTOLogin dtoLogin = requestMessage.Get<DTOLogin>();
+            dtoLogin.Temporary = false;
+
+            dtoLogin = Mapper.Map<DTOLogin>(await eLogin.Update(Mapper.Map<Login>(dtoLogin)));
 
             if(dtoLogin == null)
             {

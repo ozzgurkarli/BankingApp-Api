@@ -25,7 +25,17 @@ namespace BankingApp.Api.Controllers
 
             responseMessage = await _proxy.GetLoginCredentials(requestMessage);
 
-            return Ok(responseMessage.Get<DTOLogin>());
+            return Ok(responseMessage);
+        }
+
+        [HttpPut("UpdatePassword")]
+        public async Task<IActionResult> UpdatePassword([FromBody] MessageContainer requestMessage)
+        {
+            MessageContainer response = new MessageContainer();
+
+            response = await _proxy.UpdatePassword(requestMessage);
+
+            return Ok(response);
         }
     }
 }

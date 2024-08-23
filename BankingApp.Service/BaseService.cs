@@ -75,7 +75,10 @@ namespace BankingApp.Service
                 });
             CreateMap<MailAddresses, DTOMailAddresses>().AfterMap((src, dest) =>
             {
-                dest.CustomerNo = src.Customer.Id.ToString();
+                if(src.Customer != null)
+                {
+                    dest.CustomerNo = src.Customer.Id.ToString();
+                }
             });
             #endregion mailaddresses
         }
