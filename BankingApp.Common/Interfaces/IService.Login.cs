@@ -12,5 +12,9 @@ namespace BankingApp.Common.Interfaces
         public MessageContainer RegisterCustomer(MessageContainer requestMessage);
 
         public Task<MessageContainer> RegisterCheckDataAlreadyInUse(MessageContainer requestMessage);
+
+        public Task<MessageContainer> GetLoginCredentials(MessageContainer requestMessage);
+
+        public Task<MessageContainer> UpdatePassword(MessageContainer requestMessage);
     }
 }

@@ -15,11 +15,11 @@ namespace BankingApp.Common.DataTransferObjects
         public string? CustomerNo { get; set; }
 
         [StringLength(11)]
-        public required string IdentityNo { get; set; }
+        public  string? IdentityNo { get; set; }
 
-        public required string Name { get; set; }
+        public  string? Name { get; set; }
 
-        public required string Surname { get; set; }
+        public  string? Surname { get; set; }
 
         public bool Gender { get; set; }
 

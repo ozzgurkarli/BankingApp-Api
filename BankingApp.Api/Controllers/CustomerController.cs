@@ -16,8 +16,10 @@ namespace BankingApp.Api.Controllers
         {
             _proxy = proxy;
         }
-        [HttpPost("Create")]
-        public async Task<IActionResult> Post(DTOCustomer customer)
+
+
+        [HttpPost("CreateCustomer")]
+        public async Task<IActionResult> CreateCustomer(DTOCustomer customer)
         {
             MessageContainer message = new MessageContainer();
             message.Add(new DTOMailAddresses { MailAddress = customer.PrimaryMailAddress!, CustomerNo = "1" });

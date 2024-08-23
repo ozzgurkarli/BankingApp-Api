@@ -21,6 +21,8 @@ namespace BankingApp.Common.DataTransferObjects
 
         public bool Active { get; set; }
 
+        public bool Primary { get; set; }
+
         public string? Branch { get; set; }
 
         public virtual List<DTOTransactionHistory>? TransactionHistory { get; set; }

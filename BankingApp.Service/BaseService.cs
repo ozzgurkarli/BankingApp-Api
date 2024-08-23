@@ -19,11 +19,20 @@ namespace BankingApp.Service
         public MappingProfile()
         {
             #region customer
-            CreateMap<DTOCustomer, Customer>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CustomerNo));
+            CreateMap<DTOCustomer, Customer>().AfterMap((src, dest) =>
+            {
+                dest.Id = Convert.ToInt64(src.CustomerNo);
+            });
 
-            CreateMap<Customer, DTOCustomer>()
-                .ForMember(dest => dest.CustomerNo, opt => opt.MapFrom(src => src.Id));
+            CreateMap<Customer, DTOCustomer>().AfterMap((src, dest) =>
+            {
+                dest.CustomerNo = src.Id.ToString();
+
+                if(src.MailAddresses != null && src.MailAddresses.FirstOrDefault(x=> x.Primary) != null)
+                {
+                    dest.PrimaryMailAddress = src.MailAddresses.FirstOrDefault(x => x.Primary)!.MailAddress;
+                }
+            });
             #endregion customer
 
             #region login
@@ -66,7 +75,10 @@ namespace BankingApp.Service
                 });
             CreateMap<MailAddresses, DTOMailAddresses>().AfterMap((src, dest) =>
             {
-                dest.CustomerNo = src.Customer.Id.ToString();
+                if(src.Customer != null)
+                {
+                    dest.CustomerNo = src.Customer.Id.ToString();
+                }
             });
             #endregion mailaddresses
         }

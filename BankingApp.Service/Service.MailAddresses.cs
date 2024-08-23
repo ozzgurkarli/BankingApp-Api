@@ -34,7 +34,18 @@ namespace BankingApp.Service
             DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
 
             MessageContainer reqService = new MessageContainer();
-            reqService.Add(Mapper.Map<DTOMailAddresses>(eMailAddress.SelectByMailAddress(Mapper.Map<MailAddresses>(dtoMailAddress))));
+            reqService.Add(Mapper.Map<DTOMailAddresses>(eMailAddress.GetByMailAddress(Mapper.Map<MailAddresses>(dtoMailAddress))));
+
+            return reqService;
+        }
+
+        public async Task<MessageContainer> GetPrimaryMailAddressByCustomerNo(MessageContainer requestMessage)
+        {
+            EMailAddresses eMailAddress = new EMailAddresses();
+            DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
+
+            MessageContainer reqService = new MessageContainer();
+            reqService.Add(Mapper.Map<DTOMailAddresses>(await eMailAddress.GetPrimaryAddressByCustomerNo(Mapper.Map<MailAddresses>(dtoMailAddress))));
 
             return reqService;
         }
