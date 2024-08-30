@@ -25,6 +25,8 @@ namespace BankingApp.Entity.Entities
 
         public string? PhoneNo { get; set; }
 
+        public decimal Salary { get; set; }
+
         public int CreditScore { get; set; }
 
         public virtual List<MailAddresses>? MailAddresses { get; set; }

@@ -15,13 +15,13 @@ namespace BankingApp.Common.DataTransferObjects
         [StringLength(16)]
         public string? AccountNo { get; set; }
 
-        public decimal Balance { get; set; }
+        public decimal? Balance { get; set; }
 
         public string? Currency { get; set; }
 
-        public bool Active { get; set; }
+        public bool? Active { get; set; }
 
-        public bool Primary { get; set; }
+        public bool? Primary { get; set; }
 
         public string? Branch { get; set; }
 

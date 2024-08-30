@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BankingApp.Common.DataTransferObjects
@@ -40,5 +41,11 @@ namespace BankingApp.Common.DataTransferObjects
         {
             return (T)Contents[key];
         }
+
+        public T ToObject<T>(MessageContainer msg, string key)
+        {
+            return JsonSerializer.Deserialize<T>(msg.Get<JsonElement>(key).GetRawText(), options: new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+
     }
 }

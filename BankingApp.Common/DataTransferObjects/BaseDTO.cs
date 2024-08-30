@@ -8,7 +8,7 @@ namespace BankingApp.Common.DataTransferObjects
 {
     public class BaseDTO
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         public DateTime RecordDate { get; set; } = DateTime.Now;
 

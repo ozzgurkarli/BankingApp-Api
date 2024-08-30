@@ -70,12 +70,10 @@ namespace BankingApp.Service
             ELogin eLogin = new ELogin();
             DTOLogin dtoLogin = Mapper.Map<DTOLogin>(await eLogin.Select(Mapper.Map<Login>(requestMessage.Get<DTOLogin>())));
 
-            if(dtoLogin == null)
+            if(dtoLogin != null)
             {
-                throw new Exception("Müşteri bulunamadı.");
+                response.Add(dtoLogin);
             }
-
-            response.Add(dtoLogin);
 
             return response;
         }
