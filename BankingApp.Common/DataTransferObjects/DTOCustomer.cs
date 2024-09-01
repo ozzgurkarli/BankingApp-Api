@@ -21,9 +21,11 @@ namespace BankingApp.Common.DataTransferObjects
 
         public  string? Surname { get; set; }
 
-        public bool? Gender { get; set; }
+        public int? Gender { get; set; }
 
         public bool? Active { get; set; }
+
+        public decimal? Salary { get; set; }
 
         public string? PhoneNo { get; set; }
 
@@ -33,6 +35,6 @@ namespace BankingApp.Common.DataTransferObjects
 
         public int? Profession { get; set; }
 
-        public string? Branch { get; set; }
+        public int? Branch { get; set; }
     }
 }

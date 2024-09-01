@@ -17,6 +17,16 @@ namespace BankingApp.Api.Controllers
             _proxy = proxy;
         }
 
+        [HttpPost("GetCustomerByIdentityNo")]
+        public async Task<IActionResult> GetCustomerByIdentityNo(MessageContainer message)
+        {
+            MessageContainer requestMessage = new MessageContainer();
+            DTOCustomer dtoCustomer = message.ToObject<DTOCustomer>(message, "DTOCustomer");
+            requestMessage.Add(dtoCustomer);
+
+            return Ok(await _proxy.GetCustomerByIdentityNo(requestMessage));
+        }
+
 
         [HttpPost("CreateCustomer")]
         public async Task<IActionResult> CreateCustomer(MessageContainer message)

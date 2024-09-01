@@ -17,12 +17,12 @@ namespace BankingApp.Api.Controllers
             _proxy = proxy;
         }
 
-        [HttpGet("GetLoginCredentials")]
-        public async Task<IActionResult> GetLoginCredentials([FromQuery] string identityNo)
+        [HttpPost("GetLoginCredentials")]
+        public async Task<IActionResult> GetLoginCredentials([FromBody] MessageContainer message)
         {
             MessageContainer requestMessage = new MessageContainer();
             MessageContainer responseMessage = new MessageContainer();
-            requestMessage.Add(new DTOLogin { IdentityNo = identityNo});
+            requestMessage.Add(message.ToObject<DTOLogin>(message, "DTOLogin"));
 
             responseMessage = await _proxy.GetLoginCredentials(requestMessage);
 
