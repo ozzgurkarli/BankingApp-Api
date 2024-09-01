@@ -2,6 +2,7 @@
 using BankingApp.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace BankingApp.Api.Controllers
 {
@@ -16,12 +17,12 @@ namespace BankingApp.Api.Controllers
             _proxy = proxy;
         }
 
-        [HttpGet("GetLoginCredentials")]
-        public async Task<IActionResult> GetLoginCredentials([FromQuery] string identityNo)
+        [HttpPost("GetLoginCredentials")]
+        public async Task<IActionResult> GetLoginCredentials([FromBody] MessageContainer message)
         {
             MessageContainer requestMessage = new MessageContainer();
             MessageContainer responseMessage = new MessageContainer();
-            requestMessage.Add(new DTOLogin { IdentityNo = identityNo});
+            requestMessage.Add(message.ToObject<DTOLogin>(message, "DTOLogin"));
 
             responseMessage = await _proxy.GetLoginCredentials(requestMessage);
 
@@ -29,10 +30,12 @@ namespace BankingApp.Api.Controllers
         }
 
         [HttpPut("UpdatePassword")]
-        public async Task<IActionResult> UpdatePassword([FromBody] DTOLogin dtoLogin)
+        public async Task<IActionResult> UpdatePassword([FromBody] MessageContainer message)
         {
             MessageContainer requestMessage = new MessageContainer();
             MessageContainer response = new MessageContainer();
+
+            DTOLogin dtoLogin = message.ToObject<DTOLogin>(message, "DTOLogin");
 
             requestMessage.Add(dtoLogin);
             response = await _proxy.UpdatePassword(requestMessage);

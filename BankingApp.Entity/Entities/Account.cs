@@ -23,7 +23,7 @@ namespace BankingApp.Entity.Entities
 
         public bool Primary { get; set; }
 
-        public required string Branch { get; set; }
+        public required int Branch { get; set; }
 
         public virtual List<TransactionHistory>? TransactionHistory { get; set; }
     }

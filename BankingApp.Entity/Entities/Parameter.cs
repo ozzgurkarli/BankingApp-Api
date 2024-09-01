@@ -12,7 +12,7 @@ namespace BankingApp.Entity.Entities
 
         public int Code { get; set; }
 
-        public required string Description { get; set; }
+        public string? Description { get; set; }
 
         public string? Detail1 { get; set; }
 

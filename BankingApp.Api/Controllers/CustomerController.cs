@@ -17,17 +17,29 @@ namespace BankingApp.Api.Controllers
             _proxy = proxy;
         }
 
+        [HttpPost("GetCustomerByIdentityNo")]
+        public async Task<IActionResult> GetCustomerByIdentityNo(MessageContainer message)
+        {
+            MessageContainer requestMessage = new MessageContainer();
+            DTOCustomer dtoCustomer = message.ToObject<DTOCustomer>(message, "DTOCustomer");
+            requestMessage.Add(dtoCustomer);
+
+            return Ok(await _proxy.GetCustomerByIdentityNo(requestMessage));
+        }
+
 
         [HttpPost("CreateCustomer")]
-        public async Task<IActionResult> CreateCustomer(DTOCustomer customer)
+        public async Task<IActionResult> CreateCustomer(MessageContainer message)
         {
-            MessageContainer message = new MessageContainer();
-            message.Add(new DTOMailAddresses { MailAddress = customer.PrimaryMailAddress!, CustomerNo = "1" });
-            message.Add(new DTOLogin { IdentityNo = customer.IdentityNo! });
+            MessageContainer requestMessage = new MessageContainer();
+
+            DTOCustomer customer = message.ToObject<DTOCustomer>(message, "DTOCustomer");
+            requestMessage.Add(new DTOMailAddresses { MailAddress = customer.PrimaryMailAddress!, CustomerNo = "1" });
+            requestMessage.Add(new DTOLogin { IdentityNo = customer.IdentityNo! });
 
             try
             {
-                await _proxy.RegisterCheckDataAlreadyInUse(message);
+                await _proxy.RegisterCheckDataAlreadyInUse(requestMessage);
             }
             catch (Exception ex)
             {

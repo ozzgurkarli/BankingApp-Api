@@ -40,6 +40,11 @@ namespace BankingApp.Service
             CreateMap<Login, DTOLogin>();
             #endregion login
 
+            #region parameter
+            CreateMap<DTOParameter, Parameter>();
+            CreateMap<Parameter, DTOParameter>();
+            #endregion parameter
+
             #region account
             CreateMap<DTOAccount, Account>().AfterMap((src, dest) =>
             {

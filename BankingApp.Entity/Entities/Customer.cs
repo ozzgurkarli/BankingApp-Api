@@ -19,11 +19,13 @@ namespace BankingApp.Entity.Entities
 
         public string? Surname { get; set; }
 
-        public bool Gender { get; set; }
+        public int Gender { get; set; }
 
         public bool Active { get; set; }
 
         public string? PhoneNo { get; set; }
+
+        public decimal Salary { get; set; }
 
         public int CreditScore { get; set; }
 

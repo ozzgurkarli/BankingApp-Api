@@ -14,6 +14,6 @@ namespace BankingApp.Common.DataTransferObjects
 
         public string? MailAddress { get; set; }
 
-        public bool Primary { get; set; }
+        public bool? Primary { get; set; }
     }
 }
