@@ -24,5 +24,23 @@ namespace BankingApp.Service
 
             return response;
         }
+
+        public async Task<MessageContainer> GetAccountsByFilter(MessageContainer requestMessage)
+        {
+            MessageContainer response = new MessageContainer();
+            EAccount eAccount = new EAccount();
+
+            DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
+
+            List<DTOAccount> accountList = Mapper.Map<List<DTOAccount>>(await eAccount.GetAll()).Where(x => x.Active == true).ToList();
+
+            if(dtoAccount.CustomerNo != null)
+            {
+                accountList = accountList.Where(x => x.CustomerNo.Equals(dtoAccount.CustomerNo)).ToList();
+            }
+
+            response.Add(accountList);
+            return response;
+        }
     }
 }
