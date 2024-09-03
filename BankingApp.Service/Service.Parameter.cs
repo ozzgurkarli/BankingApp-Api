@@ -16,9 +16,8 @@ namespace BankingApp.Service
         {
             EParameter eParameter = new EParameter();
             MessageContainer response = new MessageContainer();
-            Parameter p = Mapper.Map<Parameter>(requestMessage.Get<DTOParameter>());
-            List<Parameter> pl = await eParameter.GetParametersByGroupCode(Mapper.Map<Parameter>(requestMessage.Get<DTOParameter>()));
-            response.Add("ParameterList", Mapper.Map<List<DTOParameter>>(pl));
+
+            response.Add("ParameterList", Mapper.Map<List<DTOParameter>>(await eParameter.GetParametersByGroupCode(Mapper.Map<Parameter>(requestMessage.Get<DTOParameter>()))));
 
             return response;
         }

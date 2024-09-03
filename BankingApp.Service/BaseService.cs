@@ -65,6 +65,26 @@ namespace BankingApp.Service
             });
             #endregion account
 
+            #region creditcard
+            CreateMap<DTOCreditCard, CreditCard>().AfterMap((src, dest) =>
+            {
+                dest.CardNo ??= string.Empty;
+
+                if (dest.Customer != null)
+                {
+                    dest.Customer.Id = Convert.ToInt64(src.CustomerNo);
+                }
+                else
+                {
+                    dest.Customer = new Customer { Id = Convert.ToInt64(src.CustomerNo) };
+                }
+            });
+            CreateMap<CreditCard, DTOCreditCard>().AfterMap((src, dest) =>
+            {
+                dest.CustomerNo = src.Customer.Id.ToString();
+            });
+            #endregion creditcard
+
             #region mailaddresses
             CreateMap<DTOMailAddresses, MailAddresses>()
                 .AfterMap((src, dest) =>

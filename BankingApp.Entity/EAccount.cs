@@ -34,5 +34,11 @@ namespace BankingApp.Entity
 
             return item;
         }
+
+
+        public async Task<List<Account>> GetAll()
+        {
+            return await database.Account.ToListAsync();
+        }
     }
 }
