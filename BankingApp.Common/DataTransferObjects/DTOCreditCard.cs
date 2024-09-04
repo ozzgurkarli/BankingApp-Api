@@ -29,6 +29,8 @@ namespace BankingApp.Common.DataTransferObjects
 
         public int? Type { get; set; }
 
+        public string? TypeName { get; set; }
+
         public decimal? OutstandingBalance { get; set; }
     }
 }

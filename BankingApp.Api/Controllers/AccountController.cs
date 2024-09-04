@@ -35,5 +35,21 @@ namespace BankingApp.Api.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("AddAccount")]
+        public async Task<IActionResult> AddAccount(MessageContainer requestMessage){
+            DTOAccount dtoAccount = requestMessage.ToObject<DTOAccount>(requestMessage, "DTOAccount");
+
+            MessageContainer requestAccount = new MessageContainer();
+
+            requestAccount.Add(dtoAccount);
+
+            MessageContainer responseAcc = await _proxy.CreateAccount(requestAccount);
+            MessageContainer response = new MessageContainer();
+
+            response.Add("Account", responseAcc.Get<DTOAccount>());
+
+            return Ok(response);
+        }
     }
 }

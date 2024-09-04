@@ -28,6 +28,7 @@ namespace BankingApp.Api.Controllers
             requestCCard.Add(dtoCreditCard);
 
             MessageContainer responseCC = await _proxy.GetCreditCardsByFilter(requestCCard);
+
             MessageContainer response = new MessageContainer();
 
             response.Add("CCList", responseCC.Get<List<DTOCreditCard>>());
