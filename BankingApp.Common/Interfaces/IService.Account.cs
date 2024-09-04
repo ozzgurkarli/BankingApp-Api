@@ -10,5 +10,7 @@ namespace BankingApp.Common.Interfaces
     public partial interface IService
     {
         public Task<MessageContainer> CreateAccount(MessageContainer requestMessage);
+
+        public Task<MessageContainer> GetAccountsByFilter(MessageContainer requestMessage);
     }
 }
