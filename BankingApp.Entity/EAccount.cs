@@ -38,7 +38,7 @@ namespace BankingApp.Entity
 
         public async Task<List<Account>> GetAll()
         {
-            return await database.Account.ToListAsync();
+            return await database.Account.Include(x=> x.Customer).ToListAsync();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace BankingApp.Service
             EAccount eAccount = new EAccount();
 
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
-
+            
             List<DTOAccount> accountList = Mapper.Map<List<DTOAccount>>(await eAccount.GetAll()).Where(x => x.Active == true).ToList();
 
             if(dtoAccount.CustomerNo != null)

@@ -10,10 +10,10 @@ namespace BankingApp.Common.DataTransferObjects
     public class DTOCreditCard : BaseDTO
     {
         [StringLength(12)]
-        public required string CustomerNo { get; set; }
+        public string? CustomerNo { get; set; }
 
         [StringLength(16)]
-        public required string CardNo { get; set; }
+        public string? CardNo { get; set; }
 
         public decimal? Limit { get; set; }
 
@@ -27,7 +27,7 @@ namespace BankingApp.Common.DataTransferObjects
 
         public Int16? BillingDay { get; set; }
 
-        public virtual required int Type { get; set; }
+        public int? Type { get; set; }
 
         public decimal? OutstandingBalance { get; set; }
     }
