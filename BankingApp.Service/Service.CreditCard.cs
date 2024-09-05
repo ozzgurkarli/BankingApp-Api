@@ -34,5 +34,24 @@ namespace BankingApp.Service
             response.Add(cardList);
             return response;
         }
+
+        public async Task<MessageContainer> NewCardApplication(MessageContainer requestMessage){
+            ECreditCard eCreditCard = new ECreditCard();
+            EAccountTracker eAccountTracker = new EAccountTracker();
+            DTOCreditCard dtoCreditCard = requestMessage.Get<DTOCreditCard>();
+            
+            Random rnd = new Random();
+            DateTime cvvDate = DateTime.Now.AddMonths(50);
+
+            dtoCreditCard.Active = true;
+            dtoCreditCard.ExpirationDate = DateTime.Now.AddMonths(50);
+            dtoCreditCard.CVV = Int16.Parse(rnd.Next(100,1000).ToString());
+
+            dtoCreditCard.CardNo = "530129" + (await eAccountTracker.GetAndIncrease(new AccountTracker{Currency = "CC"})).FirstAvailableNo;
+
+            await eCreditCard.Add(Mapper.Map<CreditCard>(dtoCreditCard));
+
+            return new MessageContainer();
+        }
     }
 }
