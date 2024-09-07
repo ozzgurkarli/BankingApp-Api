@@ -10,5 +10,7 @@ namespace BankingApp.Common.Interfaces
     public partial interface IService
     {
         public Task<MessageContainer> GetCreditCardsByFilter(MessageContainer requestMessage);
+
+        public Task<MessageContainer> NewCardApplication(MessageContainer requestMessage);
     }
 }

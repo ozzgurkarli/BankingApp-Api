@@ -18,6 +18,8 @@ namespace BankingApp.Entity.Entities
 
         public decimal CurrentDebt { get; set; }
 
+        public decimal TotalDebt { get; set; }
+
         public bool Active { get; set; }
 
         public Int16 CVV { get; set; }

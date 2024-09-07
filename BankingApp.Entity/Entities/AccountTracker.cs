@@ -9,9 +9,9 @@ namespace BankingApp.Entity.Entities
 {
     public class AccountTracker: BaseEntity
     {
-        public required string Currency { get; set; }
+        public string? Currency { get; set; }
 
         [StringLength(16)]
-        public required string FirstAvailableNo { get; set; }
+        public string? FirstAvailableNo { get; set; }
     }
 }

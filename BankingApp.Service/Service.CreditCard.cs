@@ -1,6 +1,7 @@
 ﻿using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
 using BankingApp.Entity;
+using BankingApp.Entity.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,15 @@ namespace BankingApp.Service
         {
             MessageContainer response = new MessageContainer();
             ECreditCard eCreditCard = new ECreditCard();
+            EParameter eParameter = new EParameter();
 
             DTOCreditCard dtoCard = requestMessage.Get<DTOCreditCard>();
 
             List<DTOCreditCard> cardList = Mapper.Map<List<DTOCreditCard>>(await eCreditCard.GetAll()).Where(x=> x.Active == true).ToList();
 
+            foreach(DTOCreditCard cc in cardList){
+                cc.TypeName = Mapper.Map<DTOParameter>(await eParameter.GetParameter(Mapper.Map<Parameter>(new DTOParameter{GroupCode="CardType", Code = cc.Type}))).Description;
+            }
             if (dtoCard.CustomerNo != null)
             {
                 cardList = cardList.Where(x => x.CustomerNo.Equals(dtoCard.CustomerNo)).ToList();
@@ -28,6 +33,33 @@ namespace BankingApp.Service
 
             response.Add(cardList);
             return response;
+        }
+
+        public async Task<MessageContainer> NewCardApplication(MessageContainer requestMessage){
+            ECreditCard eCreditCard = new ECreditCard();
+            EAccountTracker eAccountTracker = new EAccountTracker();
+            DTOCreditCard dtoCreditCard = requestMessage.Get<DTOCreditCard>();
+            
+            Random rnd = new Random();
+            DateTime cvvDate = DateTime.Now.AddMonths(50);
+
+            dtoCreditCard.Active = true;
+            dtoCreditCard.ExpirationDate = DateTime.Now.AddMonths(50);
+            dtoCreditCard.CVV = Int16.Parse(rnd.Next(100,1000).ToString());
+            dtoCreditCard.OutstandingBalance = dtoCreditCard.Limit;
+
+            dtoCreditCard.CardNo = "530129";
+            string firstAvailableNo = (await eAccountTracker.GetAndIncrease(new AccountTracker{Currency = "CC"})).FirstAvailableNo;
+
+            for (int i = 0; i < 10 - int.Parse(firstAvailableNo); i++)
+            {
+                dtoCreditCard.CardNo += "0";
+            }
+            dtoCreditCard.CardNo += firstAvailableNo;
+
+            await eCreditCard.Add(Mapper.Map<CreditCard>(dtoCreditCard));
+
+            return new MessageContainer();
         }
     }
 }

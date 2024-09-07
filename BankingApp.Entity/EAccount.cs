@@ -15,22 +15,10 @@ namespace BankingApp.Entity
 
         public async Task<Account> Add(Account item)
         {
-            AccountTracker temp = await database.AccountTracker.FirstOrDefaultAsync(x => x.Currency.Equals(item.Currency));
-            item.AccountNo = temp.FirstAvailableNo;
             database.Entry(item.Customer).State = EntityState.Unchanged;
-            temp.FirstAvailableNo = (Convert.ToInt64(temp.FirstAvailableNo) + 1).ToString();
             await database.AddAsync(item);
-            database.Update(temp);
 
-            try
-            {
-                await database.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                // Hatanın detaylarını loglayın veya hata mesajını gösterin
-                Console.WriteLine(ex.Message);
-            }
+            await database.SaveChangesAsync();
 
             return item;
         }

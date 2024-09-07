@@ -15,7 +15,15 @@ namespace BankingApp.Entity
 
         public async Task<List<CreditCard>> GetAll()
         {
-            return await database.CreditCard.ToListAsync();
+            return await database.CreditCard.Include(x=> x.Customer).ToListAsync();
+        }
+
+        public async Task<CreditCard> Add(CreditCard cc){
+            database.Entry(cc.Customer).State = EntityState.Unchanged;
+            await database.AddAsync(cc);
+            await database.SaveChangesAsync();
+
+            return cc;
         }
     }
 }
