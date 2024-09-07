@@ -46,8 +46,16 @@ namespace BankingApp.Service
             dtoCreditCard.Active = true;
             dtoCreditCard.ExpirationDate = DateTime.Now.AddMonths(50);
             dtoCreditCard.CVV = Int16.Parse(rnd.Next(100,1000).ToString());
+            dtoCreditCard.OutstandingBalance = dtoCreditCard.Limit;
 
-            dtoCreditCard.CardNo = "530129" + (await eAccountTracker.GetAndIncrease(new AccountTracker{Currency = "CC"})).FirstAvailableNo;
+            dtoCreditCard.CardNo = "530129";
+            string firstAvailableNo = (await eAccountTracker.GetAndIncrease(new AccountTracker{Currency = "CC"})).FirstAvailableNo;
+
+            for (int i = 0; i < 10 - int.Parse(firstAvailableNo); i++)
+            {
+                dtoCreditCard.CardNo += "0";
+            }
+            dtoCreditCard.CardNo += firstAvailableNo;
 
             await eCreditCard.Add(Mapper.Map<CreditCard>(dtoCreditCard));
 
