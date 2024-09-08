@@ -1,6 +1,6 @@
 namespace BankingApp.Common.enums
 {
-    public enum TransferStatus: byte
+    public enum TransferStatus: int
     {
         Waiting = 1,
         Success = 2,

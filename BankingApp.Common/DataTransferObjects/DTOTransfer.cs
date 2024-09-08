@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BankingApp.Common.DataTransferObjects
 {
-    public class DTOTransfer
+    public class DTOTransfer: BaseDTO
     {
         
         public string? SenderAccount { get; set; }
@@ -13,6 +13,12 @@ namespace BankingApp.Common.DataTransferObjects
         public string? RecipientAccount { get; set; }
 
         public string? SenderCustomerNo { get; set; }
+
+
+        public int? SenderAccountId { get; set; }
+
+        public int? RecipientAccountId { get; set; }
+
 
         public string? RecipientCustomerNo { get; set; }
 

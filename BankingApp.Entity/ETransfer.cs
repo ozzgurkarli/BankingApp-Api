@@ -14,28 +14,30 @@ namespace BankingApp.Entity
 
         public async Task<Transfer> Add(Transfer item)
         {
+            database.ChangeTracker.AutoDetectChangesEnabled = false;
             database.Entry(item.SenderAccount).State = EntityState.Unchanged;
             database.Entry(item.RecipientAccount).State = EntityState.Unchanged;
-            database.Entry(item.SenderAccount.Customer).State = EntityState.Unchanged;
-            database.Entry(item.RecipientAccount.Customer).State = EntityState.Unchanged;
-            try{
+
             await database.AddAsync(item);
 
             await database.SaveChangesAsync();
-            }
-            catch(Exception e){
-                throw e;
-            }
 
             return item;
         }
 
-        public async Task<List<Transfer>> UpdateAll(List<Transfer> items){
-            database.Transfer.UpdateRange(items);
+        public async Task<Transfer> Update(Transfer item)
+        {
+            using (var context = new BankingDbContext())
+            {
+                context.ChangeTracker.AutoDetectChangesEnabled = false;
+                context.Entry(item.SenderAccount).State = EntityState.Unchanged;
+                context.Entry(item.RecipientAccount).State = EntityState.Unchanged;
+                context.Transfer.UpdateRange(item);
 
-            await database.SaveChangesAsync();
+                await context.SaveChangesAsync();
+            }
 
-            return items;
+            return item;
         }
 
         public async Task<List<Transfer>> GetTodayOrders(Transfer item)
