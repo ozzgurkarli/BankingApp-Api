@@ -67,6 +67,28 @@ namespace BankingApp.Service
             });
             #endregion account
 
+            #region transfer
+            CreateMap<DTOTransfer, Transfer>().AfterMap((src, dest) =>
+            {
+                if(src.SenderAccount != null){
+                    dest.SenderAccount = new Account{AccountNo = src.SenderAccount};
+                }
+                if(src.RecipientAccount != null){
+                    dest.RecipientAccount = new Account{AccountNo = src.RecipientAccount};
+                }
+                
+            });
+            CreateMap<Transfer, DTOTransfer>().AfterMap((src, dest) =>
+            {
+                if(src.SenderAccount != null){
+                    dest.SenderAccount = src.SenderAccount.AccountNo;
+                }
+                if(src.RecipientAccount != null){
+                    dest.RecipientAccount = src.RecipientAccount.AccountNo;
+                }
+            });
+            #endregion transfer
+
             #region creditcard
             CreateMap<DTOCreditCard, CreditCard>().AfterMap((src, dest) =>
             {

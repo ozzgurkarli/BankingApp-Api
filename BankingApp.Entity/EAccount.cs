@@ -23,6 +23,18 @@ namespace BankingApp.Entity
             return item;
         }
 
+        public async Task<List<Account>> UpdateAll(List<Account> items){
+            database.Account.UpdateRange(items);
+
+            await database.SaveChangesAsync();
+
+            return items;
+        }
+
+        public async Task<Account> Get(Account item)
+        {
+            return await database.Account.Where(x=> x.AccountNo.Equals(item.AccountNo)).FirstOrDefaultAsync();
+        }
 
         public async Task<List<Account>> GetAll()
         {

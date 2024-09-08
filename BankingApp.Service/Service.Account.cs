@@ -20,6 +20,8 @@ namespace BankingApp.Service
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
 
             dtoAccount.Active = true;
+            dtoAccount.Balance = 0;
+            
             dtoAccount.AccountNo = (await eAccountTracker.GetAndIncrease(new AccountTracker{Currency = dtoAccount.CurrencyCode})).FirstAvailableNo;
 
             dtoAccount = Mapper.Map<DTOAccount>(await eAccount.Add(Mapper.Map<Account>(dtoAccount)));

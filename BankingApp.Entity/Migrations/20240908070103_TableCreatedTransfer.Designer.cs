@@ -4,6 +4,7 @@ using BankingApp.Entity.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BankingApp.Entity.Migrations
 {
     [DbContext(typeof(BankingDbContext))]
-    partial class BankingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908070103_TableCreatedTransfer")]
+    partial class TableCreatedTransfer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,25 +35,27 @@ namespace BankingApp.Entity.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccountNo")
+                        .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)");
 
-                    b.Property<bool?>("Active")
+                    b.Property<bool>("Active")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal?>("Balance")
+                    b.Property<decimal>("Balance")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("Branch")
+                    b.Property<int>("Branch")
                         .HasColumnType("integer");
 
                     b.Property<string>("Currency")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long?>("CustomerId")
+                    b.Property<long>("CustomerId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool?>("Primary")
+                    b.Property<bool>("Primary")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime>("RecordDate")
@@ -393,56 +398,13 @@ namespace BankingApp.Entity.Migrations
                     b.ToTable("TransactionHistory");
                 });
 
-            modelBuilder.Entity("BankingApp.Entity.Entities.Transfer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("OrderDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("RecipientAccountId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("RecordDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("RecordScreen")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("SenderAccountId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("TransactionDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipientAccountId");
-
-                    b.HasIndex("SenderAccountId");
-
-                    b.ToTable("Transfer");
-                });
-
             modelBuilder.Entity("BankingApp.Entity.Entities.Account", b =>
                 {
                     b.HasOne("BankingApp.Entity.Entities.Customer", "Customer")
                         .WithMany("Accounts")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Customer");
                 });
@@ -493,21 +455,6 @@ namespace BankingApp.Entity.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("CreditCard");
-                });
-
-            modelBuilder.Entity("BankingApp.Entity.Entities.Transfer", b =>
-                {
-                    b.HasOne("BankingApp.Entity.Entities.Account", "RecipientAccount")
-                        .WithMany()
-                        .HasForeignKey("RecipientAccountId");
-
-                    b.HasOne("BankingApp.Entity.Entities.Account", "SenderAccount")
-                        .WithMany()
-                        .HasForeignKey("SenderAccountId");
-
-                    b.Navigation("RecipientAccount");
-
-                    b.Navigation("SenderAccount");
                 });
 
             modelBuilder.Entity("BankingApp.Entity.Entities.Account", b =>
