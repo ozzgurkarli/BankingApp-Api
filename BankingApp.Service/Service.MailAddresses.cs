@@ -69,7 +69,7 @@ namespace BankingApp.Service
             }
             catch (Exception)
             {
-                throw new Exception("Mail gönderilemedi. ozzgur.par@outlook.com adresiyle iletişime geçin.");
+                
             }
         }
     }

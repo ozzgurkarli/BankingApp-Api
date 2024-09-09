@@ -22,9 +22,19 @@ namespace BankingApp.Entity
             return item;
         }
 
+        public async Task<Customer> GetIncludeMailAddress(Customer item)
+        {
+            return await database.Customer.Include(x=> x.MailAddresses).FirstOrDefaultAsync(x => x.Id.Equals(item.Id));
+        }
+
         public async Task<Customer> GetByIdentityNo(Customer item)
         {
             return await database.Customer.FirstOrDefaultAsync(x => x.IdentityNo.Equals(item.IdentityNo));
+        }
+
+        public async Task<Customer> GetByIdentityNoIncludeAccounts(Customer item)
+        {
+            return await database.Customer.Include(x=> x.Accounts).FirstOrDefaultAsync(x => x.IdentityNo.Equals(item.IdentityNo));
         }
     }
 }

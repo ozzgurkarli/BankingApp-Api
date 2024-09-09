@@ -10,5 +10,8 @@ namespace BankingApp.Common.Interfaces
     public partial interface IService
     {
         public Task<MessageContainer> GetParametersByGroupCode(MessageContainer requestMessage);
+
+
+        public Task<MessageContainer> GetMultipleGroupCode(MessageContainer requestMessage);
     }
 }

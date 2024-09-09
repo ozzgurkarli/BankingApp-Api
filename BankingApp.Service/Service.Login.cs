@@ -92,7 +92,7 @@ namespace BankingApp.Service
 
             if (dtoMailAddress != null)
             {
-                throw new Exception("Bu mail adresi kullanılıyor");
+                throw new Exception("Bu mail adresi kullanılıyor.");
             }
             else if(dtoLogin != null)
             {

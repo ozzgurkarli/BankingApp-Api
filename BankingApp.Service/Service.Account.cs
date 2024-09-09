@@ -20,6 +20,8 @@ namespace BankingApp.Service
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
 
             dtoAccount.Active = true;
+            dtoAccount.Balance = 0;
+            
             dtoAccount.AccountNo = (await eAccountTracker.GetAndIncrease(new AccountTracker{Currency = dtoAccount.CurrencyCode})).FirstAvailableNo;
 
             dtoAccount = Mapper.Map<DTOAccount>(await eAccount.Add(Mapper.Map<Account>(dtoAccount)));
@@ -36,7 +38,7 @@ namespace BankingApp.Service
 
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
             
-            List<DTOAccount> accountList = Mapper.Map<List<DTOAccount>>(await eAccount.GetAll()).Where(x => x.Active == true).ToList();
+            List<DTOAccount> accountList = Mapper.Map<List<DTOAccount>>(await eAccount.GetAll()).Where(x => x.Active == true).OrderBy(x=> x.RecordDate).ToList();
 
             if(dtoAccount.CustomerNo != null)
             {

@@ -1,5 +1,6 @@
 ﻿using BankingApp.Common.Constants;
 using BankingApp.Common.DataTransferObjects;
+using BankingApp.Common.enums;
 using BankingApp.Common.Interfaces;
 using BankingApp.Entity;
 using BankingApp.Entity.Entities;
@@ -27,7 +28,7 @@ namespace BankingApp.Service
             DTOLogin dtoLogin = new DTOLogin { IdentityNo = dtoCustomer.IdentityNo, Password = setTemporaryPassword(), Temporary = true };
             eLogin.Add(Mapper.Map<Login>(dtoLogin));
 
-            DTOAccount dtoAccount = new DTOAccount { Active = true, Branch = dtoReqCustomer.Branch, Currency = CurrencyTypes.TURKISH_LIRA, CustomerNo = dtoCustomer.CustomerNo};
+            DTOAccount dtoAccount = new DTOAccount { Active = true, Primary = true, Branch = dtoReqCustomer.Branch, Currency = "TL", CurrencyCode = "1", CustomerNo = dtoCustomer.CustomerNo};
             reqService.Add(dtoAccount);
             CreateAccount(reqService);
 

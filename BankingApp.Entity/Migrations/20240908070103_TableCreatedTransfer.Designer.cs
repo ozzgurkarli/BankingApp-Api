@@ -4,6 +4,7 @@ using BankingApp.Entity.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BankingApp.Entity.Migrations
 {
     [DbContext(typeof(BankingDbContext))]
-    partial class BankingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908070103_TableCreatedTransfer")]
+    partial class TableCreatedTransfer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,25 +35,27 @@ namespace BankingApp.Entity.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccountNo")
+                        .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)");
 
-                    b.Property<bool?>("Active")
+                    b.Property<bool>("Active")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal?>("Balance")
+                    b.Property<decimal>("Balance")
                         .HasColumnType("numeric");
 
-                    b.Property<int?>("Branch")
+                    b.Property<int>("Branch")
                         .HasColumnType("integer");
 
                     b.Property<string>("Currency")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long?>("CustomerId")
+                    b.Property<long>("CustomerId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool?>("Primary")
+                    b.Property<bool>("Primary")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime>("RecordDate")
@@ -92,40 +97,6 @@ namespace BankingApp.Entity.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AccountTracker");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Currency = "1",
-                            FirstAvailableNo = "1000000000000001",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7410),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Currency = "2",
-                            FirstAvailableNo = "2000000000000001",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7410),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Currency = "3",
-                            FirstAvailableNo = "3000000000000001",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7410),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Currency = "4",
-                            FirstAvailableNo = "4000000000000001",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7410),
-                            RecordScreen = "ADMIN"
-                        });
                 });
 
             modelBuilder.Entity("BankingApp.Entity.Entities.Credit", b =>
@@ -382,208 +353,6 @@ namespace BankingApp.Entity.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Parameter");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Code = 1,
-                            Description = "İstanbul",
-                            GroupCode = "City",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7250),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = 2,
-                            Description = "İzmir",
-                            GroupCode = "City",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7300),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Code = 3,
-                            Description = "Çanakkale",
-                            GroupCode = "City",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7300),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Code = 4,
-                            Description = "Ankara",
-                            GroupCode = "City",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7300),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Code = 1,
-                            Description = "Beykoz",
-                            Detail1 = "1",
-                            GroupCode = "District",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7300),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Code = 2,
-                            Description = "Şişli",
-                            Detail1 = "1",
-                            GroupCode = "District",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7300),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Code = 3,
-                            Description = "Avcılar",
-                            Detail1 = "1",
-                            GroupCode = "District",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7310),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Code = 4,
-                            Description = "Karşıyaka",
-                            Detail1 = "2",
-                            GroupCode = "District",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7310),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Code = 5,
-                            Description = "Merkez",
-                            Detail1 = "3",
-                            GroupCode = "District",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7310),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Code = 6,
-                            Description = "Çankaya",
-                            Detail1 = "4",
-                            GroupCode = "District",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7310),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Code = 1,
-                            Description = "Mamak",
-                            Detail1 = "4",
-                            GroupCode = "District",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7310),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Code = 1,
-                            Description = "Gold Plus",
-                            GroupCode = "CardType",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7310),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Code = 2,
-                            Description = "Midnight Prestige",
-                            GroupCode = "CardType",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7310),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Code = 1,
-                            Description = "Mühendis:Engineer",
-                            GroupCode = "Profession",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7320),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Code = 2,
-                            Description = "Mimar:Architect",
-                            GroupCode = "Profession",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7320),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Code = 1,
-                            Description = "Erkek:Male",
-                            GroupCode = "Gender",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7320),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Code = 2,
-                            Description = "Kadın:Female",
-                            GroupCode = "Gender",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7320),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Code = 1,
-                            Description = "TL",
-                            Detail1 = "Türk Lirasi:Turkish Lira",
-                            GroupCode = "Currency",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7320),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Code = 4,
-                            Description = "JPY",
-                            Detail1 = "Japon Yeni:Japanese Yen",
-                            GroupCode = "Currency",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7320),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Code = 2,
-                            Description = "EUR",
-                            Detail1 = "Euro:Euro",
-                            GroupCode = "Currency",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7330),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 21,
-                            Code = 3,
-                            Description = "USD",
-                            Detail1 = "Amerikan Doları:U.S. Dollar",
-                            GroupCode = "Currency",
-                            RecordDate = new DateTime(2024, 9, 8, 21, 57, 9, 357, DateTimeKind.Local).AddTicks(7330),
-                            RecordScreen = "ADMIN"
-                        });
                 });
 
             modelBuilder.Entity("BankingApp.Entity.Entities.TransactionHistory", b =>
@@ -629,56 +398,13 @@ namespace BankingApp.Entity.Migrations
                     b.ToTable("TransactionHistory");
                 });
 
-            modelBuilder.Entity("BankingApp.Entity.Entities.Transfer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("OrderDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("RecipientAccountId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("RecordDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("RecordScreen")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("SenderAccountId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("TransactionDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecipientAccountId");
-
-                    b.HasIndex("SenderAccountId");
-
-                    b.ToTable("Transfer");
-                });
-
             modelBuilder.Entity("BankingApp.Entity.Entities.Account", b =>
                 {
                     b.HasOne("BankingApp.Entity.Entities.Customer", "Customer")
                         .WithMany("Accounts")
-                        .HasForeignKey("CustomerId");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Customer");
                 });
@@ -729,21 +455,6 @@ namespace BankingApp.Entity.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("CreditCard");
-                });
-
-            modelBuilder.Entity("BankingApp.Entity.Entities.Transfer", b =>
-                {
-                    b.HasOne("BankingApp.Entity.Entities.Account", "RecipientAccount")
-                        .WithMany()
-                        .HasForeignKey("RecipientAccountId");
-
-                    b.HasOne("BankingApp.Entity.Entities.Account", "SenderAccount")
-                        .WithMany()
-                        .HasForeignKey("SenderAccountId");
-
-                    b.Navigation("RecipientAccount");
-
-                    b.Navigation("SenderAccount");
                 });
 
             modelBuilder.Entity("BankingApp.Entity.Entities.Account", b =>

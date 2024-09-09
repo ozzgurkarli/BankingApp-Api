@@ -10,20 +10,20 @@ namespace BankingApp.Entity.Entities
 {
     public class Account: BaseEntity
     {
-        public required virtual Customer Customer { get; set; }
+        public virtual Customer? Customer { get; set; }
 
         [StringLength(16)]
-        public required string AccountNo { get; set; }
+        public string? AccountNo { get; set; }
 
-        public decimal Balance { get; set; }
+        public decimal? Balance { get; set; }
 
-        public required string Currency { get; set; }
+        public string? Currency { get; set; }
 
-        public bool Active { get; set; }
+        public bool? Active { get; set; }
 
-        public bool Primary { get; set; }
+        public bool? Primary { get; set; }
 
-        public required int Branch { get; set; }
+        public int? Branch { get; set; }
 
         public virtual List<TransactionHistory>? TransactionHistory { get; set; }
     }

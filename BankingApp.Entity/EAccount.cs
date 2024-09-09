@@ -24,9 +24,45 @@ namespace BankingApp.Entity
         }
 
 
+        public async Task<Account> Update(Account item)
+        {
+            using (var context = new BankingDbContext())
+                {
+                    context.ChangeTracker.AutoDetectChangesEnabled = false;
+                    context.Entry(item.Customer).State = EntityState.Unchanged;
+                    context.Account.Update(item);
+
+                    await context.SaveChangesAsync();
+                }
+
+            return item;
+        }
+        public async Task<List<Account>> UpdateAll(List<Account> items)
+        {
+            try
+            {
+
+                database.ChangeTracker.AutoDetectChangesEnabled = false;
+                database.Account.UpdateRange(items);
+
+                await database.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+            return items;
+        }
+
+        public async Task<Account> Get(Account item)
+        {
+            return await database.Account.Where(x => x.AccountNo.Equals(item.AccountNo)).Include(x => x.Customer).FirstOrDefaultAsync();
+        }
+
         public async Task<List<Account>> GetAll()
         {
-            return await database.Account.Include(x=> x.Customer).ToListAsync();
+            return await database.Account.Include(x => x.Customer).ToListAsync();
         }
     }
 }
