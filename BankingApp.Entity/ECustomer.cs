@@ -22,7 +22,7 @@ namespace BankingApp.Entity
             return item;
         }
 
-        public async Task<Customer> Get(Customer item)
+        public async Task<Customer> GetIncludeMailAddress(Customer item)
         {
             return await database.Customer.Include(x=> x.MailAddresses).FirstOrDefaultAsync(x => x.Id.Equals(item.Id));
         }

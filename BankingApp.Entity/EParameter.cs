@@ -15,7 +15,10 @@ namespace BankingApp.Entity
 
         public async Task<List<Parameter>> GetParametersByGroupCode(Parameter par)
         {
-            return await database.Parameter.Where(x => x.GroupCode.Equals(par.GroupCode)).ToListAsync();
+            using (var context = new BankingDbContext())
+            {
+                return await context.Parameter.Where(x => x.GroupCode.Equals(par.GroupCode)).ToListAsync();
+            }
         }
 
         public async Task<Parameter> GetParameter(Parameter par)

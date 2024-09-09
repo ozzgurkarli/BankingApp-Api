@@ -10,7 +10,7 @@ namespace BankingApp.Entity.Entities
     {
         public required string GroupCode { get; set; }
 
-        public int Code { get; set; }
+        public int? Code { get; set; }
 
         public string? Description { get; set; }
 

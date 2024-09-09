@@ -26,5 +26,17 @@ namespace BankingApp.Api.Controllers
 
             return Ok(responseMessage);
         }
+
+        [HttpPost("GetMultipleGroupCode")]
+        public async Task<IActionResult> GetMultipleGroupCode([FromBody] MessageContainer message)
+        {
+            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer responseMessage = new MessageContainer();
+            requestMessage.Add(message.ToObject<List<DTOParameter>>(message, "ParameterList"));
+
+            responseMessage = await _proxy.GetMultipleGroupCode(requestMessage);
+
+            return Ok(responseMessage);
+        }
     }
 }

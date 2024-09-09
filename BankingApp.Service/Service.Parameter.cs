@@ -21,5 +21,30 @@ namespace BankingApp.Service
 
             return response;
         }
+
+        public async Task<MessageContainer> GetMultipleGroupCode(MessageContainer requestMessage)
+        {
+            EParameter eParameter = new EParameter();
+            MessageContainer response = new MessageContainer();
+            List<DTOParameter> parList = requestMessage.Get<List<DTOParameter>>();
+            List<DTOParameter> dtoParList = new List<DTOParameter>();
+
+            List<Task<List<Parameter>>> taskList = new List<Task<List<Parameter>>>();
+
+            parList.ForEach(x=> {
+                taskList.Add(eParameter.GetParametersByGroupCode(Mapper.Map<Parameter>(x)));
+            });
+
+            foreach (List<Parameter> item in await Task.WhenAll(taskList.ToArray()))
+            {
+                item.ForEach(x=> {
+                    dtoParList.Add(Mapper.Map<DTOParameter>(x));
+                });
+            }
+
+            response.Add("ParameterList", dtoParList);
+
+            return response;
+        }
     }
 }
