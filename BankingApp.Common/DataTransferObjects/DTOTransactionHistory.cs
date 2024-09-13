@@ -8,6 +8,8 @@ namespace BankingApp.Common.DataTransferObjects
 {
     public class DTOTransactionHistory: BaseDTO
     {
+        public string? CustomerNo { get; set; }
+
         public string? AccountNo { get; set; }
 
         public string? CreditCardNo { get; set; }
@@ -17,6 +19,10 @@ namespace BankingApp.Common.DataTransferObjects
         public required string Currency { get; set; }
 
         public DateTime? TransactionDate { get; set; }
+
+        public DateTime? MinDate { get; set; }
+
+        public DateTime? MaxDate { get; set; }
 
         public string? Description { get; set; }
     }

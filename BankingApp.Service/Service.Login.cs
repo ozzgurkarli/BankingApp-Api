@@ -45,7 +45,7 @@ namespace BankingApp.Service
                 throw new Exception("Bilinmeyen hata, şubenize başvurun.");
             }
 
-            Task.Run(async () =>
+            Task x = Task.Run(async () =>
             {
                 requestMessage.Clear();
                 requestMessage.Add(new DTOCustomer { IdentityNo = dtoLogin.IdentityNo });
