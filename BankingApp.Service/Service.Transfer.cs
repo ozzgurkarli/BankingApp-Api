@@ -64,6 +64,7 @@ namespace BankingApp.Service
         {
             ETransfer eTransfer = new ETransfer();
             EAccount eAccount = new EAccount();
+            ETransactionHistory eTransactionHistory = new ETransactionHistory();
             ECustomer eCustomer = new ECustomer();
 
             List<DTOTransfer> transfers = Mapper.Map<List<DTOTransfer>>(await eTransfer.GetTodayOrders(new Transfer()));
@@ -101,12 +102,18 @@ namespace BankingApp.Service
                 eTransfer.Update(new Transfer { Id = (int)x.Id, SenderAccount = new Account { Id = (int)x.SenderAccountId }, Amount = x.Amount, Currency = x.Currency, OrderDate = x.OrderDate, RecipientAccount = new Account { Id = (int)x.RecipientAccountId }, Status = x.Status, TransactionDate = x.TransactionDate });
 
                 DTOAccount dtoSenderAcc = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = x.SenderAccount }));
-
                 DTOCustomer dtoCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetIncludeMailAddress(new Customer { Id = int.Parse(dtoSenderAcc.CustomerNo) }));
                 if (x.Status == (int)TransferStatus.Success)
                 {
-                    sendMail([dtoCustomer.PrimaryMailAddress], "Para Transferi Başarılı", $"Merhaba {dtoCustomer.Name},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br<br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                    DTOAccount dtoRecipientAcc = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = x.RecipientAccount }));
+                    DTOCustomer dtoRecipientCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetIncludeMailAddress(new Customer { Id = int.Parse(dtoSenderAcc.CustomerNo) }));
+                    Task.Run(async () =>
+                    {
+                        eTransactionHistory.AddAsync(new TransactionHistory { Customer = new Customer { Id = Int64.Parse(dtoCustomer.CustomerNo) }, Currency = x.Currency, Account = Mapper.Map<Account>(dtoSenderAcc), Amount = -x.Amount, TransactionDate = x.TransactionDate });
+                        eTransactionHistory.AddAsync(new TransactionHistory { Customer = new Customer { Id = Int64.Parse(dtoRecipientCustomer.CustomerNo) }, Currency = x.Currency, Account = Mapper.Map<Account>(dtoRecipientAcc), Amount = x.Amount, TransactionDate = x.TransactionDate });
+                    });
 
+                    sendMail([dtoCustomer.PrimaryMailAddress], "Para Transferi Başarılı", $"Merhaba {dtoCustomer.Name},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br<br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
                 }
                 else if (x.Status == (int)TransferStatus.Failed)
                 {
