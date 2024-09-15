@@ -107,7 +107,7 @@ namespace BankingApp.Service
                 {
                     DTOAccount dtoRecipientAcc = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = x.RecipientAccount }));
                     DTOCustomer dtoRecipientCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetIncludeMailAddress(new Customer { Id = int.Parse(dtoSenderAcc.CustomerNo) }));
-                    Task.Run(async () =>
+                    Task.Run(() =>
                     {
                         eTransactionHistory.AddAsync(new TransactionHistory { Customer = new Customer { Id = Int64.Parse(dtoCustomer.CustomerNo) }, Currency = x.Currency, Account = Mapper.Map<Account>(dtoSenderAcc), Amount = -x.Amount, TransactionDate = x.TransactionDate });
                         eTransactionHistory.AddAsync(new TransactionHistory { Customer = new Customer { Id = Int64.Parse(dtoRecipientCustomer.CustomerNo) }, Currency = x.Currency, Account = Mapper.Map<Account>(dtoRecipientAcc), Amount = x.Amount, TransactionDate = x.TransactionDate });
