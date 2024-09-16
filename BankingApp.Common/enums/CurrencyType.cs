@@ -1,6 +1,6 @@
 namespace BankingApp.Common.enums
 {
-    public enum CurrencyType: byte
+    public enum CurrencyType: int
     {
         TL = 1,
         JPY = 4,
