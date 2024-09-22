@@ -9,7 +9,7 @@ namespace BankingApp.Entity.Entities
 {
     public class CreditCard: BaseEntity
     {
-        public virtual required Customer Customer { get; set; }
+        public virtual Customer? Customer { get; set; }
 
         [StringLength(16)]
         public required string CardNo { get; set; }
@@ -28,7 +28,7 @@ namespace BankingApp.Entity.Entities
 
         public Int16 BillingDay { get; set; }
 
-        public virtual required int Type { get; set; }
+        public virtual int? Type { get; set; }
 
         public decimal OutstandingBalance { get; set; }
     }
