@@ -20,5 +20,7 @@ namespace BankingApp.Entity.Entities
 
         public string? Detail3 { get; set; }
 
+        public new DateTime RecordDate { get; set; } = DateTime.MinValue;
+
     }
 }

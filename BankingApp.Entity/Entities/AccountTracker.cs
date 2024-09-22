@@ -13,5 +13,7 @@ namespace BankingApp.Entity.Entities
 
         [StringLength(16)]
         public string? FirstAvailableNo { get; set; }
+
+        public new DateTime RecordDate { get; set; } = DateTime.MinValue;
     }
 }

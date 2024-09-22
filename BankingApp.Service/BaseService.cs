@@ -67,6 +67,37 @@ namespace BankingApp.Service
             });
             #endregion account
 
+            #region transactionhistory
+            CreateMap<DTOTransactionHistory, TransactionHistory>().AfterMap((src, dest) =>
+            {
+                if(!string.IsNullOrWhiteSpace(src.CustomerNo)){
+                    dest.Customer = new Customer{Id = Int64.Parse(src.CustomerNo)};
+                }
+
+                if(!string.IsNullOrWhiteSpace(src.AccountNo)){
+                    dest.Account = new Account{AccountNo = src.AccountNo};
+                }
+
+                if(!string.IsNullOrWhiteSpace(src.CreditCardNo)){
+                    dest.CreditCard = new CreditCard{CardNo = src.CreditCardNo};
+                }
+            });
+            CreateMap<TransactionHistory, DTOTransactionHistory>().AfterMap((src, dest) =>
+            {
+                if(src.Customer != null){
+                    dest.CustomerNo = src.Customer.Id.ToString();
+                }
+
+                if(src.Account != null){
+                    dest.AccountNo = src.Account.AccountNo;
+                }
+
+                if(src.CreditCard != null){
+                    dest.CreditCardNo = src.CreditCard.CardNo;
+                }
+            });
+            #endregion transactionhistory
+
             #region transfer
             CreateMap<DTOTransfer, Transfer>().AfterMap((src, dest) =>
             {
