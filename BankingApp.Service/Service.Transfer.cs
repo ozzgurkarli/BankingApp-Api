@@ -111,7 +111,7 @@ namespace BankingApp.Service
                     if (x.RecipientAccountId != 6)
                     {
                         dtoRecipientAcc = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = x.RecipientAccount }));
-                        dtoRecipientCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetIncludeMailAddress(new Customer { Id = int.Parse(dtoSenderAcc.CustomerNo) }));
+                        dtoRecipientCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetIncludeMailAddress(new Customer { Id = int.Parse(dtoRecipientAcc.CustomerNo) }));
                     }
                     Task.Run(() =>
                     {

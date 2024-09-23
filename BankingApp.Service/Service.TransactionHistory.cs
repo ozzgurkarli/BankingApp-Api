@@ -11,27 +11,41 @@ using System.Transactions;
 
 namespace BankingApp.Service
 {
-    public partial class Service: IService
+    public partial class Service : IService
     {
-        public async Task<MessageContainer> GetHistoryByFilter(MessageContainer requestMessage){
+        public async Task<MessageContainer> GetHistoryByFilter(MessageContainer requestMessage)
+        {
             ETransactionHistory eTransactionHistory = new ETransactionHistory();
             DTOTransactionHistory dtoTransaction = requestMessage.Get<DTOTransactionHistory>();
-
-            List<DTOTransactionHistory> transactionList = Mapper.Map<List<DTOTransactionHistory>>(eTransactionHistory.GetAllByCustomerNoAsync(Mapper.Map<TransactionHistory>(dtoTransaction)));
-
-            transactionList = transactionList.OrderBy(x=> x.TransactionDate).ToList();
-
-            if(dtoTransaction.MinDate >= DateTime.MinValue){
-                transactionList.Where(x=> x.TransactionDate >= dtoTransaction.MinDate);
-            }
-
-            if(dtoTransaction.MaxDate >= DateTime.MinValue){
-                transactionList.Where(x=> x.TransactionDate <= dtoTransaction.MaxDate);
-            }
-
             MessageContainer responseMessage = new MessageContainer();
 
-            responseMessage.Add(transactionList);
+            try
+            {
+                List<DTOTransactionHistory> transactionList = Mapper.Map<List<DTOTransactionHistory>>(await eTransactionHistory.GetAllByCustomerNoAsync(Mapper.Map<TransactionHistory>(dtoTransaction)));
+
+
+            transactionList = transactionList.OrderByDescending(x => x.TransactionDate).ToList();
+
+            if(dtoTransaction.Count != null && dtoTransaction.Count != 0 && transactionList.Count() >= dtoTransaction.Count){
+                transactionList = transactionList.GetRange(0, (int)dtoTransaction.Count);
+            }
+
+            if (dtoTransaction.MinDate > DateTime.MinValue)
+            {
+                transactionList.Where(x => x.TransactionDate >= dtoTransaction.MinDate);
+            }
+
+            if (dtoTransaction.MaxDate > DateTime.MinValue)
+            {
+                transactionList.Where(x => x.TransactionDate <= dtoTransaction.MaxDate);
+            }
+
+            responseMessage.Add("TransactionList", transactionList);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
             return responseMessage;
         }
