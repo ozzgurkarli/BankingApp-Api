@@ -27,5 +27,7 @@ namespace BankingApp.Common.DataTransferObjects
         public string? Description { get; set; }
 
         public int? TransactionType {get; set; }
+
+        public int? Count {get; set; }
     }
 }

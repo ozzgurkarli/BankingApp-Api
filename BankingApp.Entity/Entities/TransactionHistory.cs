@@ -16,7 +16,7 @@ namespace BankingApp.Entity.Entities
 
         public decimal? Amount { get; set; }
 
-        public required string Currency { get; set; }
+        public string? Currency { get; set; }
 
         public DateTime? TransactionDate { get; set; }
 

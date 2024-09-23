@@ -17,7 +17,7 @@ namespace BankingApp.Api.Controllers
         {
             _proxy = proxy;
         }
-        [HttpGet("GetTransactionHistory")]
+        [HttpPost("GetTransactionHistory")]
         public async Task<IActionResult> GetTransactionHistory([FromBody] MessageContainer message)
         {
             MessageContainer requestMessage = new MessageContainer();
