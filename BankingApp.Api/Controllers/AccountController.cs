@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingApp.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AccountController : ControllerBase

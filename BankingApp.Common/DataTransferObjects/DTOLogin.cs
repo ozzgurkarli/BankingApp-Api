@@ -16,5 +16,9 @@ namespace BankingApp.Common.DataTransferObjects
         public int? Password { get; set; }
 
         public bool? Temporary { get; set; }
+
+        public string? Token { get; set; }
+
+        public DateTime? TokenExpireDate { get; set; }
     }
 }

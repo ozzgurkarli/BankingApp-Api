@@ -13,20 +13,30 @@ namespace BankingApp.Service
 {
     public partial class Service : IService
     {
+        public async Task<MessageContainer> AddNewTransaction(MessageContainer requestMessage)
+        {
+            ETransactionHistory eTransactionHistory = new ETransactionHistory();
+            DTOTransactionHistory dtoTransactionHistory = requestMessage.Get<DTOTransactionHistory>();
+            MessageContainer responseMessage = new MessageContainer();
+            
+            responseMessage.Add(await eTransactionHistory.AddAsync(Mapper.Map<TransactionHistory>(dtoTransactionHistory)));
+
+            return responseMessage;
+        }
+
         public async Task<MessageContainer> GetHistoryByFilter(MessageContainer requestMessage)
         {
             ETransactionHistory eTransactionHistory = new ETransactionHistory();
             DTOTransactionHistory dtoTransaction = requestMessage.Get<DTOTransactionHistory>();
             MessageContainer responseMessage = new MessageContainer();
 
-            try
-            {
-                List<DTOTransactionHistory> transactionList = Mapper.Map<List<DTOTransactionHistory>>(await eTransactionHistory.GetAllByCustomerNoAsync(Mapper.Map<TransactionHistory>(dtoTransaction)));
+            List<DTOTransactionHistory> transactionList = Mapper.Map<List<DTOTransactionHistory>>(await eTransactionHistory.GetAllByCustomerNoAsync(Mapper.Map<TransactionHistory>(dtoTransaction)));
 
 
             transactionList = transactionList.OrderByDescending(x => x.TransactionDate).ToList();
 
-            if(dtoTransaction.Count != null && dtoTransaction.Count != 0 && transactionList.Count() >= dtoTransaction.Count){
+            if (dtoTransaction.Count != null && dtoTransaction.Count != 0 && transactionList.Count() >= dtoTransaction.Count)
+            {
                 transactionList = transactionList.GetRange(0, (int)dtoTransaction.Count);
             }
 
@@ -41,11 +51,6 @@ namespace BankingApp.Service
             }
 
             responseMessage.Add("TransactionList", transactionList);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
 
             return responseMessage;
         }

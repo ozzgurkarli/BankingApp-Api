@@ -1,9 +1,13 @@
-﻿using BankingApp.Common.DataTransferObjects;
+﻿using BankingApp.Common.Constants;
+using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
 using BankingApp.Entity;
 using BankingApp.Entity.Entities;
+using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,6 +49,44 @@ namespace BankingApp.Service
             response.Add("ParameterList", dtoParList);
 
             return response;
+        }
+
+        public async Task<MessageContainer> SetCurrencyValues(MessageContainer requestMessage){
+            EParameter eParameter = new EParameter();
+            requestMessage.Add(new DTOParameter{GroupCode= "Currency"});
+
+            MessageContainer responsePar = await GetParametersByGroupCode(requestMessage);
+            List<DTOParameter> parList = responsePar.Get<List<DTOParameter>>();
+
+            Dictionary<string, decimal> tempCurrencyDict = new Dictionary<string, decimal>();
+            Dictionary<string, decimal> currencyDict = new Dictionary<string, decimal>();
+
+            if(DateTime.Parse(parList.Find(x=> x.Code.Equals(1))!.Detail2!).CompareTo(DateTime.Today) < 0){   // set new values
+                HttpClient client = new HttpClient();
+                Dictionary<string,object> dict = JsonConvert.DeserializeObject<Dictionary<string,object>>(await client.GetStringAsync($"https://data.fixer.io/api/latest?access_key={ENV.CurrencyApiKey}"))!;
+                foreach (KeyValuePair<string, decimal> item in JsonConvert.DeserializeObject<Dictionary<string, decimal>>(dict["rates"].ToString()!)!)
+                {
+                    if(item.Key.Equals("TRY") || parList.Select(x=> x.Description).ToList().Contains(item.Key)){
+                        tempCurrencyDict.Add(item.Key, item.Value);
+                    }
+                }
+
+                decimal tlVal = tempCurrencyDict["TRY"];
+
+                foreach (var item in tempCurrencyDict) // set base eur to try
+                {
+                    currencyDict.Add(item.Key, tlVal/item.Value);
+                }
+
+                foreach (var item in parList)
+                {
+                    item.Detail2 = DateTime.Today.ToString();
+                    item.Detail3 = item.Description.Equals("TL") ? "0" : Math.Round(currencyDict[item.Description!], 2, MidpointRounding.AwayFromZero).ToString();
+                    eParameter.UpdateParameter(Mapper.Map<Parameter>(item));
+                }
+            }
+
+            return new MessageContainer();
         }
     }
 }
