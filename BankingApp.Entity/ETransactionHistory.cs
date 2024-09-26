@@ -32,13 +32,8 @@ namespace BankingApp.Entity
                 {
                     context.Entry(item.Account).State = EntityState.Unchanged;
                 }
-                await context.TransactionHistory.AddAsync(item);
-                try{
-                    await context.SaveChangesAsync();
-                }
-                catch(Exception ex){
-                    
-                }
+                item = (await context.TransactionHistory.AddAsync(item)).Entity;
+                await context.SaveChangesAsync();
             }
 
             return item;

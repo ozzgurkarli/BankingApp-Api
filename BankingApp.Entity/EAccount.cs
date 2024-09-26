@@ -30,7 +30,7 @@ namespace BankingApp.Entity
                 {
                     context.ChangeTracker.AutoDetectChangesEnabled = false;
                     context.Entry(item.Customer).State = EntityState.Unchanged;
-                    context.Account.Update(item);
+                    item = (context.Account.Update(item)).Entity;
 
                     await context.SaveChangesAsync();
                 }

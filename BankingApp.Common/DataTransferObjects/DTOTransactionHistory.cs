@@ -12,6 +12,8 @@ namespace BankingApp.Common.DataTransferObjects
 
         public string? AccountNo { get; set; }
 
+        public int? AccountId { get; set; }
+
         public string? CreditCardNo { get; set; }
 
         public decimal? Amount { get; set; }
