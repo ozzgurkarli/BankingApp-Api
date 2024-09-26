@@ -115,19 +115,19 @@ namespace BankingApp.Service
                     }
                     Task.Run(() =>
                     {
-                        eTransactionHistory.AddAsync(new TransactionHistory { Customer = new Customer { Id = Int64.Parse(dtoCustomer.CustomerNo) }, Currency = x.Currency, TransactionType = (int)TransactionType.Transfer, Account = Mapper.Map<Account>(dtoSenderAcc), Amount = -x.Amount, TransactionDate = x.TransactionDate });
+                        eTransactionHistory.AddAsync(new TransactionHistory { Customer = new Customer { Id = Int64.Parse(dtoCustomer.CustomerNo) }, Currency = x.Currency, TransactionType = (int)TransactionType.Transfer, Account = Mapper.Map<Account>(dtoSenderAcc), Amount = -x.Amount, TransactionDate = DateTime.Now });
                         
                         if (x.RecipientAccountId != 6 && dtoRecipientCustomer != null)
                         {
-                            eTransactionHistory.AddAsync(new TransactionHistory { Customer = new Customer { Id = Int64.Parse(dtoRecipientCustomer.CustomerNo) }, TransactionType = (int)TransactionType.Transfer, Currency = x.Currency, Account = Mapper.Map<Account>(dtoRecipientAcc), Amount = x.Amount, TransactionDate = x.TransactionDate });
+                            eTransactionHistory.AddAsync(new TransactionHistory { Customer = new Customer { Id = Int64.Parse(dtoRecipientCustomer.CustomerNo) }, TransactionType = (int)TransactionType.Transfer, Currency = x.Currency, Account = Mapper.Map<Account>(dtoRecipientAcc), Amount = x.Amount, TransactionDate = DateTime.Now });
                         }
                     });
 
-                    sendMail([dtoCustomer.PrimaryMailAddress], "Para Transferi Başarılı", $"Merhaba {dtoCustomer.Name},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br<br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                    sendMail([dtoCustomer.PrimaryMailAddress], "Para Transferi Başarılı", $"Merhaba {dtoCustomer.Name},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
 
                     if (x.RecipientAccountId != 6 && dtoRecipientCustomer != null)
                     {
-                        sendMail([dtoRecipientCustomer.PrimaryMailAddress], "Hesabınıza Para Geldi", $"Merhaba {dtoRecipientCustomer.Name},<br><br>{dtoCustomer.Name} tarafından size para gönderildi.<br<br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                        sendMail([dtoRecipientCustomer.PrimaryMailAddress], "Hesabınıza Para Geldi", $"Merhaba {dtoRecipientCustomer.Name},<br><br>{dtoCustomer.Name} tarafından size para gönderildi.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
                     }
                 }
                 else if (x.Status == (int)TransferStatus.Failed)

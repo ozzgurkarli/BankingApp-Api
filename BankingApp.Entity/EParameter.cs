@@ -25,5 +25,17 @@ namespace BankingApp.Entity
         {
             return await database.Parameter.FirstOrDefaultAsync(x => x.GroupCode.Equals(par.GroupCode) && x.Code.Equals(par.Code));
         }
+
+        public async Task<Parameter> UpdateParameter(Parameter item){
+            using (var context = new BankingDbContext())
+            {
+                context.ChangeTracker.AutoDetectChangesEnabled = false;
+                context.Parameter.UpdateRange(item);
+
+                await context.SaveChangesAsync();
+            }
+
+            return item;
+        }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace BankingApp.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
@@ -17,6 +19,7 @@ namespace BankingApp.Api.Controllers
             _proxy = proxy;
         }
 
+        [AllowAnonymous]
         [HttpPost("GetLoginCredentials")]
         public async Task<IActionResult> GetLoginCredentials([FromBody] MessageContainer message)
         {

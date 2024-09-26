@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BankingApp.Common.Constants;
 using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
 using BankingApp.Entity;
 using BankingApp.Entity.Entities;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BankingApp.Service
 {
@@ -70,8 +73,15 @@ namespace BankingApp.Service
             ELogin eLogin = new ELogin();
             DTOLogin dtoLogin = Mapper.Map<DTOLogin>(await eLogin.Select(Mapper.Map<Login>(requestMessage.Get<DTOLogin>())));
 
-            if(dtoLogin != null)
+            if(dtoLogin != null)       // generate token
             {
+                SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(ENV.JwtSecretKey));
+                DateTime dtNow = DateTime.UtcNow;
+                JwtSecurityToken jwt = new JwtSecurityToken(issuer: ENV.JwtIssuer, audience: ENV.JwtAudience, notBefore: dtNow, expires: dtNow.AddMinutes(300), 
+                signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256));
+
+                dtoLogin.Token = new JwtSecurityTokenHandler().WriteToken(jwt);
+                dtoLogin.TokenExpireDate = dtNow.AddMinutes(300);
                 response.Add(dtoLogin);
             }
 

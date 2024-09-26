@@ -1,10 +1,12 @@
 ﻿using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankingApp.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ParameterController : ControllerBase
