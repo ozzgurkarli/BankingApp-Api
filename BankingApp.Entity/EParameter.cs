@@ -30,7 +30,7 @@ namespace BankingApp.Entity
             using (var context = new BankingDbContext())
             {
                 context.ChangeTracker.AutoDetectChangesEnabled = false;
-                context.Parameter.UpdateRange(item);
+                item = (context.Parameter.Update(item)).Entity;
 
                 await context.SaveChangesAsync();
             }

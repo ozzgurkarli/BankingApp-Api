@@ -54,6 +54,7 @@ namespace BankingApp.Service
         public async Task<MessageContainer> SetCurrencyValues(MessageContainer requestMessage){
             EParameter eParameter = new EParameter();
             requestMessage.Add(new DTOParameter{GroupCode= "Currency"});
+            MessageContainer responseMessage = new MessageContainer();
 
             MessageContainer responsePar = await GetParametersByGroupCode(requestMessage);
             List<DTOParameter> parList = responsePar.Get<List<DTOParameter>>();
@@ -81,12 +82,12 @@ namespace BankingApp.Service
                 foreach (var item in parList)
                 {
                     item.Detail2 = DateTime.Today.ToString();
-                    item.Detail3 = item.Description.Equals("TL") ? "0" : Math.Round(currencyDict[item.Description!], 2, MidpointRounding.AwayFromZero).ToString();
-                    eParameter.UpdateParameter(Mapper.Map<Parameter>(item));
+                    item.Detail3 = item.Description!.Equals("TL") ? "0" : Math.Round(currencyDict[item.Description!], 2, MidpointRounding.AwayFromZero).ToString();
+                    responseMessage.Add(eParameter.UpdateParameter(Mapper.Map<Parameter>(item)));
                 }
             }
 
-            return new MessageContainer();
+            return responseMessage;
         }
     }
 }
