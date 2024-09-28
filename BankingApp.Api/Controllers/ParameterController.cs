@@ -29,6 +29,7 @@ namespace BankingApp.Api.Controllers
             return Ok(responseMessage);
         }
 
+        [AllowAnonymous]
         [HttpPost("GetMultipleGroupCode")]
         public async Task<IActionResult> GetMultipleGroupCode([FromBody] MessageContainer message)
         {

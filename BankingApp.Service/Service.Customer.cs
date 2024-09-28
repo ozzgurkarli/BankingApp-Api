@@ -23,7 +23,6 @@ namespace BankingApp.Service
 
             dtoReqCustomer.CreditScore = 1000;
             dtoReqCustomer.Active = true;
-
             DTOCustomer dtoCustomer = Mapper.Map<DTOCustomer>(await eCustomer.Add(Mapper.Map<Customer>(dtoReqCustomer)));
             DTOLogin dtoLogin = new DTOLogin { IdentityNo = dtoCustomer.IdentityNo, Password = setTemporaryPassword(), Temporary = true };
             eLogin.Add(Mapper.Map<Login>(dtoLogin));

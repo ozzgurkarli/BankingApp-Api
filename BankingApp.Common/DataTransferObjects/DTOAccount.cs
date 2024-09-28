@@ -24,6 +24,8 @@ namespace BankingApp.Common.DataTransferObjects
 
         public bool? Active { get; set; }
 
+        public bool? CustomerActive { get; set; }
+
         public bool? Primary { get; set; }
 
         public int? Branch { get; set; }

@@ -11,6 +11,9 @@ namespace BankingApp.Common.DataTransferObjects
 {
     public class DTOCustomer : BaseDTO
     {
+        [Range(100000000000, 999999999999)]
+        public new Int64? Id { get; set; }
+
         [StringLength(12)]
         public string? CustomerNo { get; set; }
 

@@ -8,7 +8,8 @@ namespace BankingApp.Entity.Entities
 {
     public class MailAddresses: BaseEntity
     {
-        public required virtual Customer Customer { get; set; }
+        public long CustomerId { get; set; }
+        public virtual Customer? Customer { get; set; }
 
         public required string MailAddress { get; set; }
 

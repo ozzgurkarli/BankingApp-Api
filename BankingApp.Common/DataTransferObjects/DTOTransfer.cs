@@ -31,5 +31,7 @@ namespace BankingApp.Common.DataTransferObjects
         public DateTime? OrderDate { get; set; }
 
         public string? Currency { get; set; }
+
+        public bool? TestData { get; set; }
     }
 }
