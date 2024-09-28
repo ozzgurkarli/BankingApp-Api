@@ -63,6 +63,7 @@ namespace BankingApp.Service
             {
                 if(src.Customer != null){
                     dest.CustomerNo = src.Customer.Id.ToString();
+                    dest.CustomerActive = src.Customer.Active;
                 }
             });
             #endregion account

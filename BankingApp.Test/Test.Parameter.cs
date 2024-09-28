@@ -37,10 +37,10 @@ namespace BankingApp.Test
         [Theory]
         [InlineData(new string[] { "CardType" }, new int[] { 2 })]
         [InlineData(new string[] { "CardType", "Gender" }, new int[] { 2, 2 })]
-        public async void GetMultipleGroupCode(string[] groupCodes, int[] counts)
+        public async void GetMultipleGroupCodeTest(string[] groupCodes, int[] counts)
         {
             MessageContainer requestMessage = new MessageContainer();
-            List<DTOParameter> requestParList = [];
+            List<DTOParameter> requestParList = new List<DTOParameter>();
             foreach (var item in groupCodes)
             {
                 requestParList.Add(new DTOParameter { GroupCode = item });

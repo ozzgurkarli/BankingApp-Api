@@ -10,6 +10,7 @@ namespace BankingApp.Entity.Entities
 {
     public class Account: BaseEntity
     {
+        public long CustomerId { get; set; }
         public virtual Customer? Customer { get; set; }
 
         [StringLength(16)]
