@@ -83,7 +83,7 @@ namespace BankingApp.Service
                 {
                     item.Detail2 = DateTime.Today.ToString();
                     item.Detail3 = item.Description!.Equals("TL") ? "0" : Math.Round(currencyDict[item.Description!], 2, MidpointRounding.AwayFromZero).ToString();
-                    responseMessage.Add(eParameter.UpdateParameter(Mapper.Map<Parameter>(item)));
+                    responseMessage.Add(item.Description, eParameter.UpdateParameter(Mapper.Map<Parameter>(item)));
                 }
             }
 

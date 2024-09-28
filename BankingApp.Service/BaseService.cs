@@ -78,6 +78,12 @@ namespace BankingApp.Service
                 if(!string.IsNullOrWhiteSpace(src.AccountNo)){
                     dest.Account = new Account{AccountNo = src.AccountNo};
                 }
+                if(src.AccountId != null && src.AccountId != 0){
+                    if(dest.Account == null){
+                        dest.Account = new Account();
+                    }
+                    dest.Account.Id = (int)src.AccountId;
+                }
 
                 if(!string.IsNullOrWhiteSpace(src.CreditCardNo)){
                     dest.CreditCard = new CreditCard{CardNo = src.CreditCardNo};

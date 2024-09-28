@@ -30,6 +30,7 @@ namespace BankingApp.Api.Controllers
         }
 
 
+        [AllowAnonymous]
         [HttpPost("CreateCustomer")]
         public async Task<IActionResult> CreateCustomer(MessageContainer message)
         {
