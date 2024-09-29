@@ -55,11 +55,6 @@ namespace BankingApp.Service
             {
                 await item;
                 Task<MessageContainer> execute = ExecuteTransferSchedule(new MessageContainer());
-
-                if (dtoTransfer.TestData != null && (bool)dtoTransfer.TestData)
-                {     // test data expects executetransferschedule
-                    return await execute;
-                }
             }
 
             return new MessageContainer();

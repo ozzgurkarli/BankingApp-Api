@@ -11,18 +11,37 @@ namespace BankingApp.Test
     public partial class Test
     {
         [Theory]
-        [InlineData(1, "11111111112", 30000, "TL")]
-        public async void ExecuteTransferScheduleTest(int senderAccountId, string recipientAccountNo, decimal amount, string currency)
+        [InlineData(new int[] {1}, new string[] {"11111111112"}, new string[] {"3000.0"}, new string[] {"TL"})]
+        public async void ExecuteTransferScheduleTest(int[] senderAccountIds, string[] recipientAccountNos, string[] amountsAsString, string[] currencies)
         {
-            // BURASI PARAMETRE OLARAK LISTE ALIP, FOR ICINDE START TRANSFER CALISTIRIP, EN SON EXECUTESCHEDULE ILE TUM VERILERI ALACAK SEKILDE DUZENLENEBILIR???
-            MessageContainer requestMessage = new MessageContainer();
-            DTOTransfer dtoTransfer = new DTOTransfer{SenderAccountId = senderAccountId, RecipientAccount = recipientAccountNo, Amount = amount, Currency = currency, OrderDate = DateTime.Today, TestData = true};
+            decimal[] amounts = new decimal[amountsAsString.Length];
+            for (int i = 0; i < amountsAsString.Length; i++)    
+            {
+                amounts[i] = decimal.Parse(amountsAsString[i]);
+            }
 
-            requestMessage.Add(dtoTransfer);
-            MessageContainer responseMessage = await _proxy.StartTransfer(requestMessage);
+            MessageContainer requestMessage = new MessageContainer();
+            DTOTransfer dtoTransfer;
+            for (int i = 0; i < senderAccountIds.Length; i++)
+            {
+                dtoTransfer = new DTOTransfer{SenderAccountId = senderAccountIds[i], RecipientAccount = recipientAccountNos[i], Amount = amounts[i], Currency = currencies[i], OrderDate = DateTime.Today};
+
+                requestMessage.Clear();
+                requestMessage.Add(dtoTransfer);
+                await _proxy.StartTransfer(requestMessage);
+            }
+
+            MessageContainer responseMessage = await _proxy.ExecuteTransferSchedule(new MessageContainer());
 
             List<DTOTransfer> successTransfers = responseMessage.Get<List<DTOTransfer>>("SuccessTransfers");
             List<DTOTransfer> failedTransfers = responseMessage.Get<List<DTOTransfer>>("FailedTransfers");
+            List<DTOTransactionHistory> senderTransactions = responseMessage.Get<List<DTOTransactionHistory>>("SenderTransactions");
+            List<DTOTransactionHistory> recipientTransactions = responseMessage.Get<List<DTOTransactionHistory>>("RecipientTransactions");
+
+            for (int i = 0; i < senderAccountIds.Length; i++)
+            {
+                
+            }
 
             Assert.True(true);
         }
