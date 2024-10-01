@@ -4,6 +4,7 @@ using BankingApp.Entity.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BankingApp.Entity.Migrations
 {
     [DbContext(typeof(BankingDbContext))]
-    partial class BankingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240929171605_ParametersDetailsIncreased")]
+    partial class ParametersDetailsIncreased
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -669,9 +672,8 @@ namespace BankingApp.Entity.Migrations
                             Id = 18,
                             Code = 1,
                             Description = "TL",
-                            Detail1 = "Türk Lirası;Turkish Lira",
+                            Detail1 = "Türk Lirasi;Turkish Lira",
                             Detail2 = "TR",
-                            Detail5 = "3",
                             GroupCode = "Currency",
                             RecordDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RecordScreen = "ADMIN"
@@ -683,7 +685,6 @@ namespace BankingApp.Entity.Migrations
                             Description = "JPY",
                             Detail1 = "Japon Yeni;Japanese Yen",
                             Detail2 = "JP",
-                            Detail5 = "3",
                             GroupCode = "Currency",
                             RecordDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RecordScreen = "ADMIN"
@@ -695,43 +696,6 @@ namespace BankingApp.Entity.Migrations
                             Description = "EUR",
                             Detail1 = "Euro;Euro",
                             Detail2 = "DE",
-                            Detail5 = "3",
-                            GroupCode = "Currency",
-                            RecordDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 22,
-                            Code = 3,
-                            Description = "XAU",
-                            Detail1 = "Altın;Gold",
-                            Detail2 = "XU",
-                            Detail5 = "3",
-                            GroupCode = "Currency",
-                            RecordDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 23,
-                            Code = 5,
-                            Description = "XAG",
-                            Detail1 = "Gümüş;Silver",
-                            Detail2 = "XG",
-                            Detail5 = "3",
-                            GroupCode = "Currency",
-                            RecordDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            RecordScreen = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = 24,
-                            Code = 6,
-                            Description = "RUB",
-                            Detail1 = "Ruble;Ruble",
-                            Detail2 = "RU",
-                            Detail5 = "3",
                             GroupCode = "Currency",
                             RecordDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             RecordScreen = "ADMIN"
