@@ -20,6 +20,14 @@ namespace BankingApp.Entity
                 return await context.Parameter.Where(x => x.GroupCode.Equals(par.GroupCode)).ToListAsync();
             }
         }
+        
+        public async Task<List<Parameter>> GetParametersByMultipleGroupCode(List<Parameter> parList)
+        {
+            using (var context = new BankingDbContext())
+            {
+                return await context.Parameter.Where(x => parList.Select(y=> y.GroupCode).ToList().Contains(x.GroupCode)).ToListAsync();
+            }
+        }
 
         public async Task<Parameter> GetParameter(Parameter par)
         {

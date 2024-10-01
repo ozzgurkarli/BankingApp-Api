@@ -19,5 +19,9 @@ namespace BankingApp.Common.DataTransferObjects
         public string? Detail2 { get; set; }
 
         public string? Detail3 { get; set; }
+
+        public string? Detail4 { get; set; }
+
+        public string? Detail5 { get; set; }
     }
 }

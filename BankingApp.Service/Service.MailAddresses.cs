@@ -52,9 +52,9 @@ namespace BankingApp.Service
 
         private void sendMail(List<string> toList, string subject, string body)
         {
-            SmtpClient smtpClient = new SmtpClient("smtp.outlook.com", 587)
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
             {
-                Credentials = new NetworkCredential("ozzgur.par@outlook.com", ENV.MailPassword),
+                Credentials = new NetworkCredential("ozzgur.parbnk@gmail.com", ENV.MailPassword),
                 EnableSsl = true
             };
 
@@ -62,7 +62,7 @@ namespace BankingApp.Service
             {
                 foreach(string to in toList)
                 {
-                    MailMessage mailMessage = new MailMessage("ozzgur.par@outlook.com", to, subject, body);
+                    MailMessage mailMessage = new MailMessage("ozzgur.parbnk@gmail.com", to, subject, body);
                     mailMessage.IsBodyHtml = true;
                     smtpClient.Send(mailMessage);
                 }

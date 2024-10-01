@@ -17,6 +17,7 @@ namespace BankingApp.Api.Controllers
             _proxy = proxy;
         }
 
+        [AllowAnonymous]
         [HttpPost("GetParametersByGroupCode")]
         public async Task<IActionResult> GetParametersByGroupCode([FromBody] MessageContainer message)
         {

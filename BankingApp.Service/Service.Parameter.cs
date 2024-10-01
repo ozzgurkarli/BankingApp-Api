@@ -35,16 +35,15 @@ namespace BankingApp.Service
 
             List<Task<List<Parameter>>> taskList = new List<Task<List<Parameter>>>();
 
-            parList.ForEach(x=> {
-                taskList.Add(eParameter.GetParametersByGroupCode(Mapper.Map<Parameter>(x)));
-            });
+            dtoParList = Mapper.Map<List<DTOParameter>>(await eParameter.GetParametersByMultipleGroupCode(Mapper.Map<List<Parameter>>(parList)));
+            
 
-            foreach (List<Parameter> item in await Task.WhenAll(taskList.ToArray()))
-            {
-                item.ForEach(x=> {
-                    dtoParList.Add(Mapper.Map<DTOParameter>(x));
-                });
-            }
+            // foreach (List<Parameter> item in await Task.WhenAll(taskList.ToArray()))
+            // {
+            //     item.ForEach(x=> {
+            //         dtoParList.Add(Mapper.Map<DTOParameter>(x));
+            //     });
+            // }
 
             response.Add("ParameterList", dtoParList);
 
@@ -65,6 +64,7 @@ namespace BankingApp.Service
             if(DateTime.Parse(parList.Find(x=> x.Code.Equals(1))!.Detail2!).CompareTo(DateTime.Today) < 0){   // set new values
                 HttpClient client = new HttpClient();
                 Dictionary<string,object> dict = JsonConvert.DeserializeObject<Dictionary<string,object>>(await client.GetStringAsync($"https://data.fixer.io/api/latest?access_key={ENV.CurrencyApiKey}"))!;
+                
                 foreach (KeyValuePair<string, decimal> item in JsonConvert.DeserializeObject<Dictionary<string, decimal>>(dict["rates"].ToString()!)!)
                 {
                     if(item.Key.Equals("TRY") || parList.Select(x=> x.Description).ToList().Contains(item.Key)){
@@ -82,7 +82,8 @@ namespace BankingApp.Service
                 foreach (var item in parList)
                 {
                     item.Detail2 = DateTime.Today.ToString();
-                    item.Detail3 = item.Description!.Equals("TL") ? "0" : Math.Round(currencyDict[item.Description!], 2, MidpointRounding.AwayFromZero).ToString();
+                    item.Detail3 = item.Detail4;
+                    item.Detail4 = item.Description!.Equals("TL") ? "0" : Math.Round(currencyDict[item.Description!], 2, MidpointRounding.AwayFromZero).ToString();
                     responseMessage.Add(item.Description, eParameter.UpdateParameter(Mapper.Map<Parameter>(item)));
                 }
             }
