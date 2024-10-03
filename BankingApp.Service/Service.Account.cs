@@ -16,15 +16,15 @@ namespace BankingApp.Service
         {
             MessageContainer response = new MessageContainer();
             EAccount eAccount = new EAccount();
-            EAccountTracker eAccountTracker = new EAccountTracker();
+            EParameter eParameter = new EParameter();
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
 
             dtoAccount.Active = true;
             dtoAccount.Balance = 0;
             
-            dtoAccount.AccountNo = (await eAccountTracker.GetAndIncrease(new AccountTracker{Currency = dtoAccount.CurrencyCode})).FirstAvailableNo;
+            dtoAccount.AccountNo = (await eAccount.GetFirstAvailableNoAndIncrease(dtoAccount)).AccountNo;
 
-            dtoAccount = Mapper.Map<DTOAccount>(await eAccount.Add(Mapper.Map<Account>(dtoAccount)));
+            await eAccount.Add(dtoAccount);
 
             response.Add(dtoAccount);
 
