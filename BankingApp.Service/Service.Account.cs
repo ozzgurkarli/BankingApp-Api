@@ -23,10 +23,7 @@ namespace BankingApp.Service
             dtoAccount.Balance = 0;
             
             dtoAccount.AccountNo = (await eAccount.GetFirstAvailableNoAndIncrease(dtoAccount)).AccountNo;
-
-            await eAccount.Add(dtoAccount);
-
-            response.Add(dtoAccount);
+            response.Add(await eAccount.Add(dtoAccount));
 
             return response;
         }

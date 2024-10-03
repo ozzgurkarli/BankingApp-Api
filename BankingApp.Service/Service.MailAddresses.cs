@@ -22,8 +22,8 @@ namespace BankingApp.Service
             DTOMailAddresses dtoMailAddress = reqMessage.Get<DTOMailAddresses>("MailAddress");
             DTOLogin dtoLogin = reqMessage.Get<DTOLogin>("Login");
 
-            eMailAddress.Add(Mapper.Map<MailAddresses>(dtoMailAddress));
-            sendMail(new List<string> { dtoMailAddress.MailAddress }, "ParBank Geçici Parola", $"Merhaba {dtoCustomer.Name},<br><br>Bankamıza hoşgeldin. ParBank uygulamasına ilk girişinde kullanabileceğin geçici parola: <strong>{dtoLogin.Password}</strong><br><br>İyi Günler Dileriz.");
+            await eMailAddress.Add(dtoMailAddress);
+            sendMail(new List<string> { dtoMailAddress.MailAddress! }, "ParBank Geçici Parola", $"Merhaba {dtoCustomer.Name},<br><br>Bankamıza hoşgeldin. ParBank uygulamasına ilk girişinde kullanabileceğin geçici parola: <strong>{dtoLogin.Password}</strong><br><br>İyi Günler Dileriz.");
             
             return new MessageContainer();
         }

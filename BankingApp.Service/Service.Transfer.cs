@@ -19,19 +19,19 @@ namespace BankingApp.Service
             DTOTransfer dtoTransfer = requestMessage.Get<DTOTransfer>();
             DTOAccount? dtoRecipientAcc = null;
 
-            if (dtoTransfer.RecipientAccount!.Length > 16)
+            if (dtoTransfer.RecipientAccountNo!.Length > 16)
             {
-                dtoTransfer.RecipientAccount = dtoTransfer.RecipientAccount.Replace(" ", "").Substring(10);
-                dtoRecipientAcc = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = dtoTransfer.RecipientAccount }));
+                dtoTransfer.RecipientAccountNo = dtoTransfer.RecipientAccountNo.Replace(" ", "").Substring(10);
+                dtoRecipientAcc = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = dtoTransfer.RecipientAccountNo }));
 
-                if (dtoTransfer.RecipientAccount.Substring(2, 2) == "11" && dtoRecipientAcc == null)
+                if (dtoTransfer.RecipientAccountNo.Substring(2, 2) == "11" && dtoRecipientAcc == null)
                 { // if parbank and null
                     throw new Exception("Alıcı bilgileri bulunamadı.");
                 }
             }
             else
             {  //identity no
-                Customer? dtoCustomer = await eCustomer.GetByIdentityNoIncludeAccounts(new Customer { IdentityNo = dtoTransfer.RecipientAccount });
+                Customer? dtoCustomer = await eCustomer.GetByIdentityNoIncludeAccounts(new Customer { IdentityNo = dtoTransfer.RecipientAccountNo });
 
                 if (dtoCustomer != null && dtoCustomer.Accounts != null)
                 {
@@ -41,15 +41,12 @@ namespace BankingApp.Service
 
 
 
-            dtoTransfer.RecipientAccountId = dtoRecipientAcc == null ? 6 : dtoRecipientAcc.Id;
+            dtoTransfer.RecipientAccountNo = dtoRecipientAcc == null ? "0000000000000000" : dtoRecipientAcc.AccountNo;
 
             dtoTransfer.TransactionDate = DateTime.Now;
             dtoTransfer.Status = (int?)TransferStatus.Waiting;
 
-            Transfer x = new Transfer { SenderAccount = new Account { Id = (int)dtoTransfer.SenderAccountId! }, Amount = dtoTransfer.Amount, Currency = dtoTransfer.Currency, OrderDate = dtoTransfer.OrderDate, RecipientAccount = new Account { Id = (int)dtoTransfer.RecipientAccountId! }, Status = dtoTransfer.Status, TransactionDate = dtoTransfer.TransactionDate };
-
-
-            Task<Transfer> item = eTransfer.Add(x);
+            Task<DTOTransfer> item = eTransfer.Add(dtoTransfer);
 
             if (dtoTransfer.OrderDate == DateTime.Today)
             {
@@ -71,77 +68,49 @@ namespace BankingApp.Service
             List<DTOTransactionHistory> recipientTransactions = new List<DTOTransactionHistory>();
             List<DTOTransfer> successTransfers = new List<DTOTransfer>();
             List<DTOTransfer> failedTransfers = new List<DTOTransfer>();
-            Task task;
 
-            List<DTOTransfer> transfers = Mapper.Map<List<DTOTransfer>>(await eTransfer.GetTodayOrders(new Transfer()));
-            DTOAccount senderAccount, recipientAccount;
+            List<DTOTransfer> transfers = Mapper.Map<List<DTOTransfer>>(await eTransfer.GetOrdersToExecute(new DTOTransfer()));
 
             foreach (DTOTransfer transfer in transfers)
             {
-                try
-                {
-                    senderAccount = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = transfer.SenderAccount }));
-                    recipientAccount = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = transfer.RecipientAccount }));
-
-                    if (senderAccount == null || recipientAccount == null || senderAccount.Balance < transfer.Amount || (senderAccount.CustomerActive != null && (bool)!senderAccount.CustomerActive) || (recipientAccount.CustomerActive != null && (bool)!recipientAccount.CustomerActive) || !(bool)senderAccount.Active! || !(bool)recipientAccount.Active!)
-                    {
-                        transfer.Status = (int?)TransferStatus.Failed;
-                        continue;
-                    }
-
-                    senderAccount.Balance -= transfer.Amount;
-                    recipientAccount.Balance += transfer.Amount;
-
-                    task = eAccount.Update(Mapper.Map<Account>(senderAccount));
-                    task = eAccount.Update(Mapper.Map<Account>(recipientAccount));
-
-                    transfer.Status = (int?)TransferStatus.Success;
-                }
-                catch (Exception)
+                if (transfer.SenderAccountBalance < transfer.Amount || (bool)!transfer.SenderCustomerActive! || (bool)!transfer.RecipientCustomerActive! || !(bool)transfer.SenderAccountActive! || !(bool)transfer.RecipientAccountActive!)
                 {
                     transfer.Status = (int?)TransferStatus.Failed;
+                    continue;
                 }
+
+                transfer.Status = (int?)TransferStatus.Success;
             }
 
             transfers.ForEach(async x =>
             {
-                successTransfers.Add(Mapper.Map<DTOTransfer>(await eTransfer.Update(new Transfer { Id = (int)x.Id!, SenderAccount = new Account { Id = (int)x.SenderAccountId! }, Amount = x.Amount, Currency = x.Currency, OrderDate = x.OrderDate, RecipientAccount = new Account { Id = (int)x.RecipientAccountId! }, Status = x.Status, TransactionDate = x.TransactionDate })));
+                // senderAccount = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = x.SenderAccount }));
+                // recipientAccount = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = x.RecipientAccount }));
 
-                DTOAccount dtoSenderAcc = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = x.SenderAccount }));
-                DTOCustomer dtoCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetIncludeMailAddress(new Customer { Id = int.Parse(dtoSenderAcc.CustomerNo!) }));
+                // task = eAccount.UpdateRange([senderAccount, recipientAccount]);
+                successTransfers.Add(Mapper.Map<DTOTransfer>(await eTransfer.Update(new Transfer { Id = (int)x.Id!, SenderAccount = new Account { Id = (int)x.SenderAccountId! }, Amount = x.Amount, Currency = x.Currency, OrderDate = x.OrderDate, RecipientAccount = new Account { Id = (int)x.RecipientAccountId! }, Status = x.Status, TransactionDate = x.TransactionDate })));
                 if (x.Status == (int)TransferStatus.Success)
                 {
-                    DTOAccount? dtoRecipientAcc = null;
-                    DTOCustomer? dtoRecipientCustomer = null;
-
-                    if (x.RecipientAccountId != 6)
-                    {
-                        dtoRecipientAcc = Mapper.Map<DTOAccount>(await eAccount.Get(new Account { AccountNo = x.RecipientAccount }));
-                        dtoRecipientCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetIncludeMailAddress(new Customer { Id = int.Parse(dtoRecipientAcc.CustomerNo!) }));
-                    }
-
                     MessageContainer requestTransaction = new MessageContainer();
                     MessageContainer responseTransaction = new MessageContainer();
-                    requestTransaction.Add(new DTOTransactionHistory { Currency = x.Currency!, CustomerNo = dtoCustomer.CustomerNo, TransactionType = (int)TransactionType.Transfer, AccountNo = dtoSenderAcc.AccountNo, AccountId = dtoSenderAcc.Id, Amount = -x.Amount, TransactionDate = DateTime.UtcNow });
+                    requestTransaction.Add(new DTOTransactionHistory { Currency = x.Currency!, CustomerNo = x.SenderCustomerNo, TransactionType = (int)TransactionType.Transfer, AccountNo = x.SenderAccountNo, Amount = -x.Amount, TransactionDate = DateTime.UtcNow });
                     responseTransaction = await AddNewTransaction(requestTransaction);
                     senderTransactions.Add(responseTransaction.Get<DTOTransactionHistory>());
-                    sendMail([dtoCustomer.PrimaryMailAddress], "Para Transferi Başarılı", $"Merhaba {dtoCustomer.Name},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                    sendMail([x.SenderMailAddress], "Para Transferi Başarılı", $"Merhaba {x.SenderName},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
 
-                    if (x.RecipientAccountId != 6 && dtoRecipientCustomer != null && dtoRecipientAcc != null)
+                    if (x.RecipientAccountNo != "0000000000000000")
                     {
                         requestTransaction.Clear();
-                        requestTransaction.Add(new DTOTransactionHistory { Currency = x.Currency!, CustomerNo = dtoRecipientCustomer.CustomerNo, TransactionType = (int)TransactionType.Transfer, AccountNo = dtoRecipientAcc.AccountNo, AccountId = dtoRecipientAcc.Id, Amount = x.Amount, TransactionDate = DateTime.UtcNow });
+                        requestTransaction.Add(new DTOTransactionHistory { Currency = x.Currency!, CustomerNo = x.RecipientCustomerNo, TransactionType = (int)TransactionType.Transfer, AccountNo = x.RecipientAccountNo, Amount = x.Amount, TransactionDate = DateTime.UtcNow });
                         responseTransaction = await AddNewTransaction(requestTransaction);
                         recipientTransactions.Add(responseTransaction.Get<DTOTransactionHistory>());
-                        sendMail([dtoRecipientCustomer.PrimaryMailAddress], "Hesabınıza Para Geldi", $"Merhaba {dtoRecipientCustomer.Name},<br><br>{dtoCustomer.Name} tarafından size para gönderildi.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                        sendMail([x.RecipientMailAddress], "Hesabınıza Para Geldi", $"Merhaba {x.RecipientName},<br><br>{x.SenderName} tarafından size para gönderildi.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
                     }
 
                 }
                 else if (x.Status == (int)TransferStatus.Failed)
                 {
                     failedTransfers.Add(x);
-                    sendMail([dtoCustomer.PrimaryMailAddress], "Para Transferi Başarısız", $"Merhaba {dtoCustomer.Name},<br><br>Gerçekleştirdiğin para transferi tamamlanamadı. Detaylı bilgi için müşteri hizmetlerimizle iletişime geçebilirsin.<br<br>İyi Günler Dileriz.");
-
                 }
             });
 

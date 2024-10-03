@@ -8,9 +8,28 @@ namespace BankingApp.Common.DataTransferObjects
     public class DTOTransfer: BaseDTO
     {
         
-        public string? SenderAccount { get; set; }
+        public string? SenderAccountNo { get; set; }
 
-        public string? RecipientAccount { get; set; }
+        public string? RecipientAccountNo { get; set; }
+        
+        public decimal? SenderAccountBalance { get; set; }
+
+        public bool? SenderAccountActive { get; set; }
+
+        public bool? RecipientAccountActive { get; set; }
+
+        public bool? SenderCustomerActive { get; set; }
+
+        public bool? RecipientCustomerActive { get; set; }
+
+        public string? SenderMailAddress { get; set; }
+
+        public string? RecipientMailAddress { get; set; }
+
+        public string? SenderName { get; set; }
+
+        public string? RecipientName { get; set; }
+
 
         public string? SenderCustomerNo { get; set; }
 

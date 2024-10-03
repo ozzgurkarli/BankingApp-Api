@@ -108,13 +108,15 @@ namespace BankingApp.Entity
             return dtoparameter;
         }
 
-        public async Task Update(DTOParameter dtoParameter)
+        public async Task<DTOParameter> Update(DTOParameter dtoParameter)
         {
             using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
             {
                 await connection.OpenAsync();
-                using (var command = new NpgsqlCommand("CALL u_parameter(@p_recorddate, @p_recordscreen, @p_id, @p_groupcode, @p_code, @p_description, @p_detail1, @p_detail2, @p_detail3, @p_detail4, @p_detail5)", connection))
+                NpgsqlTransaction tran = await connection.BeginTransactionAsync();
+                using (var command = new NpgsqlCommand("SELECT u_parameter(@refcursor, @p_recorddate, @p_recordscreen, @p_id, @p_groupcode, @p_code, @p_description, @p_detail1, @p_detail2, @p_detail3, @p_detail4, @p_detail5)", connection, tran))
                 {
+                    command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
                     command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                     command.Parameters.AddWithValue("p_recordscreen", dtoParameter.RecordScreen);
                     command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
@@ -130,13 +132,40 @@ namespace BankingApp.Entity
                     command.Parameters.AddWithValue("p_detail5", dtoParameter.Detail5 ?? (object)DBNull.Value);
 
                     await command.ExecuteNonQueryAsync();
+
+                    command.CommandText = "fetch all in \"ref\"";
+                    command.CommandType = CommandType.Text;
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            dtoParameter = new DTOParameter
+                            {
+                                Id = reader.GetInt32(0),
+                                GroupCode = reader.GetString(1),
+                                Code = reader.GetInt32(2),
+                                Description = reader.GetString(3),
+                                Detail1 = await reader.IsDBNullAsync(4) ? null : reader.GetString(4),
+                                Detail2 = await reader.IsDBNullAsync(5) ? null : reader.GetString(5),
+                                Detail3 = await reader.IsDBNullAsync(6) ? null : reader.GetString(6),
+                                Detail4 = await reader.IsDBNullAsync(7) ? null : reader.GetString(7),
+                                Detail5 = await reader.IsDBNullAsync(8) ? null : reader.GetString(8)
+                            };
+                        }
+                    }
+                    await tran.CommitAsync();
                 }
+                await tran.DisposeAsync();
                 await connection.CloseAsync();
             }
+
+            return dtoParameter;
         }
 
-        public async Task UpdateRange(List<DTOParameter> dtoParameterList)
+        public async Task<List<DTOParameter>> UpdateRange(List<DTOParameter> dtoParameterList)
         {
+            List<DTOParameter> parlist = new List<DTOParameter>();
             using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
             {
                 await connection.OpenAsync();
@@ -145,8 +174,11 @@ namespace BankingApp.Entity
                 {
                     foreach (var dtoParameter in dtoParameterList)
                     {
-                        using (var command = new NpgsqlCommand("CALL u_parameter(@p_recorddate, @p_recordscreen, @p_id, @p_groupcode, @p_code, @p_description, @p_detail1, @p_detail2, @p_detail3, @p_detail4, @p_detail5)", connection, tran))
+                        using (var command = new NpgsqlCommand("SELECT u_parameter(@refcursor, @p_recorddate, @p_recordscreen, @p_id, @p_groupcode, @p_code, @p_description, @p_detail1, @p_detail2, @p_detail3, @p_detail4, @p_detail5)", connection, tran))
                         {
+                            command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{dtoParameter.Code}");
+                            command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
+                            command.Parameters.AddWithValue("p_recordscreen", dtoParameter.RecordScreen);
                             command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                             command.Parameters.AddWithValue("p_recordscreen", dtoParameter.RecordScreen);
                             command.Parameters.AddWithValue("p_id", dtoParameter.Id!);
@@ -160,6 +192,28 @@ namespace BankingApp.Entity
                             command.Parameters.AddWithValue("p_detail5", dtoParameter.Detail5 ?? (object)DBNull.Value);
 
                             await command.ExecuteNonQueryAsync();
+
+                            command.CommandText = $"fetch all in \"ref{dtoParameter.Code}\"";
+                            command.CommandType = CommandType.Text;
+
+                            using (var reader = await command.ExecuteReaderAsync())
+                            {
+                                if (await reader.ReadAsync())
+                                {
+                                    parlist.Add(new DTOParameter
+                                    {
+                                        Id = reader.GetInt32(0),
+                                        GroupCode = reader.GetString(1),
+                                        Code = reader.GetInt32(2),
+                                        Description = reader.GetString(3),
+                                        Detail1 = await reader.IsDBNullAsync(4) ? null : reader.GetString(4),
+                                        Detail2 = await reader.IsDBNullAsync(5) ? null : reader.GetString(5),
+                                        Detail3 = await reader.IsDBNullAsync(6) ? null : reader.GetString(6),
+                                        Detail4 = await reader.IsDBNullAsync(7) ? null : reader.GetString(7),
+                                        Detail5 = await reader.IsDBNullAsync(8) ? null : reader.GetString(8)
+                                    });
+                                }
+                            }
                         }
                     }
 
@@ -176,7 +230,8 @@ namespace BankingApp.Entity
                     await connection.CloseAsync();
                 }
             }
-
+            return parlist;
         }
+
     }
 }

@@ -1,6 +1,9 @@
-﻿using BankingApp.Entity.Config;
+﻿using BankingApp.Common.Constants;
+using BankingApp.Common.DataTransferObjects;
+using BankingApp.Entity.Config;
 using BankingApp.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +16,23 @@ namespace BankingApp.Entity
     {
         public readonly BankingDbContext database = new BankingDbContext();
 
-        public async Task<MailAddresses> Add(MailAddresses item)
+        public async Task Add(DTOMailAddresses item)
         {
-            database.Entry(item.Customer).State = EntityState.Unchanged;
-            await database.AddAsync(item);
-            database.SaveChangesAsync();
+            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            {
+                await connection.OpenAsync();
 
-            return item;
+                using (var command = new NpgsqlCommand("CALL i_mailaddress(@p_recorddate, @p_recordscreen, @p_customerid, @p_mailaddress, @p_primary)", connection))
+                {
+                    command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
+                    command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
+                    command.Parameters.AddWithValue("p_customerid", Int64.Parse(item.CustomerNo!));
+                    command.Parameters.AddWithValue("p_mailaddress", item.MailAddress!);
+                    command.Parameters.AddWithValue("p_primary", item.Primary!);
+
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
         }
 
         public Task<MailAddresses> GetByMailAddress(MailAddresses item)
