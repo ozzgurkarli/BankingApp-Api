@@ -361,7 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/BankingApp.Api/Program.cs
 /BankingApp.Api/Properties/launchSettings.json
 /BankingApp.Entity/Config/BankingDbContext.cs
 /BankingApp.Common/Constants/ENV.cs
