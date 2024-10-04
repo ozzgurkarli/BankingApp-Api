@@ -90,7 +90,7 @@ namespace BankingApp.Entity
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
 
-                using (var command = new NpgsqlCommand("SELECT i_customer(@refcursor, @p_recorddate, @p_recordscreen, @p_identityno, @p_name, @p_surname, @p_phoneno, @p_gender, @p_profession, @p_salary)", connection))
+                using (var command = new NpgsqlCommand("SELECT s_customer(@refcursor, @p_id, @p_identityno)", connection))
                 {
                     command.Parameters.AddWithValue("p_id", item.Id ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("p_identityno", item.IdentityNo ?? (object)DBNull.Value);
