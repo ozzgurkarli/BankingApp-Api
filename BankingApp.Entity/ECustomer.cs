@@ -68,11 +68,13 @@ namespace BankingApp.Entity
 
                     await tran.CommitAsync();
                 }
-                catch(Exception){
+                catch (Exception)
+                {
                     await tran.RollbackAsync();
                     throw;
                 }
-                finally{
+                finally
+                {
                     await tran.DisposeAsync();
                     await connection.CloseAsync();
                 }
@@ -81,19 +83,51 @@ namespace BankingApp.Entity
             return item;
         }
 
-        public async Task<Customer> GetIncludeMailAddress(Customer item)
+        public async Task<DTOCustomer> Get(DTOCustomer item)
         {
-            return await database.Customer.Include(x => x.MailAddresses).FirstOrDefaultAsync(x => x.Id.Equals(item.Id));
-        }
+            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            {
+                await connection.OpenAsync();
+                NpgsqlTransaction tran = await connection.BeginTransactionAsync();
 
-        public async Task<Customer> GetByIdentityNo(Customer item)
-        {
-            return await database.Customer.FirstOrDefaultAsync(x => x.IdentityNo.Equals(item.IdentityNo));
-        }
+                using (var command = new NpgsqlCommand("SELECT i_customer(@refcursor, @p_recorddate, @p_recordscreen, @p_identityno, @p_name, @p_surname, @p_phoneno, @p_gender, @p_profession, @p_salary)", connection))
+                {
+                    command.Parameters.AddWithValue("p_id", item.Id ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("p_identityno", item.IdentityNo ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
 
-        public async Task<Customer> GetByIdentityNoIncludeAccounts(Customer item)
-        {
-            return await database.Customer.Include(x => x.Accounts).FirstOrDefaultAsync(x => x.IdentityNo.Equals(item.IdentityNo));
+                    await command.ExecuteNonQueryAsync();
+
+                    command.CommandText = "fetch all in \"ref\"";
+                    command.CommandType = CommandType.Text;
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            item = new DTOCustomer
+                            {
+                                Id = (Int64)reader["Id"],
+                                IdentityNo = (string?)reader["IdentityNo"],
+                                Name = (string?)reader["Name"],
+                                Surname = (string?)reader["Surname"],
+                                Gender = (int?)reader["Gender"],
+                                Active = (bool?)reader["Active"],
+                                PhoneNo = (string?)reader["PhoneNo"],
+                                Salary = (decimal?)reader["Salary"],
+                                CreditScore = (int?)reader["CreditScore"],
+                                Profession = (int?)reader["Profession"],
+                                CustomerNo = (string?)reader["Id"].ToString(),
+                                PrimaryMailAddress = item.PrimaryMailAddress
+                            };
+                        }
+                    }
+                }
+                await tran.DisposeAsync();
+                await connection.CloseAsync();
+            }
+
+            return item;
         }
     }
 }

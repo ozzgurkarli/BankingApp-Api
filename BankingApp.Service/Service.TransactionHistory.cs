@@ -35,21 +35,6 @@ namespace BankingApp.Service
 
             transactionList = transactionList.OrderByDescending(x => x.TransactionDate).ToList();
 
-            if (dtoTransaction.Count != null && dtoTransaction.Count != 0 && transactionList.Count() >= dtoTransaction.Count)
-            {
-                transactionList = transactionList.GetRange(0, (int)dtoTransaction.Count);
-            }
-
-            if (dtoTransaction.MinDate > DateTime.MinValue)
-            {
-                transactionList.Where(x => x.TransactionDate >= dtoTransaction.MinDate);
-            }
-
-            if (dtoTransaction.MaxDate > DateTime.MinValue)
-            {
-                transactionList.Where(x => x.TransactionDate <= dtoTransaction.MaxDate);
-            }
-
             responseMessage.Add("TransactionList", transactionList);
 
             return responseMessage;

@@ -22,12 +22,13 @@ namespace BankingApp.Entity
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
 
-                using (var command = new NpgsqlCommand("SELECT l_transactionhistory(@refcursor, @customer_id, @p_mindate, @p_maxdate)", connection, tran))
+                using (var command = new NpgsqlCommand("SELECT l_transactionhistory(@refcursor, @customer_id, @p_mindate, @p_maxdate, @p_count)", connection, tran))
                 {
                     command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
                     command.Parameters.AddWithValue("customer_id", item.CustomerNo!);
-                    command.Parameters.AddWithValue("p_mindate", item.MinDate ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("p_maxdate", item.MaxDate ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("p_mindate", !item.MinDate.Equals(DateTime.MinValue) && item.MinDate != null ? item.MinDate : (object)DBNull.Value);
+                    command.Parameters.AddWithValue("p_maxdate", !item.MaxDate.Equals(DateTime.MinValue) && item.MaxDate != null ? item.MaxDate : (object)DBNull.Value);
+                    command.Parameters.AddWithValue("p_count", item.Count ?? (object)DBNull.Value);
 
                     await command.ExecuteNonQueryAsync();
 
@@ -41,13 +42,13 @@ namespace BankingApp.Entity
                             transactionList.Add(new DTOTransactionHistory
                             {
                                 Id = (int)reader["Id"],
-                                AccountNo = (string)reader["AccountNo"],
-                                CreditCardNo = (string)reader["CreditCardNo"],
+                                AccountNo = reader["AccountNo"] != DBNull.Value ? reader["AccountNo"].ToString() : null,
+                                CreditCardNo = reader["CreditCardNo"] != DBNull.Value ? reader["CreditCardNo"].ToString() : null,
                                 Amount = (decimal)reader["Amount"],
                                 Currency = (string)reader["Currency"],
                                 TransactionDate = (DateTime)reader["TransactionDate"],
-                                Description = (string)reader["Description"],
-                                CustomerNo = ((Int64)reader["AccountNo"]).ToString(),
+                                Description = reader["Description"] != DBNull.Value ? reader["Description"].ToString() : null,
+                                CustomerNo = ((Int64)reader["CustomerId"]).ToString(),
                                 TransactionType = (int)reader["TransactionType"]
                             });
                         }

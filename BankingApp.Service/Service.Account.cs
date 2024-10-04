@@ -35,12 +35,7 @@ namespace BankingApp.Service
 
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
             
-            List<DTOAccount> accountList = Mapper.Map<List<DTOAccount>>(await eAccount.GetAll()).Where(x => x.Active == true).OrderBy(x=> x.RecordDate).ToList();
-
-            if(dtoAccount.CustomerNo != null)
-            {
-                accountList = accountList.Where(x => x.CustomerNo.Equals(dtoAccount.CustomerNo)).ToList();
-            }
+            List<DTOAccount> accountList = (await eAccount.Get(dtoAccount)).OrderBy(x=> x.AccountNo).ToList();
 
             response.Add(accountList);
             return response;

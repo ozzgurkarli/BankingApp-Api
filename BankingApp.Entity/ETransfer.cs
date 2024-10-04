@@ -27,7 +27,7 @@ namespace BankingApp.Entity
                 {
                     command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                     command.Parameters.AddWithValue("p_recordscreen", transfer.RecordScreen);
-                    command.Parameters.AddWithValue("p_senderaccountno", Int64.Parse(transfer.SenderAccountNo!));
+                    command.Parameters.AddWithValue("p_senderaccountno", transfer.SenderAccountNo!);
                     command.Parameters.AddWithValue("p_recipientaccountno", transfer.RecipientAccountNo!);
                     command.Parameters.AddWithValue("p_status", transfer.Status!);
                     command.Parameters.AddWithValue("p_transactiondate", transfer.TransactionDate!);
@@ -66,22 +66,7 @@ namespace BankingApp.Entity
 
             return transfer;
         }
-
-        public async Task<Transfer> Update(Transfer item)
-        {
-            using (var context = new BankingDbContext())
-            {
-                context.ChangeTracker.AutoDetectChangesEnabled = false;
-                context.Entry(item.SenderAccount).State = EntityState.Unchanged;
-                context.Entry(item.RecipientAccount).State = EntityState.Unchanged;
-                context.Transfer.UpdateRange(item);
-
-                await context.SaveChangesAsync();
-            }
-
-            return item;
-        }
-
+        
         public async Task<List<DTOTransfer>> GetOrdersToExecute(DTOTransfer item)
         {
             List<DTOTransfer> transferList = new List<DTOTransfer>();
@@ -110,13 +95,13 @@ namespace BankingApp.Entity
                                 SenderAccountBalance = (decimal)reader["SenderAccountBalance"],
                                 SenderAccountActive = (bool)reader["SenderAccountActive"],
                                 SenderCustomerActive = (bool)reader["SenderCustomerActive"],
-                                SenderCustomerNo = (string)reader["SenderCustomerId"],
+                                SenderCustomerNo = ((Int64)reader["SenderCustomerId"]).ToString(),
                                 SenderMailAddress = (string)reader["SenderMailAddress"],
                                 SenderName = (string)reader["SenderCustomerName"],
                                 RecipientAccountActive = (bool)reader["RecipientAccountActive"],
                                 RecipientAccountNo = (string)reader["RecipientAccountNo"],
                                 RecipientCustomerActive = (bool)reader["RecipientCustomerActive"],
-                                RecipientCustomerNo = (string)reader["RecipientCustomerId"],
+                                RecipientCustomerNo = ((Int64)reader["RecipientCustomerId"]).ToString(),
                                 RecipientMailAddress = (string)reader["RecipientMailAddress"],
                                 RecipientName = (string)reader["RecipientCustomerName"],
                                 Amount = (decimal)reader["Amount"],
@@ -150,7 +135,7 @@ namespace BankingApp.Entity
                         command.Parameters.AddWithValue("p_id", transfer.Id!);
                         command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                         command.Parameters.AddWithValue("p_recordscreen", transfer.RecordScreen);
-                        command.Parameters.AddWithValue("p_senderaccountno", Int64.Parse(transfer.SenderAccountNo!));
+                        command.Parameters.AddWithValue("p_senderaccountno", transfer.SenderAccountNo!);
                         command.Parameters.AddWithValue("p_recipientaccountno", transfer.RecipientAccountNo!);
                         command.Parameters.AddWithValue("p_status", transfer.Status!);
                         command.Parameters.AddWithValue("p_transactiondate", transfer.TransactionDate!);
@@ -193,7 +178,7 @@ namespace BankingApp.Entity
                             command.Parameters.AddWithValue("p_customerid", Int64.Parse(item.CustomerNo!));
                             command.Parameters.AddWithValue("p_accountno", item.AccountNo!);
                             command.Parameters.AddWithValue("p_branch", item.Branch!);
-                            command.Parameters.AddWithValue("p_balance", 0.0M);
+                            command.Parameters.AddWithValue("p_balance", item.Balance!);
                             command.Parameters.AddWithValue("p_currency", item.Currency!);
                             command.Parameters.AddWithValue("p_active", true);
                             command.Parameters.AddWithValue("p_primary", item.Primary!);
@@ -218,7 +203,7 @@ namespace BankingApp.Entity
                             command.Parameters.AddWithValue("p_transactiondate", item.TransactionDate!);
                             command.Parameters.AddWithValue("p_description", item.Description ?? (object)DBNull.Value);
                             command.Parameters.AddWithValue("p_transactiontype", item.TransactionType!);
-                            command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{item.AccountNo}");
+                            command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"refT{item.AccountNo}");
 
                             await command.ExecuteNonQueryAsync();
                         }

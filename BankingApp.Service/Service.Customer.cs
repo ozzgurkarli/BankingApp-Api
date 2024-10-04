@@ -51,7 +51,7 @@ namespace BankingApp.Service
             ECustomer eCustomer = new ECustomer();
             DTOCustomer dtoCustomer = requestMessage.Get<DTOCustomer>();
 
-            dtoCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetByIdentityNo(Mapper.Map<Customer>(dtoCustomer)));
+            dtoCustomer = await eCustomer.Get(dtoCustomer);
 
             response.Add("DTOCustomer", dtoCustomer);
 
