@@ -8,7 +8,7 @@ namespace BankingApp.Common.DataTransferObjects
 {
     public class DTOParameter : BaseDTO
     {
-        public required string GroupCode { get; set; }
+        public string? GroupCode { get; set; }
 
         public int? Code { get; set; }
 

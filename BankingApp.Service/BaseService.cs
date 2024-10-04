@@ -108,21 +108,21 @@ namespace BankingApp.Service
             #region transfer
             CreateMap<DTOTransfer, Transfer>().AfterMap((src, dest) =>
             {
-                if(src.SenderAccount != null){
-                    dest.SenderAccount = new Account{AccountNo = src.SenderAccount};
+                if(src.SenderAccountNo != null){
+                    dest.SenderAccount = new Account{AccountNo = src.SenderAccountNo};
                 }
-                if(src.RecipientAccount != null){
-                    dest.RecipientAccount = new Account{AccountNo = src.RecipientAccount};
+                if(src.RecipientAccountNo != null){
+                    dest.RecipientAccount = new Account{AccountNo = src.RecipientAccountNo};
                 }
                 
             });
             CreateMap<Transfer, DTOTransfer>().AfterMap((src, dest) =>
             {
                 if(src.SenderAccount != null){
-                    dest.SenderAccount = src.SenderAccount.AccountNo;
+                    dest.SenderAccountNo = src.SenderAccount.AccountNo;
                 }
                 if(src.RecipientAccount != null){
-                    dest.RecipientAccount = src.RecipientAccount.AccountNo;
+                    dest.RecipientAccountNo = src.RecipientAccount.AccountNo;
                 }
             });
             #endregion transfer

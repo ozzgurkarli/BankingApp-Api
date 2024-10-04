@@ -16,17 +16,14 @@ namespace BankingApp.Service
         {
             MessageContainer response = new MessageContainer();
             EAccount eAccount = new EAccount();
-            EAccountTracker eAccountTracker = new EAccountTracker();
+            EParameter eParameter = new EParameter();
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
 
             dtoAccount.Active = true;
             dtoAccount.Balance = 0;
             
-            dtoAccount.AccountNo = (await eAccountTracker.GetAndIncrease(new AccountTracker{Currency = dtoAccount.CurrencyCode})).FirstAvailableNo;
-
-            dtoAccount = Mapper.Map<DTOAccount>(await eAccount.Add(Mapper.Map<Account>(dtoAccount)));
-
-            response.Add(dtoAccount);
+            dtoAccount.AccountNo = (await eAccount.GetFirstAvailableNoAndIncrease(dtoAccount)).AccountNo;
+            response.Add(await eAccount.Add(dtoAccount));
 
             return response;
         }
@@ -38,12 +35,7 @@ namespace BankingApp.Service
 
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
             
-            List<DTOAccount> accountList = Mapper.Map<List<DTOAccount>>(await eAccount.GetAll()).Where(x => x.Active == true).OrderBy(x=> x.RecordDate).ToList();
-
-            if(dtoAccount.CustomerNo != null)
-            {
-                accountList = accountList.Where(x => x.CustomerNo.Equals(dtoAccount.CustomerNo)).ToList();
-            }
+            List<DTOAccount> accountList = (await eAccount.Get(dtoAccount)).OrderBy(x=> x.AccountNo).ToList();
 
             response.Add(accountList);
             return response;

@@ -22,6 +22,9 @@ namespace BankingApp.Common.DataTransferObjects
 
         public string? CurrencyCode { get; set; }
 
+        public string? CustomerIdentityNo { get; set; }
+
+
         public bool? Active { get; set; }
 
         public bool? CustomerActive { get; set; }

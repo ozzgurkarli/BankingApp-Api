@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace BankingApp.Service
 {
@@ -21,8 +22,13 @@ namespace BankingApp.Service
             EParameter eParameter = new EParameter();
             MessageContainer response = new MessageContainer();
 
-            response.Add("ParameterList", Mapper.Map<List<DTOParameter>>(await eParameter.GetParametersByGroupCode(Mapper.Map<Parameter>(requestMessage.Get<DTOParameter>()))));
+            DTOParameter dtoParameter = requestMessage.Get<DTOParameter>();
 
+            dtoParameter.GroupCode = $"'{dtoParameter.GroupCode}'";
+
+            List<DTOParameter> dtoParList = await eParameter.GetByMultipleGroupCode(dtoParameter);
+
+            response.Add("ParameterList", dtoParList);
             return response;
         }
 
@@ -31,28 +37,30 @@ namespace BankingApp.Service
             EParameter eParameter = new EParameter();
             MessageContainer response = new MessageContainer();
             List<DTOParameter> parList = requestMessage.Get<List<DTOParameter>>();
-            List<DTOParameter> dtoParList = new List<DTOParameter>();
 
-            List<Task<List<Parameter>>> taskList = new List<Task<List<Parameter>>>();
+            DTOParameter dtoParGroupCodes = new DTOParameter();
 
-            dtoParList = Mapper.Map<List<DTOParameter>>(await eParameter.GetParametersByMultipleGroupCode(Mapper.Map<List<Parameter>>(parList)));
-            
+            foreach (var item in parList)
+            {
+                if (string.IsNullOrWhiteSpace(dtoParGroupCodes.GroupCode))
+                {
+                    dtoParGroupCodes.GroupCode = $"'{item.GroupCode}'";
+                    continue;
+                }
 
-            // foreach (List<Parameter> item in await Task.WhenAll(taskList.ToArray()))
-            // {
-            //     item.ForEach(x=> {
-            //         dtoParList.Add(Mapper.Map<DTOParameter>(x));
-            //     });
-            // }
+                dtoParGroupCodes.GroupCode += $",'{item.GroupCode}'";
+            }
+
+            List<DTOParameter> dtoParList = await eParameter.GetByMultipleGroupCode(dtoParGroupCodes);
 
             response.Add("ParameterList", dtoParList);
-
             return response;
         }
 
-        public async Task<MessageContainer> SetCurrencyValues(MessageContainer requestMessage){
+        public async Task<MessageContainer> SetCurrencyValues(MessageContainer requestMessage)
+        {
             EParameter eParameter = new EParameter();
-            requestMessage.Add(new DTOParameter{GroupCode= "Currency"});
+            requestMessage.Add(new DTOParameter { GroupCode = "Currency" });
             MessageContainer responseMessage = new MessageContainer();
 
             MessageContainer responsePar = await GetParametersByGroupCode(requestMessage);
@@ -61,13 +69,15 @@ namespace BankingApp.Service
             Dictionary<string, decimal> tempCurrencyDict = new Dictionary<string, decimal>();
             Dictionary<string, decimal> currencyDict = new Dictionary<string, decimal>();
 
-            if(DateTime.Parse(parList.Find(x=> x.Code.Equals(1))!.Detail2!).CompareTo(DateTime.Today) < 0){   // set new values
+            if (DateTime.Parse(parList.Find(x => x.Code.Equals(1))!.Detail2!).CompareTo(DateTime.Today) < 0)
+            {   // set new values
                 HttpClient client = new HttpClient();
-                Dictionary<string,object> dict = JsonConvert.DeserializeObject<Dictionary<string,object>>(await client.GetStringAsync($"https://data.fixer.io/api/latest?access_key={ENV.CurrencyApiKey}"))!;
-                
+                Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(await client.GetStringAsync($"https://data.fixer.io/api/latest?access_key={ENV.CurrencyApiKey}"))!;
+
                 foreach (KeyValuePair<string, decimal> item in JsonConvert.DeserializeObject<Dictionary<string, decimal>>(dict["rates"].ToString()!)!)
                 {
-                    if(item.Key.Equals("TRY") || parList.Select(x=> x.Description).ToList().Contains(item.Key)){
+                    if (item.Key.Equals("TRY") || parList.Select(x => x.Description).ToList().Contains(item.Key))
+                    {
                         tempCurrencyDict.Add(item.Key, item.Value);
                     }
                 }
@@ -76,7 +86,7 @@ namespace BankingApp.Service
 
                 foreach (var item in tempCurrencyDict) // set base eur to try
                 {
-                    currencyDict.Add(item.Key, tlVal/item.Value);
+                    currencyDict.Add(item.Key, tlVal / item.Value);
                 }
 
                 foreach (var item in parList)
@@ -84,8 +94,10 @@ namespace BankingApp.Service
                     item.Detail2 = DateTime.Today.ToString();
                     item.Detail3 = item.Detail4;
                     item.Detail4 = item.Description!.Equals("TL") ? "0" : Math.Round(currencyDict[item.Description!], 2, MidpointRounding.AwayFromZero).ToString();
-                    responseMessage.Add(item.Description, eParameter.UpdateParameter(Mapper.Map<Parameter>(item)));
+                    responseMessage.Add(item.Description, item);
                 }
+
+                await eParameter.UpdateRange(parList);
             }
 
             return responseMessage;

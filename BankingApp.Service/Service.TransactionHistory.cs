@@ -19,7 +19,7 @@ namespace BankingApp.Service
             DTOTransactionHistory dtoTransactionHistory = requestMessage.Get<DTOTransactionHistory>();
             MessageContainer responseMessage = new MessageContainer();
             
-            responseMessage.Add(await eTransactionHistory.AddAsync(Mapper.Map<TransactionHistory>(dtoTransactionHistory)));
+            await eTransactionHistory.Add(dtoTransactionHistory);
 
             return responseMessage;
         }
@@ -30,25 +30,10 @@ namespace BankingApp.Service
             DTOTransactionHistory dtoTransaction = requestMessage.Get<DTOTransactionHistory>();
             MessageContainer responseMessage = new MessageContainer();
 
-            List<DTOTransactionHistory> transactionList = Mapper.Map<List<DTOTransactionHistory>>(await eTransactionHistory.GetAllByCustomerNoAsync(Mapper.Map<TransactionHistory>(dtoTransaction)));
+            List<DTOTransactionHistory> transactionList = await eTransactionHistory.Get(dtoTransaction);
 
 
             transactionList = transactionList.OrderByDescending(x => x.TransactionDate).ToList();
-
-            if (dtoTransaction.Count != null && dtoTransaction.Count != 0 && transactionList.Count() >= dtoTransaction.Count)
-            {
-                transactionList = transactionList.GetRange(0, (int)dtoTransaction.Count);
-            }
-
-            if (dtoTransaction.MinDate > DateTime.MinValue)
-            {
-                transactionList.Where(x => x.TransactionDate >= dtoTransaction.MinDate);
-            }
-
-            if (dtoTransaction.MaxDate > DateTime.MinValue)
-            {
-                transactionList.Where(x => x.TransactionDate <= dtoTransaction.MaxDate);
-            }
 
             responseMessage.Add("TransactionList", transactionList);
 

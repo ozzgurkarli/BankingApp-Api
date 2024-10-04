@@ -21,9 +21,7 @@ namespace BankingApp.Service
             DTOCustomer dtoReqCustomer = requestMessage.Get<DTOCustomer>();
             MessageContainer reqService = new MessageContainer();
 
-            dtoReqCustomer.CreditScore = 1000;
-            dtoReqCustomer.Active = true;
-            DTOCustomer dtoCustomer = Mapper.Map<DTOCustomer>(await eCustomer.Add(Mapper.Map<Customer>(dtoReqCustomer)));
+            DTOCustomer dtoCustomer = await eCustomer.Add(dtoReqCustomer);
             DTOLogin dtoLogin = new DTOLogin { IdentityNo = dtoCustomer.IdentityNo, Password = setTemporaryPassword(), Temporary = true };
             eLogin.Add(Mapper.Map<Login>(dtoLogin));
 
@@ -53,7 +51,7 @@ namespace BankingApp.Service
             ECustomer eCustomer = new ECustomer();
             DTOCustomer dtoCustomer = requestMessage.Get<DTOCustomer>();
 
-            dtoCustomer = Mapper.Map<DTOCustomer>(await eCustomer.GetByIdentityNo(Mapper.Map<Customer>(dtoCustomer)));
+            dtoCustomer = await eCustomer.Get(dtoCustomer);
 
             response.Add("DTOCustomer", dtoCustomer);
 
