@@ -24,7 +24,7 @@ namespace BankingApp.Test
             DTOTransfer dtoTransfer;
             for (int i = 0; i < senderAccountIds.Length; i++)
             {
-                dtoTransfer = new DTOTransfer{SenderAccountId = senderAccountIds[i], RecipientAccount = recipientAccountNos[i], Amount = amounts[i], Currency = currencies[i], OrderDate = DateTime.Today};
+                dtoTransfer = new DTOTransfer{SenderAccountId = senderAccountIds[i], RecipientAccountNo = recipientAccountNos[i], Amount = amounts[i], Currency = currencies[i], OrderDate = DateTime.Today};
 
                 requestMessage.Clear();
                 requestMessage.Add(dtoTransfer);
