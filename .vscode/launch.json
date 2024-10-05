@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Core Launch (Web)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/BankingApp.Api/bin/Debug/net8.0/BankingApp.Api.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      },
+      "launchBrowser": {
+        "enabled": true, // Tarayıcıyı başlatmak için
+        "args": "${auto-detect-url}", // Tarayıcının hangi URL'yi açacağını belirtir
+        "windows": {
+          "command": "cmd.exe"
+        },
+        "linux": {
+          "command": "xdg-open"
+        },
+        "osx": {
+          "command": "open"
+        }
+      },
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
+}

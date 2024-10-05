@@ -12,8 +12,7 @@ namespace BankingApp.Common.DataTransferObjects
         [StringLength(11)]
         public required string IdentityNo { get; set; }
 
-        [Range(100000, 999999)]
-        public int? Password { get; set; }
+        public string? Password { get; set; }
 
         public bool? Temporary { get; set; }
 

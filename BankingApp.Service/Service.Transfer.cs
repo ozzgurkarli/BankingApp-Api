@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.enums;
 using BankingApp.Entity;
-using BankingApp.Entity.Entities;
 
 namespace BankingApp.Service
 {
@@ -64,7 +63,7 @@ namespace BankingApp.Service
             List<DTOTransfer> successTransfers = new List<DTOTransfer>();
             List<DTOTransfer> failedTransfers = new List<DTOTransfer>();
 
-            List<DTOTransfer> transfers = Mapper.Map<List<DTOTransfer>>(await eTransfer.GetOrdersToExecute(new DTOTransfer()));
+            List<DTOTransfer> transfers = await eTransfer.GetOrdersToExecute(new DTOTransfer());
 
             foreach (DTOTransfer transfer in transfers)
             {

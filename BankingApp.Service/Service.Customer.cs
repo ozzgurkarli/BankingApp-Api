@@ -22,7 +22,7 @@ namespace BankingApp.Service
 
             DTOCustomer dtoCustomer = await eCustomer.Add(dtoReqCustomer);
             DTOLogin dtoLogin = new DTOLogin { IdentityNo = dtoCustomer.IdentityNo, Password = setTemporaryPassword(), Temporary = true };
-            eLogin.Add(Mapper.Map<Login>(dtoLogin));
+            eLogin.Add(dtoLogin);
 
             DTOAccount dtoAccount = new DTOAccount { Active = true, Primary = true, Branch = dtoReqCustomer.Branch, Currency = "TL", CurrencyCode = "1", CustomerNo = dtoCustomer.CustomerNo};
             reqService.Add(dtoAccount);

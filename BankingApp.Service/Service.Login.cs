@@ -8,28 +8,31 @@ using BankingApp.Common.Constants;
 using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
 using BankingApp.Entity;
-using BankingApp.Entity.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BankingApp.Service
 {
     public partial class Service: IService
     {
-        public MessageContainer RegisterCustomer(MessageContainer requestMessage)
+        public async Task<MessageContainer> RegisterCustomer(MessageContainer requestMessage)
         {
             ELogin eLogin = new ELogin();
-            DTOLogin dtoLogin = Mapper.Map<DTOLogin>(eLogin.Add(Mapper.Map<Login>(requestMessage.Get<DTOLogin>("Login"))));
+            DTOLogin dtoLogin = requestMessage.Get<DTOLogin>("Login");
+            PasswordHasher<string> passwordHasher = new PasswordHasher<string>();
+            dtoLogin.Password = passwordHasher.HashPassword(dtoLogin.IdentityNo, dtoLogin.Password);
+            dtoLogin = await eLogin.Add(requestMessage.Get<DTOLogin>("Login"));
 
             requestMessage.Clear();
             requestMessage.Add("Login", dtoLogin);
             return requestMessage;
         }
 
-        private int setTemporaryPassword()
+        private string setTemporaryPassword()
         {
             Random random = new Random();
 
-            return random.Next(100000, 1000000);
+            return random.Next(100000, 1000000).ToString();
         }
 
         public async Task<MessageContainer> UpdatePassword(MessageContainer requestMessage)
@@ -39,9 +42,11 @@ namespace BankingApp.Service
             ELogin eLogin = new ELogin();
 
             DTOLogin dtoLogin = requestMessage.Get<DTOLogin>();
+            PasswordHasher<string> passwordHasher = new PasswordHasher<string>();
+            dtoLogin.Password = passwordHasher.HashPassword(dtoLogin.IdentityNo, dtoLogin.Password);
             dtoLogin.Temporary = false;
 
-            dtoLogin = Mapper.Map<DTOLogin>(await eLogin.Update(Mapper.Map<Login>(dtoLogin)));
+            dtoLogin = await eLogin.Update(dtoLogin);
 
             if(dtoLogin == null)
             {
@@ -71,7 +76,13 @@ namespace BankingApp.Service
         {
             MessageContainer response = new MessageContainer();
             ELogin eLogin = new ELogin();
-            DTOLogin dtoLogin = Mapper.Map<DTOLogin>(await eLogin.Select(Mapper.Map<Login>(requestMessage.Get<DTOLogin>())));
+            DTOLogin dtoLogin = await eLogin.Select(requestMessage.Get<DTOLogin>());
+            PasswordHasher<string> passwordHasher = new PasswordHasher<string>();
+            // dtoLogin.Password = passwordHasher.VerifyHashedPassword(dtoLogin.IdentityNo, dtoLogin.Password, "ds");
+            
+            if(!string.IsNullOrWhiteSpace(requestMessage.Get<DTOLogin>().Password) && passwordHasher.VerifyHashedPassword(dtoLogin.IdentityNo, dtoLogin.Password, requestMessage.Get<DTOLogin>().Password) == PasswordVerificationResult.Failed){
+                throw new Exception("Hatalı Şifre");
+            }
 
             if(dtoLogin != null)       // generate token
             {
@@ -97,7 +108,7 @@ namespace BankingApp.Service
             DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
             
             dtoMailAddress = await eMailAddress.Get(dtoMailAddress);
-            dtoLogin = Mapper.Map<DTOLogin>(await eLogin.Select(Mapper.Map<Login>(dtoLogin)));
+            dtoLogin = await eLogin.Select(dtoLogin);
 
 
             if (dtoMailAddress != null)
