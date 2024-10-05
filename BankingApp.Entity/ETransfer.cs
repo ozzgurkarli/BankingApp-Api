@@ -5,8 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BankingApp.Common.Constants;
 using BankingApp.Common.DataTransferObjects;
-using BankingApp.Entity.Config;
-using BankingApp.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
@@ -14,8 +12,6 @@ namespace BankingApp.Entity
 {
     public class ETransfer
     {
-        private readonly BankingDbContext database = new BankingDbContext();
-
         public async Task<DTOTransfer> Add(DTOTransfer transfer)
         {
             using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))

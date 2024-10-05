@@ -1,7 +1,5 @@
 ﻿using BankingApp.Common.Constants;
 using BankingApp.Common.DataTransferObjects;
-using BankingApp.Entity.Config;
-using BankingApp.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System;
@@ -15,8 +13,6 @@ namespace BankingApp.Entity
 {
     public class ECustomer
     {
-        public readonly BankingDbContext database = new BankingDbContext();
-
         public async Task<DTOCustomer> Add(DTOCustomer item)
         {
             using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
@@ -25,8 +21,7 @@ namespace BankingApp.Entity
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
                 try
                 {
-                    using (var command = new NpgsqlCommand("SELECT i_customer(@refcursor, @p_recorddate, @p_recordscreen, @p_identityno, @p_name, @p_surname, @p_phoneno, @p_gender, @p_profession, @p_salary)", connection))
-                    {
+                    using (var command = new NpgsqlCommand("SELECT s_customer(@refcursor, @p_id, @p_identityno)", connection)){
                         command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                         command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
                         command.Parameters.AddWithValue("p_identityno", item.IdentityNo!);

@@ -1,7 +1,5 @@
 ﻿using BankingApp.Common.Constants;
 using BankingApp.Common.DataTransferObjects;
-using BankingApp.Entity.Config;
-using BankingApp.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System;
@@ -15,8 +13,6 @@ namespace BankingApp.Entity
 {
     public class EAccount
     {
-        public readonly BankingDbContext database = new BankingDbContext();
-
         public async Task<DTOAccount> Add(DTOAccount item)
         {
             DTOAccount dtoAccount = new DTOAccount();

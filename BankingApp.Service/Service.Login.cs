@@ -96,7 +96,7 @@ namespace BankingApp.Service
             DTOLogin dtoLogin = requestMessage.Get<DTOLogin>();
             DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
             
-            dtoMailAddress = Mapper.Map<DTOMailAddresses>(await eMailAddress.GetByMailAddress(Mapper.Map<MailAddresses>(dtoMailAddress)));
+            dtoMailAddress = await eMailAddress.Get(dtoMailAddress);
             dtoLogin = Mapper.Map<DTOLogin>(await eLogin.Select(Mapper.Map<Login>(dtoLogin)));
 
 

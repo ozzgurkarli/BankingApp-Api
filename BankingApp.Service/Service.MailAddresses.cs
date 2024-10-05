@@ -1,6 +1,5 @@
 ﻿using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
-using BankingApp.Entity.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,13 +27,13 @@ namespace BankingApp.Service
             return new MessageContainer();
         }
 
-        public MessageContainer SelectMailAddressByMailAddress(MessageContainer requestMessage)
+        public async Task<MessageContainer> SelectMailAddressByMailAddress(MessageContainer requestMessage)
         {
             EMailAddresses eMailAddress = new EMailAddresses();
             DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
 
             MessageContainer reqService = new MessageContainer();
-            reqService.Add(Mapper.Map<DTOMailAddresses>(eMailAddress.GetByMailAddress(Mapper.Map<MailAddresses>(dtoMailAddress))));
+            reqService.Add(await eMailAddress.Get(dtoMailAddress));
 
             return reqService;
         }
@@ -45,7 +44,7 @@ namespace BankingApp.Service
             DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
 
             MessageContainer reqService = new MessageContainer();
-            reqService.Add(Mapper.Map<DTOMailAddresses>(await eMailAddress.GetPrimaryAddressByCustomerNo(Mapper.Map<MailAddresses>(dtoMailAddress))));
+            reqService.Add(await eMailAddress.Get(dtoMailAddress));
 
             return reqService;
         }

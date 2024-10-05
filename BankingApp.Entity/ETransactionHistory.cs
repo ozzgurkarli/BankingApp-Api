@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using BankingApp.Common.Constants;
 using BankingApp.Common.DataTransferObjects;
-using BankingApp.Entity.Config;
-using BankingApp.Entity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 

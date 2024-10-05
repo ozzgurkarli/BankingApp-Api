@@ -1,7 +1,6 @@
 ﻿using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
 using BankingApp.Entity;
-using BankingApp.Entity.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
