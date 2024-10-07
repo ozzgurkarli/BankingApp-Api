@@ -3,6 +3,7 @@ using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.enums;
 using BankingApp.Common.Interfaces;
 using BankingApp.Entity;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +22,12 @@ namespace BankingApp.Service
             MessageContainer reqService = new MessageContainer();
 
             DTOCustomer dtoCustomer = await eCustomer.Add(dtoReqCustomer);
-            DTOLogin dtoLogin = new DTOLogin { IdentityNo = dtoCustomer.IdentityNo, Password = setTemporaryPassword(), Temporary = true };
-            eLogin.Add(dtoLogin);
+            string tempPassword = setTemporaryPassword();
+            DTOLogin dtoLogin = new DTOLogin { IdentityNo = dtoCustomer.IdentityNo, Password = tempPassword, Temporary = true };
+            reqService.Add("Login", dtoLogin);
+            RegisterCustomer(reqService);
 
+            reqService.Clear();
             DTOAccount dtoAccount = new DTOAccount { Active = true, Primary = true, Branch = dtoReqCustomer.Branch, Currency = "TL", CurrencyCode = "1", CustomerNo = dtoCustomer.CustomerNo};
             reqService.Add(dtoAccount);
             CreateAccount(reqService);
@@ -33,6 +37,7 @@ namespace BankingApp.Service
             reqService.Clear();
             reqService.Add("MailAddress", dtoMailAddress);
             reqService.Add("Customer", dtoCustomer);
+            dtoLogin.Password = tempPassword;
             reqService.Add("Login", dtoLogin);
 
             AddMailAddressWithTemporaryPassword(reqService);

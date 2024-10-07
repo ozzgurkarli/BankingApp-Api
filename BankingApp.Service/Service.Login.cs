@@ -21,7 +21,7 @@ namespace BankingApp.Service
             DTOLogin dtoLogin = requestMessage.Get<DTOLogin>("Login");
             PasswordHasher<string> passwordHasher = new PasswordHasher<string>();
             dtoLogin.Password = passwordHasher.HashPassword(dtoLogin.IdentityNo, dtoLogin.Password);
-            dtoLogin = await eLogin.Add(requestMessage.Get<DTOLogin>("Login"));
+            dtoLogin = await eLogin.Add(dtoLogin);
 
             requestMessage.Clear();
             requestMessage.Add("Login", dtoLogin);
@@ -78,13 +78,12 @@ namespace BankingApp.Service
             ELogin eLogin = new ELogin();
             DTOLogin dtoLogin = await eLogin.Select(requestMessage.Get<DTOLogin>());
             PasswordHasher<string> passwordHasher = new PasswordHasher<string>();
-            // dtoLogin.Password = passwordHasher.VerifyHashedPassword(dtoLogin.IdentityNo, dtoLogin.Password, "ds");
             
-            if(!string.IsNullOrWhiteSpace(requestMessage.Get<DTOLogin>().Password) && passwordHasher.VerifyHashedPassword(dtoLogin.IdentityNo, dtoLogin.Password, requestMessage.Get<DTOLogin>().Password) == PasswordVerificationResult.Failed){
+            if(!string.IsNullOrWhiteSpace(requestMessage.Get<DTOLogin>().Password) && requestMessage.Get<DTOLogin>().Password != "null" && passwordHasher.VerifyHashedPassword(dtoLogin.IdentityNo, dtoLogin.Password, requestMessage.Get<DTOLogin>().Password) == PasswordVerificationResult.Failed){
                 throw new Exception("Hatalı Şifre");
             }
 
-            if(dtoLogin != null)       // generate token
+            if(dtoLogin != null && dtoLogin.Password != "null")       // generate token
             {
                 SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(ENV.JwtSecretKey));
                 DateTime dtNow = DateTime.UtcNow;

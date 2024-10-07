@@ -32,8 +32,9 @@ namespace BankingApp.Entity
             }
         }
 
-        public async Task<DTOMailAddresses> Get(DTOMailAddresses item)
+        public async Task<DTOMailAddresses?> Get(DTOMailAddresses item)
         {
+            DTOMailAddresses? mailAddress = null;
             using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
             {
                 await connection.OpenAsync();
@@ -55,10 +56,10 @@ namespace BankingApp.Entity
                     {
                         if (await reader.ReadAsync())
                         {
-                            item = new DTOMailAddresses
+                            mailAddress = new DTOMailAddresses
                             {
                                 Id = (int)reader["Id"],
-                                MailAddress = (string?)reader["IdentityNo"],
+                                MailAddress = (string?)reader["MailAddress"],
                                 Primary = (bool?)reader["Primary"],
                                 CustomerNo = ((Int64)reader["CustomerId"]).ToString()
                             };
@@ -69,7 +70,7 @@ namespace BankingApp.Entity
                 await connection.CloseAsync();
             }
 
-            return item;
+            return mailAddress;
         }
     }
 }

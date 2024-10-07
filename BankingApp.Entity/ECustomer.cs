@@ -21,7 +21,7 @@ namespace BankingApp.Entity
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
                 try
                 {
-                    using (var command = new NpgsqlCommand("SELECT s_customer(@refcursor, @p_id, @p_identityno)", connection)){
+                    using (var command = new NpgsqlCommand("SELECT i_customer(@refcursor, @p_recorddate, @p_recordscreen, @p_identityno, @p_name, @p_surname, @p_phoneno, @p_gender, @p_profession, @p_salary)", connection)){
                         command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                         command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
                         command.Parameters.AddWithValue("p_identityno", item.IdentityNo!);
@@ -114,6 +114,48 @@ namespace BankingApp.Entity
                                 Profession = (int?)reader["Profession"],
                                 CustomerNo = (string?)reader["Id"].ToString(),
                                 PrimaryMailAddress = item.PrimaryMailAddress
+                            };
+                        }
+                    }
+                }
+                await tran.DisposeAsync();
+                await connection.CloseAsync();
+            }
+
+            return item;
+        }
+
+        public async Task<DTOCustomer> GetByAccountNo(DTOCustomer item)
+        {
+            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            {
+                await connection.OpenAsync();
+                NpgsqlTransaction tran = await connection.BeginTransactionAsync();
+
+                using (var command = new NpgsqlCommand("SELECT s_customerinfosbyaccountno(@refcursor, @p_accountno)", connection))
+                {
+                    command.Parameters.AddWithValue("p_accountno", item.AccountNo ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+
+                    await command.ExecuteNonQueryAsync();
+
+                    command.CommandText = "fetch all in \"ref\"";
+                    command.CommandType = CommandType.Text;
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            item = new DTOCustomer
+                            {
+                                Id = (Int64)reader["Id"],
+                                IdentityNo = (string?)reader["IdentityNo"],
+                                Name = (string?)reader["Name"],
+                                Surname = (string?)reader["Surname"],
+                                Gender = (int?)reader["Gender"],
+                                Active = (bool?)reader["Active"],
+                                PhoneNo = (string?)reader["PhoneNo"],
+                                CustomerNo = (string?)reader["Id"].ToString()
                             };
                         }
                     }

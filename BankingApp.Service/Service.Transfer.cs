@@ -10,6 +10,34 @@ namespace BankingApp.Service
 {
     public partial class Service
     {
+        public async Task<MessageContainer> CheckRecipientCustomer(MessageContainer requstMessage)
+        {
+            ECustomer eCustomer = new ECustomer();
+            DTOTransfer dtoTransfer = requstMessage.Get<DTOTransfer>();
+            MessageContainer responseMessage = new MessageContainer();
+            DTOCustomer customer = new DTOCustomer();
+
+            if (dtoTransfer.RecipientAccountNo!.Length > 11 && dtoTransfer.RecipientAccountNo.Substring(2, 2) == "11")
+            {
+                dtoTransfer.RecipientAccountNo = dtoTransfer.RecipientAccountNo.Replace(" ", "").Substring(10);
+                customer = await eCustomer.GetByAccountNo(new DTOCustomer { AccountNo = dtoTransfer.RecipientAccountNo});
+            }
+            else
+            {
+                customer = await eCustomer.Get(new DTOCustomer { IdentityNo = dtoTransfer.RecipientAccountNo });
+            }
+
+            if(string.IsNullOrWhiteSpace(customer.Name)){
+                throw new Exception("Alıcı bilgileri hatalıdır, devam etmeniz halinde transfer işlemi başarısız olarak tamamlanacak.");
+            }
+            else if(!(bool)customer.Active!){
+                throw new Exception("Alıcının hesabı aktif değil, devam etmeniz halinde transfer işlemi başarısız olarak tamamlanacak.");
+            }
+            
+            responseMessage.Add("DTOCustomer", customer);
+            return responseMessage;
+        }
+
         public async Task<MessageContainer> StartTransfer(MessageContainer requestMessage)
         {
             ETransfer eTransfer = new ETransfer();
@@ -30,7 +58,7 @@ namespace BankingApp.Service
             }
             else
             {  //identity no
-                dtoRecipientAcc = await eAccount.GetByCustomerIdentityNo(new DTOAccount{CustomerIdentityNo = dtoTransfer.RecipientAccountNo, Primary = true});
+                dtoRecipientAcc = await eAccount.GetByCustomerIdentityNo(new DTOAccount { CustomerIdentityNo = dtoTransfer.RecipientAccountNo, Primary = true });
             }
 
 

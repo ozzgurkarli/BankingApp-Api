@@ -100,8 +100,9 @@ namespace BankingApp.Entity
             return item;
         }
 
-        public async Task<DTOLogin> Select(DTOLogin item)
+        public async Task<DTOLogin?> Select(DTOLogin item)
         {
+            DTOLogin? dtoLogin = null;
             using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
             {
                 await connection.OpenAsync();
@@ -122,10 +123,10 @@ namespace BankingApp.Entity
                     {
                         if (await reader.ReadAsync())
                         {
-                            item = new DTOLogin
+                            dtoLogin = new DTOLogin
                             {
                                 Id = (int)reader["Id"],
-                                Password = (string)reader["Password"],
+                                Password = (string?)reader["Password"].ToString(),
                                 IdentityNo = (string)reader["IdentityNo"],
                                 Temporary = (bool)reader["Temporary"]
                             };
@@ -137,7 +138,7 @@ namespace BankingApp.Entity
                 await connection.CloseAsync();
             }
 
-            return item;
+            return dtoLogin;
         }
     }
 }

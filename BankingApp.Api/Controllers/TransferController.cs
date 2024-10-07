@@ -20,6 +20,20 @@ namespace BankingApp.Api.Controllers
             _proxy = proxy;
         }
 
+
+        [HttpPost("CheckRecipientCustomer")]
+        public async Task<IActionResult> CheckRecipientCustomer(MessageContainer message){
+            DTOTransfer dtoTransfer = message.ToObject<DTOTransfer>(message, "DTOTransfer");
+
+            MessageContainer requestMessage = new MessageContainer();
+
+            requestMessage.Add(dtoTransfer);
+
+            MessageContainer responseMessage = await _proxy.CheckRecipientCustomer(requestMessage);
+
+            return Ok(responseMessage);
+        }
+
         [HttpPost("StartTransfer")]
         public async Task<IActionResult> StartTransfer(MessageContainer message){
             DTOTransfer dtoTransfer = message.ToObject<DTOTransfer>(message, "DTOTransfer");

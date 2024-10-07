@@ -8,7 +8,9 @@ namespace BankingApp.Common.Interfaces
 {
     public partial interface IService
     {
-        
+
+        public Task<MessageContainer> CheckRecipientCustomer(MessageContainer requstMessage);
+
         public Task<MessageContainer> StartTransfer(MessageContainer requestMessage);
 
         public Task<MessageContainer> ExecuteTransferSchedule(MessageContainer requestMessage);

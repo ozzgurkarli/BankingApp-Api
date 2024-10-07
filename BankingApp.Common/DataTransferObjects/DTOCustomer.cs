@@ -36,6 +36,8 @@ namespace BankingApp.Common.DataTransferObjects
 
         public string? PrimaryMailAddress { get; set; }
 
+        public string? AccountNo { get; set; }
+
         public int? Profession { get; set; }
 
         public int? Branch { get; set; }
