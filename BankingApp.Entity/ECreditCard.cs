@@ -36,7 +36,7 @@ namespace BankingApp.Entity
                     {
                         if (await reader.ReadAsync())
                         {
-                            cc = new DTOCreditCard
+                            ccList.Add(new DTOCreditCard
                             {
                                 Id = (int)reader["Id"],
                                 CardNo = (string?)reader["CardNo"],
@@ -51,7 +51,7 @@ namespace BankingApp.Entity
                                 OutstandingBalance = (decimal?)reader["OutstandingBalance"],
                                 TotalDebt = (decimal?)reader["TotalDebt"],
                                 CustomerNo = ((Int64)reader["CustomerId"]).ToString()
-                            };
+                            });
                         }
                     }
                     await tran.CommitAsync();

@@ -234,7 +234,7 @@ namespace BankingApp.Entity
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
                 using (var command = new NpgsqlCommand("SELECT u_accounttracker(@refcursor, @p_currencycode)", connection))
                 {
-                    command.Parameters.AddWithValue("p_currencycode", acc.CurrencyCode!);
+                    command.Parameters.AddWithValue("p_currencycode", acc.Currency!);
                     command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
                     await command.ExecuteNonQueryAsync();
 
