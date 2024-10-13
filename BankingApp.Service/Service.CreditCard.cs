@@ -11,6 +11,14 @@ namespace BankingApp.Service
 {
     public partial class Service: IService
     {
+        public async Task<MessageContainer> CardRevenuePayment(MessageContainer requestMessage){
+            return new MessageContainer();
+        }
+
+        public async Task<MessageContainer> CardExpensePayment(MessageContainer requestMessage){
+            
+            return new MessageContainer();
+        }
 
         public async Task<MessageContainer> GetCreditCardsByFilter(MessageContainer requestMessage)
         {
