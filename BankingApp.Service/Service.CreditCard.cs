@@ -12,6 +12,19 @@ namespace BankingApp.Service
     public partial class Service: IService
     {
         public async Task<MessageContainer> CardRevenuePayment(MessageContainer requestMessage){
+            ECreditCard eCreditCard = new ECreditCard();
+            EParameter eParameter = new EParameter();
+
+            List<DTOCreditCard> ccList = await eCreditCard.Get(new DTOCreditCard{ExpirationDate = DateTime.Today.AddYears(-1)});
+            List<DTOParameter> parList = await eParameter.GetByMultipleGroupCode(new DTOParameter{GroupCode = "CardType"});
+
+            decimal cardFee;
+            for(int i = 0; i < ccList.Count; i++)
+            {
+                cardFee = decimal.Parse(parList.Find(x=> x.Code.Equals(ccList[i].Type))!.Detail1!);
+                ccList[i] = cardExpense(ccList[i], cardFee);
+            }
+            
             return new MessageContainer();
         }
 
@@ -59,6 +72,14 @@ namespace BankingApp.Service
             await eCreditCard.Add(dtoCreditCard);
 
             return new MessageContainer();
+        }
+
+        private DTOCreditCard cardExpense(DTOCreditCard cc, decimal fee){
+            cc.CurrentDebt += fee;
+            cc.OutstandingBalance -= fee;
+            cc.TotalDebt += fee;
+
+            return cc;
         }
     }
 }
