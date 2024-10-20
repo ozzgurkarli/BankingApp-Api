@@ -38,6 +38,25 @@ namespace BankingApp.Api.Controllers
             return Ok(response);
         }
 
+
+        [HttpPost("CardExpensePayment")]
+        public async Task<IActionResult> CardExpensePayment(MessageContainer requestMessage){
+
+            DTOCreditCard dtoCreditCard = requestMessage.ToObject<DTOCreditCard>(requestMessage, "DTOCreditCard");
+
+            MessageContainer requestCCard = new MessageContainer();
+
+            requestCCard.Add(dtoCreditCard);
+
+            MessageContainer responseCC = await _proxy.CardExpensePayment(requestCCard);
+
+            MessageContainer response = new MessageContainer();
+
+            response.Add("CreditCard", responseCC.Get<List<DTOCreditCard>>());
+
+            return Ok(response);
+        }
+
         [HttpPost("CardApplication")]
         public async Task<IActionResult> CardApplication(MessageContainer requestMessage){
 

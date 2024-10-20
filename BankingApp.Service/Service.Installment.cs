@@ -17,15 +17,15 @@ namespace BankingApp.Service
         public async Task<MessageContainer> CreateInstallmentTransaction(MessageContainer requestMessage){
             MessageContainer responseMessage = new MessageContainer();
             EInstallment eInstallment = new EInstallment();
-            DTOExpense dtoExpense = requestMessage.Get<DTOExpense>();
+            DTOCreditCard dtoCreditCard = requestMessage.Get<DTOCreditCard>();
 
             List<DTOInstallment> installmentList = new List<DTOInstallment>();
             
-            decimal installmentAmount = (decimal)(dtoExpense.Amount! / dtoExpense.InstallmentCount!);
+            decimal installmentAmount = (decimal)(dtoCreditCard.Amount! / dtoCreditCard.InstallmentCount!);
             
-            for (int i = 0; i < dtoExpense.InstallmentCount; i++)
+            for (int i = 0; i < dtoCreditCard.InstallmentCount; i++)
             {
-                installmentList.Add(new DTOInstallment{Amount = installmentAmount, InstallmentNumber = i, PaymentDate = DateTime.Today.AddMonths(i), Success = false, CreditCardNo = dtoExpense.CreditCardNo});
+                installmentList.Add(new DTOInstallment{Amount = installmentAmount, InstallmentNumber = i, PaymentDate = DateTime.Today.AddMonths(i), Success = false, CreditCardNo = dtoCreditCard.CardNo});
             }
 
             responseMessage.Add(await eInstallment.AddRange(installmentList));

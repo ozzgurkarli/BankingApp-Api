@@ -23,8 +23,10 @@ namespace BankingApp.Api.Controllers
         [HttpPost("TriggerSchedules")]
         public async Task<IActionResult> TriggerSchedules(){
 
-            _proxy.SetCurrencyValues(new MessageContainer());
-            _proxy.ExecuteTransferSchedule(new MessageContainer());
+            await _proxy.ExecuteInstallmentSchedule(new MessageContainer());
+            await _proxy.CardRevenuePaymentSchedule(new MessageContainer());
+            await _proxy.SetCurrencyValuesSchedule(new MessageContainer());
+            await _proxy.ExecuteTransferSchedule(new MessageContainer());
             
             return Ok(new MessageContainer());
         }

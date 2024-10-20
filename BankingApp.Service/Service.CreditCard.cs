@@ -1,4 +1,5 @@
-﻿using BankingApp.Common.DataTransferObjects;
+﻿using BankingApp.Common.Constants;
+using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.Interfaces;
 using BankingApp.Entity;
 using System;
@@ -11,7 +12,7 @@ namespace BankingApp.Service
 {
     public partial class Service: IService
     {
-        public async Task<MessageContainer> CardRevenuePayment(MessageContainer requestMessage){
+        public async Task<MessageContainer> CardRevenuePaymentSchedule(MessageContainer requestMessage){
             ECreditCard eCreditCard = new ECreditCard();
             EParameter eParameter = new EParameter();
 
@@ -22,14 +23,31 @@ namespace BankingApp.Service
             for(int i = 0; i < ccList.Count; i++)
             {
                 cardFee = decimal.Parse(parList.Find(x=> x.Code.Equals(ccList[i].Type))!.Detail1!);
-                ccList[i] = cardExpense(ccList[i], cardFee);
+                ccList[i] = CommonMethods.CardExpense(ccList[i], cardFee, false);
             }
+
+            await eCreditCard.UpdateRange(ccList);
             
             return new MessageContainer();
         }
 
         public async Task<MessageContainer> CardExpensePayment(MessageContainer requestMessage){
+            ECreditCard eCreditCard = new ECreditCard();
+            DTOCreditCard cc = requestMessage.Get<DTOCreditCard>();
             
+            DTOCreditCard dtoCreditCard = await eCreditCard.Select(cc);
+
+            if(cc.InstallmentCount != null && cc.InstallmentCount > 0){
+                MessageContainer requestInstallment = new MessageContainer();
+                dtoCreditCard.Amount = cc.Amount;
+                dtoCreditCard.InstallmentCount = cc.InstallmentCount;
+                requestInstallment.Add(dtoCreditCard);
+                MessageContainer responseInstallment = await CreateInstallmentTransaction(requestInstallment);
+            }
+
+            CommonMethods.CardExpense(dtoCreditCard, (decimal)cc.Amount!, cc.InstallmentCount != null && cc.InstallmentCount > 0);
+            dtoCreditCard = await eCreditCard.Update(dtoCreditCard);
+
             return new MessageContainer();
         }
 
@@ -74,12 +92,5 @@ namespace BankingApp.Service
             return new MessageContainer();
         }
 
-        private DTOCreditCard cardExpense(DTOCreditCard cc, decimal fee){
-            cc.CurrentDebt += fee;
-            cc.OutstandingBalance -= fee;
-            cc.TotalDebt += fee;
-
-            return cc;
-        }
     }
 }

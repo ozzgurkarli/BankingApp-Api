@@ -56,7 +56,7 @@ namespace BankingApp.Service
             return response;
         }
 
-        public async Task<MessageContainer> SetCurrencyValues(MessageContainer requestMessage)
+        public async Task<MessageContainer> SetCurrencyValuesSchedule(MessageContainer requestMessage)
         {
             EParameter eParameter = new EParameter();
             requestMessage.Add(new DTOParameter { GroupCode = "Currency" });
