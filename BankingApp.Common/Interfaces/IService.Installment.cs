@@ -9,5 +9,8 @@ namespace BankingApp.Common.Interfaces
 {
     public partial interface IService
     {
+        public Task<MessageContainer> CreateInstallmentTransaction(MessageContainer requestMessage);
+
+        public Task<MessageContainer> ExecuteInstallmentSchedule(MessageContainer requestMessage);
     }
 }
