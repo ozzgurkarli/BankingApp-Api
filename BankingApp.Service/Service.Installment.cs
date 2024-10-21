@@ -21,11 +21,11 @@ namespace BankingApp.Service
 
             List<DTOInstallment> installmentList = new List<DTOInstallment>();
             
-            decimal installmentAmount = (decimal)(dtoCreditCard.Amount! / dtoCreditCard.InstallmentCount!);
+            decimal installmentAmount = Math.Round((decimal)(dtoCreditCard.Amount! / dtoCreditCard.InstallmentCount!), 2, MidpointRounding.AwayFromZero);
             
             for (int i = 0; i < dtoCreditCard.InstallmentCount; i++)
             {
-                installmentList.Add(new DTOInstallment{Amount = installmentAmount, InstallmentNumber = i, PaymentDate = DateTime.Today.AddMonths(i), Success = false, CreditCardNo = dtoCreditCard.CardNo});
+                installmentList.Add(new DTOInstallment{Amount = installmentAmount, InstallmentNumber = i+1, PaymentDate = DateTime.Today.AddMonths(i), Success = false, CreditCardNo = dtoCreditCard.CardNo});
             }
 
             responseMessage.Add(await eInstallment.AddRange(installmentList));
