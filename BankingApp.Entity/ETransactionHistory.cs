@@ -88,18 +88,18 @@ namespace BankingApp.Entity
 
                     using (var reader = await command.ExecuteReaderAsync())
                     {
-                        while (await reader.ReadAsync())
+                        if (await reader.ReadAsync())
                         {
                             item = new DTOTransactionHistory
                             {
                                 Id = (int)reader["Id"],
-                                AccountNo = (string)reader["AccountNo"],
-                                CreditCardNo = (string)reader["CreditCardNo"],
+                                AccountNo = reader["AccountNo"] != DBNull.Value ? (string?)reader["AccountNo"] : null,
+                                CreditCardNo = reader["CreditCardNo"] != DBNull.Value ? (string?)reader["CreditCardNo"] : null,
                                 Amount = (decimal)reader["Amount"],
                                 Currency = (string)reader["Currency"],
                                 TransactionDate = (DateTime)reader["TransactionDate"],
-                                Description = (string)reader["Description"],
-                                CustomerNo = ((Int64)reader["AccountNo"]).ToString(),
+                                Description = reader["Description"] != DBNull.Value ? (string?)reader["Description"] : null,
+                                CustomerNo = ((Int64)reader["CustomerId"]).ToString(),
                                 TransactionType = (int)reader["TransactionType"]
                             };
                         }
