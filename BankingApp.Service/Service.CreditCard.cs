@@ -19,7 +19,7 @@ namespace BankingApp.Service
             EParameter eParameter = new EParameter();
 
             List<DTOCreditCard> ccList = await eCreditCard.Get(new DTOCreditCard { ExpirationDate = DateTime.Today.AddYears(-1) });
-            List<DTOParameter> parList = await eParameter.GetByMultipleGroupCode(new DTOParameter { GroupCode = "CardType" });
+            List<DTOParameter> parList = await eParameter.GetByMultipleGroupCode(new DTOParameter { GroupCode = "'CardType'" });
 
             decimal cardFee;
             for (int i = 0; i < ccList.Count; i++)
@@ -52,7 +52,7 @@ namespace BankingApp.Service
             }
             else
             {
-                DTOTransactionHistory dtoTH = new DTOTransactionHistory { CustomerNo = dtoCreditCard.CustomerNo, Amount = dtoCreditCard.Amount, CreditCardNo = dtoCreditCard.CardNo, Currency = CurrencyTypes.TURKISH_LIRA, TransactionDate = DateTime.Today, TransactionType = (int?)TransactionType.Expense };
+                DTOTransactionHistory dtoTH = new DTOTransactionHistory { CustomerNo = dtoCreditCard.CustomerNo, Amount = -dtoCreditCard.Amount, CreditCardNo = dtoCreditCard.CardNo, Currency = CurrencyTypes.TURKISH_LIRA, TransactionDate = DateTime.Today, TransactionType = (int?)TransactionType.Expense };
                 MessageContainer requestTH = new MessageContainer();
                 requestTH.Add(dtoTH);
                 await AddNewTransaction(requestTH);

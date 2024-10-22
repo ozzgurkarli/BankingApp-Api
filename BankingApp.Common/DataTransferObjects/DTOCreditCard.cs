@@ -21,6 +21,8 @@ namespace BankingApp.Common.DataTransferObjects
 
         public decimal? TotalDebt { get; set; }
 
+        public decimal? EndOfCycleDebt { get; set; }
+
         public bool? Active { get; set; }
 
         public Int16? CVV { get; set; }

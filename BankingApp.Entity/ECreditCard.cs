@@ -51,6 +51,7 @@ namespace BankingApp.Entity
                                 TypeName = (string?)reader["TypeName"],
                                 OutstandingBalance = (decimal?)reader["OutstandingBalance"],
                                 TotalDebt = (decimal?)reader["TotalDebt"],
+                                EndOfCycleDebt = (decimal?)reader["EndOfCycleDebt"],
                                 CustomerNo = ((Int64)reader["CustomerId"]).ToString()
                             });
                         }
@@ -99,6 +100,7 @@ namespace BankingApp.Entity
                                 TypeName = (string?)reader["TypeName"],
                                 OutstandingBalance = (decimal?)reader["OutstandingBalance"],
                                 TotalDebt = (decimal?)reader["TotalDebt"],
+                                EndOfCycleDebt = (decimal?)reader["EndOfCycleDebt"],
                                 CustomerNo = ((Int64)reader["CustomerId"]).ToString()
                             };
                         }
@@ -154,6 +156,7 @@ namespace BankingApp.Entity
                                 Type = (int?)reader["Type"],
                                 OutstandingBalance = (decimal?)reader["OutstandingBalance"],
                                 TotalDebt = (decimal?)reader["TotalDebt"],
+                                EndOfCycleDebt = (decimal?)reader["EndOfCycleDebt"],
                                 CustomerNo = ((Int64)reader["CustomerId"]).ToString()
                             };
                         }
@@ -174,7 +177,7 @@ namespace BankingApp.Entity
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
 
-                using (var command = new NpgsqlCommand("SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id)", connection, tran))
+                using (var command = new NpgsqlCommand("SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id, @p_endofcycledebt)", connection, tran))
                 {
                     command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                     command.Parameters.AddWithValue("p_recordscreen", cc.RecordScreen);
@@ -188,6 +191,7 @@ namespace BankingApp.Entity
                     command.Parameters.AddWithValue("p_currentdebt", cc.CurrentDebt!);
                     command.Parameters.AddWithValue("p_outstandingbalance", cc.OutstandingBalance!);
                     command.Parameters.AddWithValue("p_totaldebt", cc.TotalDebt!);
+                            command.Parameters.AddWithValue("p_endofcycledebt", cc.EndOfCycleDebt!);
                     command.Parameters.AddWithValue("p_id", cc.Id!);
                     command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
 
@@ -213,6 +217,7 @@ namespace BankingApp.Entity
                                 Type = (int?)reader["Type"],
                                 OutstandingBalance = (decimal?)reader["OutstandingBalance"],
                                 TotalDebt = (decimal?)reader["TotalDebt"],
+                                EndOfCycleDebt = (decimal?)reader["EndOfCycleDebt"],
                                 CustomerNo = ((Int64)reader["CustomerId"]).ToString()
                             };
                         }
@@ -238,7 +243,7 @@ namespace BankingApp.Entity
                 {
                     foreach (var item in ccList)
                     {
-                        using (var command = new NpgsqlCommand("SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id)", connection, tran))
+                        using (var command = new NpgsqlCommand("SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id, @p_endofcycledebt)", connection, tran))
                         {
                             command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                             command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
@@ -252,6 +257,7 @@ namespace BankingApp.Entity
                             command.Parameters.AddWithValue("p_currentdebt", item.CurrentDebt!);
                             command.Parameters.AddWithValue("p_outstandingbalance", item.OutstandingBalance!);
                             command.Parameters.AddWithValue("p_totaldebt", item.TotalDebt!);
+                            command.Parameters.AddWithValue("p_endofcycledebt", item.EndOfCycleDebt!);
                             command.Parameters.AddWithValue("p_id", item.Id!);
                             command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
 
@@ -277,6 +283,7 @@ namespace BankingApp.Entity
                                         Type = (int?)reader["Type"],
                                         OutstandingBalance = (decimal?)reader["OutstandingBalance"],
                                         TotalDebt = (decimal?)reader["TotalDebt"],
+                                        EndOfCycleDebt = (decimal?)reader["EndOfCycleDebt"],
                                         CustomerNo = ((Int64)reader["CustomerId"]).ToString()
                                     });
                                 }

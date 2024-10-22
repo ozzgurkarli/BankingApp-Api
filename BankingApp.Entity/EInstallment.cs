@@ -72,5 +72,45 @@ namespace BankingApp.Entity
             return dtoInstallmentList;
         }
 
+                public async Task<List<DTOInstallment>> GetInstallmentsToExecute(DTOInstallment item)
+        {
+            List<DTOInstallment> installmentList = new List<DTOInstallment>();
+            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            {
+                await connection.OpenAsync();
+                NpgsqlTransaction tran = await connection.BeginTransactionAsync();
+
+                using (var command = new NpgsqlCommand("SELECT l_installmentstoexecute(@refcursor, @p_orderdate)", connection, tran))
+                {
+                    command.Parameters.AddWithValue("p_orderdate", DateTime.Today);
+                    command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                    await command.ExecuteNonQueryAsync();
+
+                    command.CommandText = "fetch all in \"ref\"";
+                    command.CommandType = CommandType.Text;
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            installmentList.Add(new DTOInstallment
+                            {
+                                Id = (int)reader["Id"],
+                                CreditCardNo = (string)reader["SenderAccountNo"],
+                                Success = (bool)reader["SenderAccountActive"],
+                                Amount = (decimal)reader["Amount"],
+                                PaymentDate = (DateTime)reader["TransactionDate"],
+                                InstallmentNumber = (int)reader["Status"],
+                            });
+                        }
+                    }
+
+                    await tran.DisposeAsync();
+                    await connection.CloseAsync();
+                }
+            }
+            return installmentList;
+        }
+
     }
 }
