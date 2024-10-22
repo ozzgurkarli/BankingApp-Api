@@ -34,6 +34,16 @@ namespace BankingApp.Service
         }
 
         public async Task<MessageContainer> ExecuteInstallmentSchedule(MessageContainer requestMessage){
+            EInstallment eInstallment = new EInstallment();
+
+            List<DTOInstallment> installmentList = await eInstallment.GetInstallmentsToExecute(new DTOInstallment{PaymentDate = DateTime.Today});
+            List<DTOTransactionHistory> transactionList = new List<DTOTransactionHistory>();
+            List<Task> taskList = new List<Task>();
+            foreach (var item in installmentList)
+            {
+                
+            }
+
             return new MessageContainer();
         }
     }
