@@ -241,8 +241,10 @@ namespace BankingApp.Entity
 
                 try
                 {
+                    int count = 0;
                     foreach (var item in ccList)
                     {
+                        count++;
                         using (var command = new NpgsqlCommand("SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id, @p_endofcycledebt)", connection, tran))
                         {
                             command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
@@ -259,11 +261,11 @@ namespace BankingApp.Entity
                             command.Parameters.AddWithValue("p_totaldebt", item.TotalDebt!);
                             command.Parameters.AddWithValue("p_endofcycledebt", item.EndOfCycleDebt!);
                             command.Parameters.AddWithValue("p_id", item.Id!);
-                            command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                            command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{count}");
 
                             await command.ExecuteNonQueryAsync();
 
-                            command.CommandText = "fetch all in \"ref\"";
+                            command.CommandText = $"fetch all in \"ref{count}\"";
                             command.CommandType = CommandType.Text;
 
                             using (var reader = await command.ExecuteReaderAsync())

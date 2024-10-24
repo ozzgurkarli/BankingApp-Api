@@ -40,7 +40,24 @@ namespace BankingApp.Service
             DTOCreditCard cc = requestMessage.Get<DTOCreditCard>();
 
             DTOCreditCard dtoCreditCard = await eCreditCard.Select(cc);
+
+            if (cc.Amount > dtoCreditCard.OutstandingBalance)
+            {
+                throw new Exception("Gerçekleştirmek istediğiniz işlem için limitiniz yetersizdir.");
+            }
+            else if (DateTime.Today > cc.ExpirationDate)
+            {
+                cc.Active = false;
+                await eCreditCard.Update(cc);
+                throw new Exception("Kartınızın kullanım tarihi geçmiştir, lütfen şubenize başvurun.");
+            }
+            else if((bool)!cc.Active!)
+            {
+                throw new Exception("Kartınız kullanıma kapalıdır.");
+            }
+            
             dtoCreditCard.Amount = cc.Amount;
+            dtoCreditCard.TransactionCompany = cc.TransactionCompany;
 
             if (cc.InstallmentCount != null && cc.InstallmentCount > 0)
             {

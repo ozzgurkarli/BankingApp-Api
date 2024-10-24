@@ -19,5 +19,9 @@ namespace BankingApp.Common.DataTransferObjects
         public bool? Success { get; set; }
 
         public decimal? Amount { get; set; }
+
+        public int? TransactionId { get; set; }
+
+        public string? TransactionCompany { get; set; }
     }
 }
