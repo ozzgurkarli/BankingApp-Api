@@ -40,5 +40,7 @@ namespace BankingApp.Common.DataTransferObjects
         public int? InstallmentCount { get; set; }
 
         public decimal? Amount { get; set; }
+
+        public string? TransactionCompany { get; set; }
     }
 }

@@ -41,6 +41,7 @@ namespace BankingApp.Service
 
             DTOCreditCard dtoCreditCard = await eCreditCard.Select(cc);
             dtoCreditCard.Amount = cc.Amount;
+            dtoCreditCard.TransactionCompany = cc.TransactionCompany;
 
             if (cc.InstallmentCount != null && cc.InstallmentCount > 0)
             {

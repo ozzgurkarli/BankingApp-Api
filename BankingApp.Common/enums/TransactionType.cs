@@ -4,6 +4,8 @@ namespace BankingApp.Common.enums
     {
         Transfer = 1,
 
-        Expense = 2
+        Expense = 2,
+
+        Installment = 3
     }
 }
