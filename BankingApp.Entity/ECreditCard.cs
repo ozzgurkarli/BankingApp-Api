@@ -21,10 +21,11 @@ namespace BankingApp.Entity
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
 
-                using (var command = new NpgsqlCommand("SELECT l_creditcard(@refcursor, @p_customerid, @p_expirationdate, @p_active)", connection, tran))
+                using (var command = new NpgsqlCommand("SELECT l_creditcard(@refcursor, @p_customerid, @p_expirationdate, @p_billingday, @p_active)", connection, tran))
                 {
                     command.Parameters.AddWithValue("p_customerid", cc.CustomerNo != null ? Int64.Parse(cc.CustomerNo) : (object)DBNull.Value);
                     command.Parameters.AddWithValue("p_expirationdate", cc.ExpirationDate ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("p_billingday", cc.BillingDay ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("p_active", cc.Active ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
 

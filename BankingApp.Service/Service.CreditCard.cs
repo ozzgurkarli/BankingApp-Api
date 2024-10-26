@@ -92,7 +92,38 @@ namespace BankingApp.Service
 
             List<DTOCreditCard> cardList = await eCreditCard.Get(dtoCard);
 
-            response.Add(cardList);
+            response.Add(cardList.OrderBy(x=> x.CardNo).ToList());
+            return response;
+        }
+
+        public async Task<MessageContainer> AccountClosingSchedule(MessageContainer requestMessage)
+        {
+            MessageContainer response = new MessageContainer();
+            ECreditCard eCreditCard = new ECreditCard();
+            List<Task<List<DTOCreditCard>>> taskList = new List<Task<List<DTOCreditCard>>>();
+            
+            DTOCreditCard dtoCreditCard = new DTOCreditCard();
+            List<DTOCreditCard> updatedCCList = new List<DTOCreditCard>();
+
+            foreach (int day in CommonMethods.GetBillableDays())
+            {
+                dtoCreditCard.BillingDay = short.Parse(day.ToString());
+                taskList.Add(eCreditCard.Get(dtoCreditCard));
+            }
+
+            List<List<DTOCreditCard>> ccList = (await Task.WhenAll(taskList.ToArray())).ToList();
+
+            foreach (List<DTOCreditCard> ccL in ccList)
+            {
+                foreach (DTOCreditCard cc in ccL)
+                {
+                    cc.EndOfCycleDebt += cc.CurrentDebt;
+                    updatedCCList.Add(cc);
+                }
+            }
+            
+            response.Add(await eCreditCard.UpdateRange(updatedCCList));
+
             return response;
         }
 
