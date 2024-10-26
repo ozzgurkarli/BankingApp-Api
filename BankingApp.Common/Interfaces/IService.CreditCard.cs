@@ -10,6 +10,8 @@ namespace BankingApp.Common.Interfaces
     public partial interface IService
     {
         public Task<MessageContainer> CardRevenuePaymentSchedule(MessageContainer requestMessage);
+        
+        public Task<MessageContainer> AccountClosingSchedule(MessageContainer requestMessage);
 
         public Task<MessageContainer> CardExpensePayment(MessageContainer requestMessage);
 
