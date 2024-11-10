@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using BankingApp.Common.Constants;
@@ -87,11 +88,15 @@ namespace BankingApp.Service
             {
                 SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(ENV.JwtSecretKey));
                 DateTime dtNow = DateTime.UtcNow;
-                JwtSecurityToken jwt = new JwtSecurityToken(issuer: ENV.JwtIssuer, audience: ENV.JwtAudience, notBefore: dtNow, expires: dtNow.AddMinutes(300), 
+
+                JwtSecurityToken jwt = new JwtSecurityToken(issuer: ENV.JwtIssuer, audience: ENV.JwtAudience, notBefore: dtNow, expires: dtNow.AddMinutes(60), 
+                    claims: new List<Claim> {
+                        new Claim("identityNo", dtoLogin.IdentityNo)
+                    },
                 signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256));
 
                 dtoLogin.Token = new JwtSecurityTokenHandler().WriteToken(jwt);
-                dtoLogin.TokenExpireDate = dtNow.AddMinutes(300);
+                dtoLogin.TokenExpireDate = dtNow.AddMinutes(60);
                 response.Add(dtoLogin);
             }
 
