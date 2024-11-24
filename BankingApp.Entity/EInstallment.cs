@@ -16,7 +16,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOInstallment>> AddRange(List<DTOInstallment> installmentList)
         {
             List<DTOInstallment> dtoInstallmentList = new List<DTOInstallment>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -25,7 +25,7 @@ namespace BankingApp.Entity
                 {
                     foreach (var item in installmentList)
                     {
-                        using (var command = new NpgsqlCommand("SELECT i_installment(@refcursor, @p_recorddate, @p_recordscreen, @p_cardno, @p_amount, @p_paymentdate, @p_installmentnumber, @p_transactionid)", connection, tran))
+                         using (var command = new NpgsqlCommand("SELECT i_installment(@refcursor, @p_recorddate, @p_recordscreen, @p_cardno, @p_amount, @p_paymentdate, @p_installmentnumber, @p_transactionid)", connection, tran))
                         {
                             command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                             command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
@@ -77,7 +77,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOInstallment>> UpdateRange(List<DTOInstallment> installmentList)
         {
             List<DTOInstallment> dtoInstallmentList = new List<DTOInstallment>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -141,7 +141,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOInstallment>> GetInstallmentsToExecute(DTOInstallment item)
         {
             List<DTOInstallment> installmentList = new List<DTOInstallment>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();

@@ -24,9 +24,9 @@ builder.Services.AddAuthentication(options =>
 {
     o.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidIssuer = ENV.JwtIssuer,
-        ValidAudience = ENV.JwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ENV.JwtSecretKey)),
+        ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY"))),
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = false,
@@ -64,7 +64,7 @@ app.Use(async (context, next) =>
         {
             context.Response.ContentType = "application/json";
                         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            var response = new { error = "Bir hata oluştu." };
+            var response = new { error = ex.Message };
             await context.Response.WriteAsJsonAsync(response);
         }
     }

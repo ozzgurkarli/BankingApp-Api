@@ -26,9 +26,15 @@ namespace BankingApp.Service
             decimal installmentAmount = Math.Round((decimal)(dtoCreditCard.Amount! / dtoCreditCard.InstallmentCount!), 2, MidpointRounding.AwayFromZero);
 
             DTOTransactionHistory dtoTransactionHistory = await eTransactionHistory.Add(new DTOTransactionHistory { Amount = dtoCreditCard.Amount, Currency = "INF", TransactionDate = DateTime.Today, CreditCardNo = dtoCreditCard.CardNo, CustomerNo = dtoCreditCard.CustomerNo, TransactionType = (int)TransactionType.Installment, Description = $"{dtoCreditCard.TransactionCompany}||{dtoCreditCard.InstallmentCount}"});
-
+            
+            decimal overPrice = (decimal)(installmentAmount * dtoCreditCard.InstallmentCount!) - (decimal)dtoCreditCard.Amount!;
+            
             for (int i = 0; i < dtoCreditCard.InstallmentCount; i++)
             {
+                if (i.Equals(dtoCreditCard.InstallmentCount - 1))
+                {
+                    installmentAmount -= overPrice;
+                }
                 installmentList.Add(new DTOInstallment { Amount = installmentAmount, InstallmentNumber = i + 1, PaymentDate = DateTime.Today.AddMonths(i), Success = false, CreditCardNo = dtoCreditCard.CardNo, TransactionId = dtoTransactionHistory.Id });
             }
 
@@ -51,7 +57,8 @@ namespace BankingApp.Service
             string installmentCount = string.Empty;
             foreach (var item in installmentList)
             {
-                transactionCompany = item.TransactionCompany!.Substring(0, item.TransactionCompany.Length - 3);
+                item.TransactionCompany ??= "UNKNOWN";
+                transactionCompany = item.TransactionCompany.Substring(0, item.TransactionCompany.Length - 3);
                 installmentCount = item.TransactionCompany!.Substring(item.TransactionCompany.Length - 1);
                 try
                 {

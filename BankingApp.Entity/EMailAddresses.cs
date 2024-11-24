@@ -15,7 +15,7 @@ namespace BankingApp.Entity
     {
         public async Task Add(DTOMailAddresses item)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
 
@@ -35,7 +35,7 @@ namespace BankingApp.Entity
         public async Task<DTOMailAddresses?> Get(DTOMailAddresses item)
         {
             DTOMailAddresses? mailAddress = null;
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();

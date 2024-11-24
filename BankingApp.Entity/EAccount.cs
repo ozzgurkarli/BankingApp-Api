@@ -16,7 +16,7 @@ namespace BankingApp.Entity
         public async Task<DTOAccount> Add(DTOAccount item)
         {
             DTOAccount dtoAccount = new DTOAccount();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -68,7 +68,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOAccount>> UpdateRange(List<DTOAccount> accList)
         {
             List<DTOAccount> dtoAccountList = new List<DTOAccount>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -131,7 +131,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOAccount>> Get(DTOAccount acc)
         {
             List<DTOAccount> accList = new List<DTOAccount>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -180,7 +180,7 @@ namespace BankingApp.Entity
 
         public async Task<DTOAccount> GetByCustomerIdentityNo(DTOAccount acc)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -228,7 +228,7 @@ namespace BankingApp.Entity
         {
             DTOAccount dtoAccount = new DTOAccount();
 
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();

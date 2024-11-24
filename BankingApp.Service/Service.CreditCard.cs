@@ -18,8 +18,10 @@ namespace BankingApp.Service
             ECreditCard eCreditCard = new ECreditCard();
             EParameter eParameter = new EParameter();
 
-            List<DTOCreditCard> ccList = await eCreditCard.Get(new DTOCreditCard { ExpirationDate = DateTime.Today.AddYears(-1) });
-            List<DTOParameter> parList = await eParameter.GetByMultipleGroupCode(new DTOParameter { GroupCode = "'CardType'" });
+            List<DTOCreditCard> ccList = await eCreditCard.Get(new DTOCreditCard
+                { ExpirationDate = DateTime.Today.AddYears(-1) });
+            List<DTOParameter> parList =
+                await eParameter.GetByMultipleGroupCode(new DTOParameter { GroupCode = "'CardType'" });
 
             decimal cardFee;
             for (int i = 0; i < ccList.Count; i++)
@@ -45,17 +47,17 @@ namespace BankingApp.Service
             {
                 throw new Exception("Gerçekleştirmek istediğiniz işlem için limitiniz yetersizdir.");
             }
-            else if (DateTime.Today > cc.ExpirationDate)
+            else if (DateTime.Today > dtoCreditCard.ExpirationDate)
             {
-                cc.Active = false;
-                await eCreditCard.Update(cc);
+                dtoCreditCard.Active = false;
+                await eCreditCard.Update(dtoCreditCard);
                 throw new Exception("Kartınızın kullanım tarihi geçmiştir, lütfen şubenize başvurun.");
             }
-            else if((bool)!cc.Active!)
+            else if ((bool)!dtoCreditCard.Active!)
             {
                 throw new Exception("Kartınız kullanıma kapalıdır.");
             }
-            
+
             dtoCreditCard.Amount = cc.Amount;
             dtoCreditCard.TransactionCompany = cc.TransactionCompany;
 
@@ -69,7 +71,12 @@ namespace BankingApp.Service
             }
             else
             {
-                DTOTransactionHistory dtoTH = new DTOTransactionHistory { CustomerNo = dtoCreditCard.CustomerNo, Amount = -dtoCreditCard.Amount, CreditCardNo = dtoCreditCard.CardNo, Currency = CurrencyTypes.TURKISH_LIRA, TransactionDate = DateTime.Today, TransactionType = (int?)TransactionType.Expense };
+                DTOTransactionHistory dtoTH = new DTOTransactionHistory
+                {
+                    CustomerNo = dtoCreditCard.CustomerNo, Amount = -dtoCreditCard.Amount,
+                    CreditCardNo = dtoCreditCard.CardNo, Currency = CurrencyTypes.TURKISH_LIRA,
+                    TransactionDate = DateTime.Today, TransactionType = (int?)TransactionType.Expense
+                };
                 MessageContainer requestTH = new MessageContainer();
                 requestTH.Add(dtoTH);
                 await AddNewTransaction(requestTH);
@@ -92,7 +99,36 @@ namespace BankingApp.Service
 
             List<DTOCreditCard> cardList = await eCreditCard.Get(dtoCard);
 
-            response.Add(cardList.OrderBy(x=> x.CardNo).ToList());
+            response.Add(cardList.OrderBy(x => x.CardNo).ToList());
+            return response;
+        }
+
+        public async Task<MessageContainer> SelectCreditCardWithDetails(MessageContainer requestMessage)
+        {
+            MessageContainer response = new MessageContainer();
+            ECreditCard eCreditCard = new ECreditCard();
+
+            DTOCreditCard dtoCard = requestMessage.Get<DTOCreditCard>();
+
+            dtoCard = await eCreditCard.SelectWithDetails(dtoCard);
+
+            DateTime date = DateTime.Today;
+
+            if (dtoCard.BillingDay >= date.Day)
+            {
+                date = date.AddMonths(-1);
+            }
+
+
+            dtoCard.AccountClosingDate = new DateTime(year: date.Year, month: date.Month,
+                day: setBillingDay(date, int.Parse(dtoCard.BillingDay.ToString()!)));
+
+            date = date.AddMonths(1);
+            dtoCard.NextAccountClosingDate = new DateTime(year: date.Year, month: date.Month,
+                day: setBillingDay(date, int.Parse(dtoCard.BillingDay.ToString()!)));
+
+            response.Add(dtoCard);
+
             return response;
         }
 
@@ -101,9 +137,9 @@ namespace BankingApp.Service
             MessageContainer response = new MessageContainer();
             ECreditCard eCreditCard = new ECreditCard();
             List<Task<List<DTOCreditCard>>> taskList = new List<Task<List<DTOCreditCard>>>();
-            
+
             DTOCreditCard dtoCreditCard = new DTOCreditCard();
-            List<DTOCreditCard> updatedCCList = new List<DTOCreditCard>();
+            List<DTOCreditCard> updatedCcList = new List<DTOCreditCard>();
 
             foreach (int day in CommonMethods.GetBillableDays())
             {
@@ -118,11 +154,11 @@ namespace BankingApp.Service
                 foreach (DTOCreditCard cc in ccL)
                 {
                     cc.EndOfCycleDebt += cc.CurrentDebt;
-                    updatedCCList.Add(cc);
+                    updatedCcList.Add(cc);
                 }
             }
-            
-            response.Add(await eCreditCard.UpdateRange(updatedCCList));
+
+            response.Add(await eCreditCard.UpdateRange(updatedCcList));
 
             return response;
         }
@@ -142,12 +178,14 @@ namespace BankingApp.Service
             dtoCreditCard.OutstandingBalance = dtoCreditCard.Limit;
 
             dtoCreditCard.CardNo = "530129";
-            string firstAvailableNo = (await eAccount.GetFirstAvailableNoAndIncrease(new DTOAccount { Currency = "CC" })).AccountNo!;
+            string firstAvailableNo =
+                (await eAccount.GetFirstAvailableNoAndIncrease(new DTOAccount { Currency = "CC" })).AccountNo!;
 
             for (int i = 0; i < 10 - int.Parse(firstAvailableNo); i++)
             {
                 dtoCreditCard.CardNo += "0";
             }
+
             dtoCreditCard.CardNo += firstAvailableNo;
 
             await eCreditCard.Add(dtoCreditCard);
@@ -155,5 +193,14 @@ namespace BankingApp.Service
             return new MessageContainer();
         }
 
+        private int setBillingDay(DateTime date, int billingDay)
+        {
+            if (billingDay > DateTime.DaysInMonth(date.Year, date.Month))
+            {
+                billingDay = DateTime.DaysInMonth(date.Year, date.Month);
+            }
+
+            return billingDay;
+        }
     }
 }

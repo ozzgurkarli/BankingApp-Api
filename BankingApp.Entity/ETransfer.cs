@@ -14,7 +14,7 @@ namespace BankingApp.Entity
     {
         public async Task<DTOTransfer> Add(DTOTransfer transfer)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -66,7 +66,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOTransfer>> GetOrdersToExecute(DTOTransfer item)
         {
             List<DTOTransfer> transferList = new List<DTOTransfer>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -119,7 +119,7 @@ namespace BankingApp.Entity
         public async Task<DTOTransfer> ExecuteTransfer(DTOTransfer transfer, List<DTOAccount> accountList, List<DTOTransactionHistory> transactionList)
         {
             DTOTransfer dtoTransfer = new DTOTransfer();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();

@@ -86,10 +86,10 @@ namespace BankingApp.Service
 
             if(dtoLogin != null && dtoLogin.Password != "null")       // generate token
             {
-                SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(ENV.JwtSecretKey));
+                SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")));
                 DateTime dtNow = DateTime.UtcNow;
 
-                JwtSecurityToken jwt = new JwtSecurityToken(issuer: ENV.JwtIssuer, audience: ENV.JwtAudience, notBefore: dtNow, expires: dtNow.AddMinutes(60), 
+                JwtSecurityToken jwt = new JwtSecurityToken(issuer: Environment.GetEnvironmentVariable("JWT_ISSUER"), audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE"), notBefore: dtNow, expires: dtNow.AddMinutes(60), 
                     claims: new List<Claim> {
                         new Claim("identityNo", dtoLogin.IdentityNo)
                     },
