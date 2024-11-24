@@ -71,7 +71,7 @@ namespace BankingApp.Service
             if (DateTime.Parse(parList.Find(x => x.Code.Equals(1))!.Detail2!).CompareTo(DateTime.Today) < 0)
             {   // set new values
                 HttpClient client = new HttpClient();
-                Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(await client.GetStringAsync($"https://data.fixer.io/api/latest?access_key={ENV.CurrencyApiKey}"))!;
+                Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(await client.GetStringAsync($"https://data.fixer.io/api/latest?access_key={Environment.GetEnvironmentVariable("CURRENCY_API_KEY")}"))!;
 
                 foreach (KeyValuePair<string, decimal> item in JsonConvert.DeserializeObject<Dictionary<string, decimal>>(dict["rates"].ToString()!)!)
                 {

@@ -17,7 +17,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOParameter>> GetByMultipleGroupCode(DTOParameter parGroupCodes)
         {
             List<DTOParameter> parameterList = new List<DTOParameter>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = connection.BeginTransaction();
@@ -62,7 +62,7 @@ namespace BankingApp.Entity
         {
             DTOParameter dtoparameter = new DTOParameter();
 
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -106,7 +106,7 @@ namespace BankingApp.Entity
 
         public async Task<DTOParameter> Update(DTOParameter dtoParameter)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -162,7 +162,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOParameter>> UpdateRange(List<DTOParameter> dtoParameterList)
         {
             List<DTOParameter> parlist = new List<DTOParameter>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();

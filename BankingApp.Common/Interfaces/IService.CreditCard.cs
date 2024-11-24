@@ -12,6 +12,8 @@ namespace BankingApp.Common.Interfaces
         public Task<MessageContainer> CardRevenuePaymentSchedule(MessageContainer requestMessage);
         
         public Task<MessageContainer> AccountClosingSchedule(MessageContainer requestMessage);
+        
+        public Task<MessageContainer> SelectCreditCardWithDetails(MessageContainer requestMessage);
 
         public Task<MessageContainer> CardExpensePayment(MessageContainer requestMessage);
 

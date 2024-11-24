@@ -15,7 +15,7 @@ namespace BankingApp.Entity
     {
         public async Task<DTOLogin> Add(DTOLogin item)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -58,7 +58,7 @@ namespace BankingApp.Entity
 
         public async Task<DTOLogin> Update(DTOLogin item)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -103,7 +103,7 @@ namespace BankingApp.Entity
         public async Task<DTOLogin?> Select(DTOLogin item)
         {
             DTOLogin? dtoLogin = null;
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();

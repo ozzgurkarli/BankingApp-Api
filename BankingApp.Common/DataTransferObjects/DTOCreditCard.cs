@@ -35,6 +35,15 @@ namespace BankingApp.Common.DataTransferObjects
 
         public string? TypeName { get; set; }
 
+        
+        public decimal? TypeFee { get; set; }
+
+        public decimal? FutureInstallments { get; set; }
+
+        public DateTime? AccountClosingDate { get; set; }
+
+        public DateTime? NextAccountClosingDate { get; set; }
+
         public decimal? OutstandingBalance { get; set; }
 
         public int? InstallmentCount { get; set; }

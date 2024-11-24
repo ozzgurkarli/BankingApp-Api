@@ -53,7 +53,7 @@ namespace BankingApp.Service
         {
             SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
             {
-                Credentials = new NetworkCredential("ozzgur.parbnk@gmail.com", ENV.MailPassword),
+                Credentials = new NetworkCredential("ozzgur.parbnk@gmail.com", Environment.GetEnvironmentVariable("MAIL_PASSWORD")),
                 EnableSsl = true
             };
 

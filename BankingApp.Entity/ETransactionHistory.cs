@@ -15,7 +15,7 @@ namespace BankingApp.Entity
         {
             List<DTOTransactionHistory> transactionList = new List<DTOTransactionHistory>();
 
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -62,7 +62,7 @@ namespace BankingApp.Entity
 
         public async Task<DTOTransactionHistory> Add(DTOTransactionHistory item)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -116,7 +116,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOTransactionHistory>> AddRange(List<DTOTransactionHistory> transactionList)
         {
             List<DTOTransactionHistory> dtoTHList = new List<DTOTransactionHistory>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();

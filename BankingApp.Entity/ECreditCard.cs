@@ -16,7 +16,8 @@ namespace BankingApp.Entity
         public async Task<List<DTOCreditCard>> Get(DTOCreditCard cc)
         {
             List<DTOCreditCard> ccList = new List<DTOCreditCard>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            var xx = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -68,7 +69,7 @@ namespace BankingApp.Entity
 
         public async Task<DTOCreditCard> Select(DTOCreditCard cc)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -114,10 +115,60 @@ namespace BankingApp.Entity
 
             return cc;
         }
+        
+        public async Task<DTOCreditCard> SelectWithDetails(DTOCreditCard cc)
+        {
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
+            {
+                await connection.OpenAsync();
+                NpgsqlTransaction tran = await connection.BeginTransactionAsync();
+
+                using (var command = new NpgsqlCommand("SELECT s_creditcardwithdetails(@refcursor, @p_cardno)", connection, tran))
+                {
+                    command.Parameters.AddWithValue("p_cardno", cc.CardNo!);
+                    command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+
+                    await command.ExecuteNonQueryAsync();
+
+                    command.CommandText = "fetch all in \"ref\"";
+                    command.CommandType = CommandType.Text;
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            cc = new DTOCreditCard
+                            {
+                                Id = (int)reader["Id"],
+                                CardNo = (string?)reader["CardNo"],
+                                Active = (bool?)reader["Active"],
+                                Limit = (decimal?)reader["Limit"],
+                                CurrentDebt = (decimal?)reader["CurrentDebt"],
+                                CVV = (Int16?)reader["CVV"],
+                                ExpirationDate = (DateTime?)reader["ExpirationDate"],
+                                BillingDay = (Int16?)reader["BillingDay"],
+                                Type = (int?)reader["Type"],
+                                TypeName = (string?)reader["TypeName"],
+                                OutstandingBalance = (decimal?)reader["OutstandingBalance"],
+                                TotalDebt = (decimal?)reader["TotalDebt"],
+                                EndOfCycleDebt = (decimal?)reader["EndOfCycleDebt"],
+                                TypeFee = decimal.Parse((string)reader["TypeFee"]),
+                                CustomerNo = ((Int64)reader["CustomerId"]).ToString()
+                            };
+                        }
+                    }
+                    await tran.CommitAsync();
+                }
+                await tran.DisposeAsync();
+                await connection.CloseAsync();
+            }
+
+            return cc;
+        }
 
         public async Task<DTOCreditCard> Add(DTOCreditCard cc)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -173,7 +224,7 @@ namespace BankingApp.Entity
 
         public async Task<DTOCreditCard> Update(DTOCreditCard cc)
         {
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
@@ -235,7 +286,7 @@ namespace BankingApp.Entity
         public async Task<List<DTOCreditCard>> UpdateRange(List<DTOCreditCard> ccList)
         {
             List<DTOCreditCard> dtoCCList = new List<DTOCreditCard>();
-            using (var connection = new NpgsqlConnection(ENV.DatabaseConnectionString))
+            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
             {
                 await connection.OpenAsync();
                 NpgsqlTransaction tran = await connection.BeginTransactionAsync();
