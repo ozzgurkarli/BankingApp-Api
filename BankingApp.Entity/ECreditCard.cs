@@ -152,7 +152,7 @@ namespace BankingApp.Entity
                                 OutstandingBalance = (decimal?)reader["OutstandingBalance"],
                                 TotalDebt = (decimal?)reader["TotalDebt"],
                                 EndOfCycleDebt = (decimal?)reader["EndOfCycleDebt"],
-                                TypeFee = decimal.Parse((string)reader["TypeFee"]),
+                                TypeFee = decimal.Parse(((string)reader["TypeFee"]).Replace('.', ',')),
                                 CustomerNo = ((Int64)reader["CustomerId"]).ToString()
                             };
                         }
