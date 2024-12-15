@@ -62,7 +62,7 @@ namespace BankingApp.Service
                 installmentCount = item.TransactionCompany!.Substring(item.TransactionCompany.Length - 1);
                 try
                 {
-                    dtoCreditCard = await eCreditCard.Select(new DTOCreditCard { CardNo = item.CreditCardNo });
+                    dtoCreditCard = dtoCreditCardList.FirstOrDefault(x=> x.CardNo.Equals(item.CreditCardNo)) ?? await eCreditCard.Select(new DTOCreditCard { CardNo = item.CreditCardNo });
                     dtoCreditCard.CurrentDebt += item.Amount;
                     dtoCreditCardList.Add(dtoCreditCard);
                     transactionList.Add(new DTOTransactionHistory { CreditCardNo = item.CreditCardNo, TransactionType = (int)TransactionType.Installment, Amount = -item.Amount, Currency = CurrencyTypes.TURKISH_LIRA, CustomerNo = dtoCreditCard.CustomerNo, Description = $"{transactionCompany} {item.InstallmentNumber}/{installmentCount}", TransactionDate = DateTime.Now});
