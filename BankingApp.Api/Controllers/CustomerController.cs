@@ -10,23 +10,19 @@ namespace BankingApp.Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : ControllerBase
+    public class CustomerController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
-        private readonly IService _proxy;
-
-        public CustomerController(IService proxy)
-        {
-            _proxy = proxy;
-        }
-
         [HttpPost("GetCustomerByIdentityNo")]
         public async Task<IActionResult> GetCustomerByIdentityNo(MessageContainer message)
         {
-            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer requestMessage = new MessageContainer(unitOfWork);
             DTOCustomer dtoCustomer = message.ToObject<DTOCustomer>(message, "DTOCustomer");
             requestMessage.Add(dtoCustomer);
 
-            return Ok(await _proxy.GetCustomerByIdentityNo(requestMessage));
+            MessageContainer responseMessage = await proxy.GetCustomerByIdentityNo(requestMessage);
+            unitOfWork.Commit();
+
+            return Ok(responseMessage);
         }
 
 
@@ -34,7 +30,7 @@ namespace BankingApp.Api.Controllers
         [HttpPost("CreateCustomer")]
         public async Task<IActionResult> CreateCustomer(MessageContainer message)
         {
-            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer requestMessage = new MessageContainer(unitOfWork);
 
             DTOCustomer customer = message.ToObject<DTOCustomer>(message, "DTOCustomer");
             requestMessage.Add(new DTOMailAddresses { MailAddress = customer.PrimaryMailAddress!, CustomerNo = "1" });
@@ -42,7 +38,7 @@ namespace BankingApp.Api.Controllers
 
             try
             {
-                await _proxy.RegisterCheckDataAlreadyInUse(requestMessage);
+                await proxy.RegisterCheckDataAlreadyInUse(requestMessage);
             }
             catch (Exception ex)
             {
@@ -52,7 +48,10 @@ namespace BankingApp.Api.Controllers
             message.Clear();
             message.Add(customer);
 
-            return Ok(await _proxy.CreateCustomer(message));
+            MessageContainer responseMessage = await proxy.CreateCustomer(requestMessage);
+            unitOfWork.Commit();
+
+            return Ok(responseMessage);
         }
     }
 }

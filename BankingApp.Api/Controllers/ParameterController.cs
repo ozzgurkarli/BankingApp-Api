@@ -9,23 +9,18 @@ namespace BankingApp.Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class ParameterController : ControllerBase
+    public class ParameterController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
-        private readonly IService _proxy;
-        public ParameterController(IService proxy)
-        {
-            _proxy = proxy;
-        }
-
         [AllowAnonymous]
         [HttpPost("GetParametersByGroupCode")]
         public async Task<IActionResult> GetParametersByGroupCode([FromBody] MessageContainer message)
         {
-            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer requestMessage = new MessageContainer(unitOfWork);
             MessageContainer responseMessage = new MessageContainer();
             requestMessage.Add(message.ToObject<DTOParameter>(message, "Parameter"));
 
-            responseMessage = await _proxy.GetParametersByGroupCode(requestMessage);
+            responseMessage = await proxy.GetParametersByGroupCode(requestMessage);
+            unitOfWork.Commit();
 
             return Ok(responseMessage);
         }
@@ -34,11 +29,12 @@ namespace BankingApp.Api.Controllers
         [HttpPost("GetMultipleGroupCode")]
         public async Task<IActionResult> GetMultipleGroupCode([FromBody] MessageContainer message)
         {
-            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer requestMessage = new MessageContainer(unitOfWork);
             MessageContainer responseMessage = new MessageContainer();
             requestMessage.Add(message.ToObject<List<DTOParameter>>(message, "ParameterList"));
 
-            responseMessage = await _proxy.GetMultipleGroupCode(requestMessage);
+            responseMessage = await proxy.GetMultipleGroupCode(requestMessage);
+            unitOfWork.Commit();
 
             return Ok(responseMessage);
         }

@@ -12,27 +12,34 @@ using System.Threading.Tasks;
 
 namespace BankingApp.Service
 {
-    public partial class Service: BaseService, IService
+    public partial class Service : BaseService, IService
     {
         public async Task<MessageContainer> CreateCustomer(MessageContainer requestMessage)
         {
-            ECustomer eCustomer = new ECustomer();
-            ELogin eLogin = new ELogin();
+            ECustomer eCustomer = new ECustomer(requestMessage.UnitOfWork);
             DTOCustomer dtoReqCustomer = requestMessage.Get<DTOCustomer>();
-            MessageContainer reqService = new MessageContainer();
+            MessageContainer reqService = new MessageContainer(requestMessage.UnitOfWork);
 
             DTOCustomer dtoCustomer = await eCustomer.Add(dtoReqCustomer);
             string tempPassword = setTemporaryPassword();
-            DTOLogin dtoLogin = new DTOLogin { IdentityNo = dtoCustomer.IdentityNo, Password = tempPassword, Temporary = true };
+            DTOLogin dtoLogin = new DTOLogin
+                { IdentityNo = dtoCustomer.IdentityNo, Password = tempPassword, Temporary = true };
             reqService.Add("Login", dtoLogin);
             RegisterCustomer(reqService);
 
             reqService.Clear();
-            DTOAccount dtoAccount = new DTOAccount { Active = true, Primary = true, Branch = dtoReqCustomer.Branch, Currency = "TL", CurrencyCode = "1", CustomerNo = dtoCustomer.CustomerNo};
+            DTOAccount dtoAccount = new DTOAccount
+            {
+                Active = true, Primary = true, Branch = dtoReqCustomer.Branch, Currency = "TL", CurrencyCode = "1",
+                CustomerNo = dtoCustomer.CustomerNo
+            };
             reqService.Add(dtoAccount);
             CreateAccount(reqService);
 
-            DTOMailAddresses dtoMailAddress = new DTOMailAddresses { CustomerNo = dtoCustomer.CustomerNo!, MailAddress = dtoReqCustomer.PrimaryMailAddress!, Primary = true };
+            DTOMailAddresses dtoMailAddress = new DTOMailAddresses
+            {
+                CustomerNo = dtoCustomer.CustomerNo!, MailAddress = dtoReqCustomer.PrimaryMailAddress!, Primary = true
+            };
 
             reqService.Clear();
             reqService.Add("MailAddress", dtoMailAddress);
@@ -52,7 +59,7 @@ namespace BankingApp.Service
         public async Task<MessageContainer> GetCustomerByIdentityNo(MessageContainer requestMessage)
         {
             MessageContainer response = new MessageContainer();
-            ECustomer eCustomer = new ECustomer();
+            ECustomer eCustomer = new ECustomer(requestMessage.UnitOfWork);
             DTOCustomer dtoCustomer = requestMessage.Get<DTOCustomer>();
 
             dtoCustomer = await eCustomer.Get(dtoCustomer);

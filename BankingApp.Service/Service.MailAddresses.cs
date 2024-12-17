@@ -12,24 +12,25 @@ using BankingApp.Entity;
 
 namespace BankingApp.Service
 {
-    public partial class Service: IService
+    public partial class Service : IService
     {
         public async Task<MessageContainer> AddMailAddressWithTemporaryPassword(MessageContainer reqMessage)
         {
-            EMailAddresses eMailAddress = new EMailAddresses();
+            EMailAddresses eMailAddress = new EMailAddresses(reqMessage.UnitOfWork);
             DTOCustomer dtoCustomer = reqMessage.Get<DTOCustomer>("Customer");
             DTOMailAddresses dtoMailAddress = reqMessage.Get<DTOMailAddresses>("MailAddress");
             DTOLogin dtoLogin = reqMessage.Get<DTOLogin>("Login");
 
             await eMailAddress.Add(dtoMailAddress);
-            sendMail(new List<string> { dtoMailAddress.MailAddress! }, "ParBank Geçici Parola", $"Merhaba {dtoCustomer.Name},<br><br>Bankamıza hoşgeldin. ParBank uygulamasına ilk girişinde kullanabileceğin geçici parola: <strong>{dtoLogin.Password}</strong><br><br>İyi Günler Dileriz.");
-            
+            sendMail(new List<string> { dtoMailAddress.MailAddress! }, "ParBank Geçici Parola",
+                $"Merhaba {dtoCustomer.Name},<br><br>Bankamıza hoşgeldin. ParBank uygulamasına ilk girişinde kullanabileceğin geçici parola: <strong>{dtoLogin.Password}</strong><br><br>İyi Günler Dileriz.");
+
             return new MessageContainer();
         }
 
         public async Task<MessageContainer> SelectMailAddressByMailAddress(MessageContainer requestMessage)
         {
-            EMailAddresses eMailAddress = new EMailAddresses();
+            EMailAddresses eMailAddress = new EMailAddresses(requestMessage.UnitOfWork);
             DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
 
             MessageContainer reqService = new MessageContainer();
@@ -40,7 +41,7 @@ namespace BankingApp.Service
 
         public async Task<MessageContainer> GetPrimaryMailAddressByCustomerNo(MessageContainer requestMessage)
         {
-            EMailAddresses eMailAddress = new EMailAddresses();
+            EMailAddresses eMailAddress = new EMailAddresses(requestMessage.UnitOfWork);
             DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
 
             MessageContainer reqService = new MessageContainer();
@@ -53,13 +54,14 @@ namespace BankingApp.Service
         {
             SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
             {
-                Credentials = new NetworkCredential("ozzgur.parbnk@gmail.com", Environment.GetEnvironmentVariable("MAIL_PASSWORD")),
+                Credentials = new NetworkCredential("ozzgur.parbnk@gmail.com",
+                    Environment.GetEnvironmentVariable("MAIL_PASSWORD")),
                 EnableSsl = true
             };
 
             try
             {
-                foreach(string to in toList)
+                foreach (string to in toList)
                 {
                     MailMessage mailMessage = new MailMessage("ozzgur.parbnk@gmail.com", to, subject, body);
                     mailMessage.IsBodyHtml = true;
@@ -68,7 +70,6 @@ namespace BankingApp.Service
             }
             catch (Exception)
             {
-                
             }
         }
     }

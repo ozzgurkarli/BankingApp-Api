@@ -12,25 +12,18 @@ namespace BankingApp.Api.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountController : ControllerBase
+    public class AccountController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
-        
-        private readonly IService _proxy;
-
-        public AccountController(IService proxy)
-        {
-            _proxy = proxy;
-        }
-
         [HttpPost("GetAccounts")]
-        public async Task<IActionResult> GetAccounts(MessageContainer requestMessage){
+        public async Task<IActionResult> GetAccounts(MessageContainer requestMessage)
+        {
             DTOAccount dtoAccount = requestMessage.ToObject<DTOAccount>(requestMessage, "DTOAccount");
 
-            MessageContainer requestAccount = new MessageContainer();
+            MessageContainer requestAccount = new MessageContainer(unitOfWork);
 
             requestAccount.Add(dtoAccount);
 
-            MessageContainer responseAcc = await _proxy.GetAccountsByFilter(requestAccount);
+            MessageContainer responseAcc = await proxy.GetAccountsByFilter(requestAccount);
             MessageContainer response = new MessageContainer();
 
             response.Add("AccountList", responseAcc.Get<List<DTOAccount>>());
@@ -39,17 +32,18 @@ namespace BankingApp.Api.Controllers
         }
 
         [HttpPost("AddAccount")]
-        public async Task<IActionResult> AddAccount(MessageContainer requestMessage){
+        public async Task<IActionResult> AddAccount(MessageContainer requestMessage)
+        {
             DTOAccount dtoAccount = requestMessage.ToObject<DTOAccount>(requestMessage, "DTOAccount");
 
-            MessageContainer requestAccount = new MessageContainer();
-
+            MessageContainer requestAccount = new MessageContainer(unitOfWork);
             requestAccount.Add(dtoAccount);
 
-            MessageContainer responseAcc = await _proxy.CreateAccount(requestAccount);
+            MessageContainer responseAcc = await proxy.CreateAccount(requestAccount);
             MessageContainer response = new MessageContainer();
 
             response.Add("Account", responseAcc.Get<DTOAccount>());
+            unitOfWork.Commit();
 
             return Ok(response);
         }

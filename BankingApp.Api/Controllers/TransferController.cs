@@ -12,37 +12,32 @@ namespace BankingApp.Api.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class TransferController : ControllerBase
+    public class TransferController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
-        private readonly IService _proxy;
-        public TransferController(IService proxy)
-        {
-            _proxy = proxy;
-        }
-
-
         [HttpPost("CheckRecipientCustomer")]
-        public async Task<IActionResult> CheckRecipientCustomer(MessageContainer message){
+        public async Task<IActionResult> CheckRecipientCustomer(MessageContainer message)
+        {
             DTOTransfer dtoTransfer = message.ToObject<DTOTransfer>(message, "DTOTransfer");
 
-            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer requestMessage = new MessageContainer(unitOfWork);
 
             requestMessage.Add(dtoTransfer);
 
-            MessageContainer responseMessage = await _proxy.CheckRecipientCustomer(requestMessage);
+            MessageContainer responseMessage = await proxy.CheckRecipientCustomer(requestMessage);
 
             return Ok(responseMessage);
         }
 
         [HttpPost("StartTransfer")]
-        public async Task<IActionResult> StartTransfer(MessageContainer message){
+        public async Task<IActionResult> StartTransfer(MessageContainer message)
+        {
             DTOTransfer dtoTransfer = message.ToObject<DTOTransfer>(message, "DTOTransfer");
 
-            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer requestMessage = new MessageContainer(unitOfWork);
 
             requestMessage.Add(dtoTransfer);
 
-            MessageContainer responseMessage = await _proxy.StartTransfer(requestMessage);
+            MessageContainer responseMessage = await proxy.StartTransfer(requestMessage);
 
             return Ok(responseMessage);
         }

@@ -14,11 +14,11 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace BankingApp.Service
 {
-    public partial class Service: IService
+    public partial class Service : IService
     {
         public async Task<MessageContainer> RegisterCustomer(MessageContainer requestMessage)
         {
-            ELogin eLogin = new ELogin();
+            ELogin eLogin = new ELogin(requestMessage.UnitOfWork);
             DTOLogin dtoLogin = requestMessage.Get<DTOLogin>("Login");
             PasswordHasher<string> passwordHasher = new PasswordHasher<string>();
             dtoLogin.Password = passwordHasher.HashPassword(dtoLogin.IdentityNo, dtoLogin.Password);
@@ -40,7 +40,7 @@ namespace BankingApp.Service
         {
             MessageContainer responseMessage = new MessageContainer();
             MessageContainer responseTask = new MessageContainer();
-            ELogin eLogin = new ELogin();
+            ELogin eLogin = new ELogin(requestMessage.UnitOfWork);
 
             DTOLogin dtoLogin = requestMessage.Get<DTOLogin>();
             PasswordHasher<string> passwordHasher = new PasswordHasher<string>();
@@ -49,7 +49,7 @@ namespace BankingApp.Service
 
             dtoLogin = await eLogin.Update(dtoLogin);
 
-            if(dtoLogin == null)
+            if (dtoLogin == null)
             {
                 throw new Exception("Bilinmeyen hata, şubenize başvurun.");
             }
@@ -65,7 +65,9 @@ namespace BankingApp.Service
 
                 responseTask = await GetPrimaryMailAddressByCustomerNo(requestMessage);
 
-                sendMail(new List<string> { responseTask.Get<DTOMailAddresses>().MailAddress }, "ParBank Parola Değişikliği", "Merhaba<br><br>Parolanız isteğiniz doğrultusunda güncellenmiştir. Bu işlemi siz gerçekleştirmediyseniz şubemize başvurun.");
+                sendMail(new List<string> { responseTask.Get<DTOMailAddresses>().MailAddress },
+                    "ParBank Parola Değişikliği",
+                    "Merhaba<br><br>Parolanız isteğiniz doğrultusunda güncellenmiştir. Bu işlemi siz gerçekleştirmediyseniz şubemize başvurun.");
             });
 
             responseMessage.Add(dtoLogin);
@@ -76,24 +78,33 @@ namespace BankingApp.Service
         public async Task<MessageContainer> GetLoginCredentials(MessageContainer requestMessage)
         {
             MessageContainer response = new MessageContainer();
-            ELogin eLogin = new ELogin();
+            ELogin eLogin = new ELogin(requestMessage.UnitOfWork);
             DTOLogin dtoLogin = await eLogin.Select(requestMessage.Get<DTOLogin>());
             PasswordHasher<string> passwordHasher = new PasswordHasher<string>();
-            
-            if(!string.IsNullOrWhiteSpace(requestMessage.Get<DTOLogin>().Password) && requestMessage.Get<DTOLogin>().Password != "null" && passwordHasher.VerifyHashedPassword(dtoLogin.IdentityNo, dtoLogin.Password, requestMessage.Get<DTOLogin>().Password) == PasswordVerificationResult.Failed){
+
+            if (!string.IsNullOrWhiteSpace(requestMessage.Get<DTOLogin>().Password) &&
+                requestMessage.Get<DTOLogin>().Password != "null" &&
+                passwordHasher.VerifyHashedPassword(dtoLogin.IdentityNo, dtoLogin.Password,
+                    requestMessage.Get<DTOLogin>().Password) == PasswordVerificationResult.Failed)
+            {
                 throw new Exception("Hatalı Şifre");
             }
 
-            if(dtoLogin != null && dtoLogin.Password != "null")       // generate token
+            if (dtoLogin != null && dtoLogin.Password != "null") // generate token
             {
-                SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")));
+                SymmetricSecurityKey symmetricSecurityKey =
+                    new SymmetricSecurityKey(
+                        Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")));
                 DateTime dtNow = DateTime.UtcNow;
 
-                JwtSecurityToken jwt = new JwtSecurityToken(issuer: Environment.GetEnvironmentVariable("JWT_ISSUER"), audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE"), notBefore: dtNow, expires: dtNow.AddMinutes(60), 
-                    claims: new List<Claim> {
+                JwtSecurityToken jwt = new JwtSecurityToken(issuer: Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                    audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE"), notBefore: dtNow,
+                    expires: dtNow.AddMinutes(60),
+                    claims: new List<Claim>
+                    {
                         new Claim("identityNo", dtoLogin.IdentityNo)
                     },
-                signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256));
+                    signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256));
 
                 dtoLogin.Token = new JwtSecurityTokenHandler().WriteToken(jwt);
                 dtoLogin.TokenExpireDate = dtNow.AddMinutes(60);
@@ -105,12 +116,12 @@ namespace BankingApp.Service
 
         public async Task<MessageContainer> RegisterCheckDataAlreadyInUse(MessageContainer requestMessage)
         {
-            EMailAddresses eMailAddress = new EMailAddresses();
-            ELogin eLogin = new ELogin();
+            EMailAddresses eMailAddress = new EMailAddresses(requestMessage.UnitOfWork);
+            ELogin eLogin = new ELogin(requestMessage.UnitOfWork);
 
             DTOLogin dtoLogin = requestMessage.Get<DTOLogin>();
             DTOMailAddresses dtoMailAddress = requestMessage.Get<DTOMailAddresses>();
-            
+
             dtoMailAddress = await eMailAddress.Get(dtoMailAddress);
             dtoLogin = await eLogin.Select(dtoLogin);
 
@@ -119,7 +130,7 @@ namespace BankingApp.Service
             {
                 throw new Exception("Bu mail adresi kullanılıyor.");
             }
-            else if(dtoLogin != null)
+            else if (dtoLogin != null)
             {
                 throw new Exception("Müşteri zaten kayıtlı.");
             }

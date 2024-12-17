@@ -14,18 +14,29 @@ namespace BankingApp.Service
     {
         public async Task<MessageContainer> AddNewTransaction(MessageContainer requestMessage)
         {
-            ETransactionHistory eTransactionHistory = new ETransactionHistory();
+            ETransactionHistory eTransactionHistory = new ETransactionHistory(requestMessage.UnitOfWork);
             DTOTransactionHistory dtoTransactionHistory = requestMessage.Get<DTOTransactionHistory>();
             MessageContainer responseMessage = new MessageContainer();
-            
-            await eTransactionHistory.Add(dtoTransactionHistory);
+
+            responseMessage.Add(await eTransactionHistory.Add(dtoTransactionHistory));
+
+            return responseMessage;
+        }
+
+        public async Task<MessageContainer> AddMultipleTransactions(MessageContainer requestMessage)
+        {
+            ETransactionHistory eTransactionHistory = new ETransactionHistory(requestMessage.UnitOfWork);
+            List<DTOTransactionHistory> dtoTransactionHistoryList = requestMessage.Get<List<DTOTransactionHistory>>();
+            MessageContainer responseMessage = new MessageContainer();
+
+            await eTransactionHistory.AddRange(dtoTransactionHistoryList);
 
             return responseMessage;
         }
 
         public async Task<MessageContainer> GetHistoryByFilter(MessageContainer requestMessage)
         {
-            ETransactionHistory eTransactionHistory = new ETransactionHistory();
+            ETransactionHistory eTransactionHistory = new ETransactionHistory(requestMessage.UnitOfWork);
             DTOTransactionHistory dtoTransaction = requestMessage.Get<DTOTransactionHistory>();
             MessageContainer responseMessage = new MessageContainer();
 

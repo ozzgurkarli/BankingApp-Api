@@ -18,7 +18,7 @@ namespace BankingApp.Service
     {
         public async Task<MessageContainer> GetParametersByGroupCode(MessageContainer requestMessage)
         {
-            EParameter eParameter = new EParameter();
+            EParameter eParameter = new EParameter(requestMessage.UnitOfWork);
             MessageContainer response = new MessageContainer();
 
             DTOParameter dtoParameter = requestMessage.Get<DTOParameter>();
@@ -33,7 +33,7 @@ namespace BankingApp.Service
 
         public async Task<MessageContainer> GetMultipleGroupCode(MessageContainer requestMessage)
         {
-            EParameter eParameter = new EParameter();
+            EParameter eParameter = new EParameter(requestMessage.UnitOfWork);
             MessageContainer response = new MessageContainer();
             List<DTOParameter> parList = requestMessage.Get<List<DTOParameter>>();
 
@@ -58,7 +58,7 @@ namespace BankingApp.Service
 
         public async Task<MessageContainer> SetCurrencyValuesSchedule(MessageContainer requestMessage)
         {
-            EParameter eParameter = new EParameter();
+            EParameter eParameter = new EParameter(requestMessage.UnitOfWork);
             requestMessage.Add(new DTOParameter { GroupCode = "Currency" });
             MessageContainer responseMessage = new MessageContainer();
 
@@ -69,11 +69,16 @@ namespace BankingApp.Service
             Dictionary<string, decimal> currencyDict = new Dictionary<string, decimal>();
 
             if (DateTime.Parse(parList.Find(x => x.Code.Equals(1))!.Detail2!).CompareTo(DateTime.Today) < 0)
-            {   // set new values
+            {
+                // set new values
                 HttpClient client = new HttpClient();
-                Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(await client.GetStringAsync($"https://data.fixer.io/api/latest?access_key={Environment.GetEnvironmentVariable("CURRENCY_API_KEY")}"))!;
+                Dictionary<string, object> dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(
+                        await client.GetStringAsync(
+                            $"https://data.fixer.io/api/latest?access_key={Environment.GetEnvironmentVariable("CURRENCY_API_KEY")}"))
+                    !;
 
-                foreach (KeyValuePair<string, decimal> item in JsonConvert.DeserializeObject<Dictionary<string, decimal>>(dict["rates"].ToString()!)!)
+                foreach (KeyValuePair<string, decimal> item in JsonConvert
+                             .DeserializeObject<Dictionary<string, decimal>>(dict["rates"].ToString()!)!)
                 {
                     if (item.Key.Equals("TRY") || parList.Select(x => x.Description).ToList().Contains(item.Key))
                     {
@@ -92,7 +97,9 @@ namespace BankingApp.Service
                 {
                     item.Detail2 = DateTime.Today.ToString();
                     item.Detail3 = item.Detail4;
-                    item.Detail4 = item.Description!.Equals("TL") ? "0" : Math.Round(currencyDict[item.Description!], 2, MidpointRounding.AwayFromZero).ToString();
+                    item.Detail4 = item.Description!.Equals("TL")
+                        ? "0"
+                        : Math.Round(currencyDict[item.Description!], 2, MidpointRounding.AwayFromZero).ToString();
                     responseMessage.Add(item.Description, item);
                 }
 

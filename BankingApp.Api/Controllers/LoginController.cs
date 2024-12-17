@@ -10,24 +10,18 @@ namespace BankingApp.Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class LoginController : ControllerBase
+    public class LoginController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
-        private readonly IService _proxy;
-
-        public LoginController(IService proxy)
-        {
-            _proxy = proxy;
-        }
-
         [AllowAnonymous]
         [HttpPost("GetLoginCredentials")]
         public async Task<IActionResult> GetLoginCredentials([FromBody] MessageContainer message)
         {
-            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer requestMessage = new MessageContainer(unitOfWork);
             MessageContainer responseMessage = new MessageContainer();
             requestMessage.Add(message.ToObject<DTOLogin>(message, "DTOLogin"));
 
-            responseMessage = await _proxy.GetLoginCredentials(requestMessage);
+            responseMessage = await proxy.GetLoginCredentials(requestMessage);
+            unitOfWork.Commit();
 
             return Ok(responseMessage);
         }
@@ -35,13 +29,14 @@ namespace BankingApp.Api.Controllers
         [HttpPut("UpdatePassword")]
         public async Task<IActionResult> UpdatePassword([FromBody] MessageContainer message)
         {
-            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer requestMessage = new MessageContainer(unitOfWork);
             MessageContainer response = new MessageContainer();
 
             DTOLogin dtoLogin = message.ToObject<DTOLogin>(message, "DTOLogin");
 
             requestMessage.Add(dtoLogin);
-            response = await _proxy.UpdatePassword(requestMessage);
+            response = await proxy.UpdatePassword(requestMessage);
+            unitOfWork.Commit();
 
             return Ok(response);
         }
