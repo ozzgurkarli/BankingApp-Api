@@ -16,6 +16,7 @@ namespace BankingApp.Entity
     {
         public async Task<List<DTOCreditCard>> Get(DTOCreditCard cc)
         {
+            long now = DateTime.Now.Ticks;
             List<DTOCreditCard> ccList = new List<DTOCreditCard>();
             using (var command = (NpgsqlCommand)_unitOfWork.CreateCommand(
                        "SELECT l_creditcard(@refcursor, @p_customerid, @p_expirationdate, @p_billingday, @p_active)"))
@@ -25,11 +26,11 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_expirationdate", cc.ExpirationDate ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("p_billingday", cc.BillingDay ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("p_active", cc.Active ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -192,6 +193,7 @@ namespace BankingApp.Entity
 
         public async Task<DTOCreditCard> Update(DTOCreditCard cc)
         {
+            long now = DateTime.UtcNow.Ticks;
             using (var command = (NpgsqlCommand)_unitOfWork.CreateCommand(
                        "SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id, @p_endofcycledebt)"))
             {
@@ -209,11 +211,11 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_totaldebt", cc.TotalDebt!);
                 command.Parameters.AddWithValue("p_endofcycledebt", cc.EndOfCycleDebt!);
                 command.Parameters.AddWithValue("p_id", cc.Id!);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -247,6 +249,7 @@ namespace BankingApp.Entity
         {
             List<DTOCreditCard> dtoCCList = new List<DTOCreditCard>();
             int count = 0;
+            long now = DateTime.UtcNow.Ticks;
             foreach (var item in ccList)
             {
                 count++;
@@ -268,11 +271,11 @@ namespace BankingApp.Entity
                     command.Parameters.AddWithValue("p_endofcycledebt", item.EndOfCycleDebt!);
                     command.Parameters.AddWithValue("p_id", item.Id!);
                     command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor,
-                        $"ref{count}");
+                        $"ref{count}{now}");
 
                     await command.ExecuteNonQueryAsync();
 
-                    command.CommandText = $"fetch all in \"ref{count}\"";
+                    command.CommandText = $"fetch all in \"ref{count}{now}\"";
                     command.CommandType = CommandType.Text;
 
                     using (var reader = await command.ExecuteReaderAsync())

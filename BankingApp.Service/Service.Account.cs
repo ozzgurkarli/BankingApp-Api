@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BankingApp.Service
 {
-    public partial class Service: IService
+    public partial class Service : IService
     {
         public async Task<MessageContainer> CreateAccount(MessageContainer requestMessage)
         {
@@ -18,9 +18,18 @@ namespace BankingApp.Service
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
             dtoAccount.Active = true;
             dtoAccount.Balance = 0;
-            
+
             dtoAccount.AccountNo = (await eAccount.GetFirstAvailableNoAndIncrease(dtoAccount)).AccountNo;
             response.Add(await eAccount.Add(dtoAccount));
+
+            return response;
+        }
+
+        public async Task<MessageContainer> UpdateRangeAccount(MessageContainer requestMessage)
+        {
+            MessageContainer response = new MessageContainer();
+            EAccount eAccount = new EAccount(requestMessage.UnitOfWork);
+            response.Add(await eAccount.UpdateRange(requestMessage.Get<List<DTOAccount>>()));
 
             return response;
         }
@@ -31,8 +40,8 @@ namespace BankingApp.Service
             EAccount eAccount = new EAccount(requestMessage.UnitOfWork);
 
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
-            
-            List<DTOAccount> accountList = (await eAccount.Get(dtoAccount)).OrderBy(x=> x.AccountNo).ToList();
+
+            List<DTOAccount> accountList = (await eAccount.Get(dtoAccount)).OrderBy(x => x.AccountNo).ToList();
 
             response.Add(accountList);
             return response;

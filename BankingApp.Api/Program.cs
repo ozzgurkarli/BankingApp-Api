@@ -3,7 +3,7 @@ using System.Text;
 using BankingApp.Common.Constants;
 using BankingApp.Common.Interfaces;
 using BankingApp.Service;
-using BankingApp.UnitOfWork;
+using BankingApp.Common.DataTransferObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
@@ -28,7 +28,8 @@ builder.Services.AddAuthentication(options =>
     {
         ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
         ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY"))),
+        IssuerSigningKey =
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY"))),
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = false,
@@ -45,6 +46,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 app.Use(async (context, next) =>
@@ -65,7 +67,7 @@ app.Use(async (context, next) =>
         else
         {
             context.Response.ContentType = "application/json";
-                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             var response = new { error = ex.Message };
             await context.Response.WriteAsJsonAsync(response);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -15,7 +16,9 @@ namespace BankingApp.Common.DataTransferObjects
             UnitOfWork = unitOfWork;
         }
         public Dictionary<string, object> Contents { get; set; } = new Dictionary<string, object>();
-        public IUnitOfWork UnitOfWork { get; set; }
+
+        [Required(ErrorMessage = "The UnitOfWork field is required. ananısileyim")]
+        public IUnitOfWork UnitOfWork { get; set; } = new UnitOfWork();
 
         public void Add(object content)
         {

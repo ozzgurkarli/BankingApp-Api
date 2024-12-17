@@ -16,16 +16,17 @@ namespace BankingApp.Entity
     {
         public async Task<List<DTOParameter>> GetByMultipleGroupCode(DTOParameter parGroupCodes)
         {
+            long now = DateTime.Now.Ticks;
             List<DTOParameter> parameterList = new List<DTOParameter>();
             using (var command =
                    (NpgsqlCommand)unitOfWork.CreateCommand(
                        "SELECT l_parametersbygroupcodes(@refcursor, @p_groupcodes)"))
             {
                 command.Parameters.AddWithValue("p_groupcodes", parGroupCodes.GroupCode!);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())

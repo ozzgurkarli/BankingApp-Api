@@ -64,67 +64,49 @@ namespace BankingApp.Entity
         public async Task<List<DTOInstallment>> UpdateRange(List<DTOInstallment> installmentList)
         {
             List<DTOInstallment> dtoInstallmentList = new List<DTOInstallment>();
-            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
+            int count = 0;
+            long now = DateTime.UtcNow.Ticks;
+            foreach (var item in installmentList)
             {
-                await connection.OpenAsync();
-                NpgsqlTransaction tran = await connection.BeginTransactionAsync();
-
-                try
+                count++;
+                using (var command = (NpgsqlCommand)_unitOfWork.CreateCommand(
+                           "SELECT u_installment(@refcursor, @p_id, @p_recorddate, @p_recordscreen, @p_cardno, @p_amount, @p_success, @p_paymentdate, @p_installmentnumber)"))
                 {
-                    int count = 0;
-                    foreach (var item in installmentList)
+                    command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
+                    command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
+                    command.Parameters.AddWithValue("p_cardno", item.CreditCardNo!);
+                    command.Parameters.AddWithValue("p_amount", item.Amount!);
+                    command.Parameters.AddWithValue("p_id", item.Id!);
+                    command.Parameters.AddWithValue("p_success", item.Success!);
+                    command.Parameters.AddWithValue("p_paymentdate", item.PaymentDate!);
+                    command.Parameters.AddWithValue("p_installmentnumber", item.InstallmentNumber!);
+                    command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor,
+                        $"ref{count}{now}");
+
+                    await command.ExecuteNonQueryAsync();
+
+                    command.CommandText = $"fetch all in \"ref{count}{now}\"";
+                    command.CommandType = CommandType.Text;
+
+                    using (var reader = await command.ExecuteReaderAsync())
                     {
-                        count++;
-                        using (var command = new NpgsqlCommand(
-                                   "SELECT u_installment(@refcursor, @p_id, @p_recorddate, @p_recordscreen, @p_cardno, @p_amount, @p_success, @p_paymentdate, @p_installmentnumber)",
-                                   connection, tran))
+                        if (await reader.ReadAsync())
                         {
-                            command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
-                            command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
-                            command.Parameters.AddWithValue("p_cardno", item.CreditCardNo!);
-                            command.Parameters.AddWithValue("p_amount", item.Amount!);
-                            command.Parameters.AddWithValue("p_id", item.Id!);
-                            command.Parameters.AddWithValue("p_success", item.Success!);
-                            command.Parameters.AddWithValue("p_paymentdate", item.PaymentDate!);
-                            command.Parameters.AddWithValue("p_installmentnumber", item.InstallmentNumber!);
-                            command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor,
-                                $"ref{count}");
-
-                            await command.ExecuteNonQueryAsync();
-
-                            command.CommandText = $"fetch all in \"ref{count}\"";
-                            command.CommandType = CommandType.Text;
-
-                            using (var reader = await command.ExecuteReaderAsync())
+                            dtoInstallmentList.Add(new DTOInstallment
                             {
-                                if (await reader.ReadAsync())
-                                {
-                                    dtoInstallmentList.Add(new DTOInstallment
-                                    {
-                                        Id = (int)reader["Id"],
-                                        CreditCardNo = (string)reader["CreditCardNo"],
-                                        InstallmentNumber = (int)reader["InstallmentNumber"],
-                                        PaymentDate = (DateTime)reader["PaymentDate"],
-                                        Success = (bool)reader["Success"],
-                                        Amount = (decimal)reader["Amount"],
-                                        RecordDate = (DateTime)reader["RecordDate"],
-                                        RecordScreen = (string)reader["RecordScreen"],
-                                        TransactionId = (int)reader["TransactionId"]
-                                    });
-                                }
-                            }
+                                Id = (int)reader["Id"],
+                                CreditCardNo = (string)reader["CreditCardNo"],
+                                InstallmentNumber = (int)reader["InstallmentNumber"],
+                                PaymentDate = (DateTime)reader["PaymentDate"],
+                                Success = (bool)reader["Success"],
+                                Amount = (decimal)reader["Amount"],
+                                RecordDate = (DateTime)reader["RecordDate"],
+                                RecordScreen = (string)reader["RecordScreen"],
+                                TransactionId = (int)reader["TransactionId"]
+                            });
                         }
                     }
-
-                    await tran.CommitAsync();
                 }
-                catch (Exception)
-                {
-                    await tran.RollbackAsync();
-                }
-
-                await tran.DisposeAsync();
-                await connection.CloseAsync();
             }
 
             return dtoInstallmentList;
@@ -133,42 +115,35 @@ namespace BankingApp.Entity
         public async Task<List<DTOInstallment>> GetInstallmentsToExecute(DTOInstallment item)
         {
             List<DTOInstallment> installmentList = new List<DTOInstallment>();
-            using (var connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")))
+            long now = DateTime.UtcNow.Ticks;
+            using (var command =
+                   (NpgsqlCommand)_unitOfWork.CreateCommand(
+                       "SELECT l_installmentstoexecute(@refcursor, @p_orderdate)"))
             {
-                await connection.OpenAsync();
-                NpgsqlTransaction tran = await connection.BeginTransactionAsync();
+                command.Parameters.AddWithValue("p_orderdate", DateTime.Today);
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
+                await command.ExecuteNonQueryAsync();
 
-                using (var command = new NpgsqlCommand("SELECT l_installmentstoexecute(@refcursor, @p_orderdate)",
-                           connection, tran))
+                command.CommandText = $"fetch all in \"ref{now}\"";
+                command.CommandType = CommandType.Text;
+
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    command.Parameters.AddWithValue("p_orderdate", DateTime.Today);
-                    command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
-                    await command.ExecuteNonQueryAsync();
-
-                    command.CommandText = "fetch all in \"ref\"";
-                    command.CommandType = CommandType.Text;
-
-                    using (var reader = await command.ExecuteReaderAsync())
+                    while (await reader.ReadAsync())
                     {
-                        while (await reader.ReadAsync())
+                        installmentList.Add(new DTOInstallment
                         {
-                            installmentList.Add(new DTOInstallment
-                            {
-                                Id = (int)reader["Id"],
-                                CreditCardNo = (string)reader["CreditCardNo"],
-                                Success = (bool)reader["Success"],
-                                Amount = (decimal)reader["Amount"],
-                                PaymentDate = (DateTime)reader["PaymentDate"],
-                                InstallmentNumber = (int)reader["InstallmentNumber"],
-                                TransactionCompany = await reader.IsDBNullAsync("TransactionCompany")
-                                    ? null
-                                    : (string)reader["TransactionCompany"]
-                            });
-                        }
+                            Id = (int)reader["Id"],
+                            CreditCardNo = (string)reader["CreditCardNo"],
+                            Success = (bool)reader["Success"],
+                            Amount = (decimal)reader["Amount"],
+                            PaymentDate = (DateTime)reader["PaymentDate"],
+                            InstallmentNumber = (int)reader["InstallmentNumber"],
+                            TransactionCompany = await reader.IsDBNullAsync("TransactionCompany")
+                                ? null
+                                : (string)reader["TransactionCompany"]
+                        });
                     }
-
-                    await tran.DisposeAsync();
-                    await connection.CloseAsync();
                 }
             }
 

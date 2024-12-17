@@ -1,8 +1,8 @@
-﻿using System.Data;
+using System.Data;
 using BankingApp.Common.Interfaces;
 using Npgsql;
 
-namespace BankingApp.UnitOfWork;
+namespace BankingApp.Common.DataTransferObjects;
 
 public class UnitOfWork : IUnitOfWork
 {
@@ -35,6 +35,7 @@ public class UnitOfWork : IUnitOfWork
         {
             _transaction?.Dispose();
             _transaction = null;
+            Dispose();
         }
     }
 

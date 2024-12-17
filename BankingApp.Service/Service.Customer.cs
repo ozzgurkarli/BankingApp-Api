@@ -59,7 +59,7 @@ namespace BankingApp.Service
         public async Task<MessageContainer> GetCustomerByIdentityNo(MessageContainer requestMessage)
         {
             MessageContainer response = new MessageContainer();
-            ECustomer eCustomer = new ECustomer();
+            ECustomer eCustomer = new ECustomer(requestMessage.UnitOfWork);
             DTOCustomer dtoCustomer = requestMessage.Get<DTOCustomer>();
 
             dtoCustomer = await eCustomer.Get(dtoCustomer);

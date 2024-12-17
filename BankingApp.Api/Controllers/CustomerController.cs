@@ -22,7 +22,7 @@ namespace BankingApp.Api.Controllers
             MessageContainer responseMessage = await proxy.GetCustomerByIdentityNo(requestMessage);
             unitOfWork.Commit();
 
-            return Ok();
+            return Ok(responseMessage);
         }
 
 
@@ -30,7 +30,7 @@ namespace BankingApp.Api.Controllers
         [HttpPost("CreateCustomer")]
         public async Task<IActionResult> CreateCustomer(MessageContainer message)
         {
-            MessageContainer requestMessage = new MessageContainer();
+            MessageContainer requestMessage = new MessageContainer(unitOfWork);
 
             DTOCustomer customer = message.ToObject<DTOCustomer>(message, "DTOCustomer");
             requestMessage.Add(new DTOMailAddresses { MailAddress = customer.PrimaryMailAddress!, CustomerNo = "1" });
@@ -48,7 +48,10 @@ namespace BankingApp.Api.Controllers
             message.Clear();
             message.Add(customer);
 
-            return Ok(await proxy.CreateCustomer(message));
+            MessageContainer responseMessage = await proxy.CreateCustomer(requestMessage);
+            unitOfWork.Commit();
+
+            return Ok(responseMessage);
         }
     }
 }

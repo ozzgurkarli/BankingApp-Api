@@ -15,7 +15,8 @@ namespace BankingApp.Api.Controllers
     public class AccountController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
         [HttpPost("GetAccounts")]
-        public async Task<IActionResult> GetAccounts(MessageContainer requestMessage){
+        public async Task<IActionResult> GetAccounts(MessageContainer requestMessage)
+        {
             DTOAccount dtoAccount = requestMessage.ToObject<DTOAccount>(requestMessage, "DTOAccount");
 
             MessageContainer requestAccount = new MessageContainer(unitOfWork);
@@ -31,7 +32,8 @@ namespace BankingApp.Api.Controllers
         }
 
         [HttpPost("AddAccount")]
-        public async Task<IActionResult> AddAccount(MessageContainer requestMessage){
+        public async Task<IActionResult> AddAccount(MessageContainer requestMessage)
+        {
             DTOAccount dtoAccount = requestMessage.ToObject<DTOAccount>(requestMessage, "DTOAccount");
 
             MessageContainer requestAccount = new MessageContainer(unitOfWork);

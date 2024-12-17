@@ -21,7 +21,7 @@ namespace BankingApp.Service
                 { ExpirationDate = DateTime.Today.AddYears(-1) });
 
             MessageContainer requestParameter = new MessageContainer(requestMessage.UnitOfWork);
-            requestParameter.Add(new List<DTOParameter> { new DTOParameter { GroupCode = "'CardType'" } });
+            requestParameter.Add(new List<DTOParameter> { new DTOParameter { GroupCode = "CardType" } });
             List<DTOParameter> parList = (await GetMultipleGroupCode(requestParameter)).Get<List<DTOParameter>>();
 
             decimal cardFee;

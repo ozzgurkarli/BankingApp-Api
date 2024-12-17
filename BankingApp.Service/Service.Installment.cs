@@ -12,30 +12,45 @@ using System.Threading.Tasks;
 
 namespace BankingApp.Service
 {
-    public partial class Service: IService
+    public partial class Service : IService
     {
         public async Task<MessageContainer> CreateInstallmentTransaction(MessageContainer requestMessage)
         {
             MessageContainer responseMessage = new MessageContainer();
             EInstallment eInstallment = new EInstallment(requestMessage.UnitOfWork);
-            ETransactionHistory eTransactionHistory = new ETransactionHistory();
             DTOCreditCard dtoCreditCard = requestMessage.Get<DTOCreditCard>();
 
             List<DTOInstallment> installmentList = new List<DTOInstallment>();
 
-            decimal installmentAmount = Math.Round((decimal)(dtoCreditCard.Amount! / dtoCreditCard.InstallmentCount!), 2, MidpointRounding.AwayFromZero);
+            decimal installmentAmount = Math.Round((decimal)(dtoCreditCard.Amount! / dtoCreditCard.InstallmentCount!),
+                2, MidpointRounding.AwayFromZero);
 
-            DTOTransactionHistory dtoTransactionHistory = await eTransactionHistory.Add(new DTOTransactionHistory { Amount = dtoCreditCard.Amount, Currency = "INF", TransactionDate = DateTime.Today, CreditCardNo = dtoCreditCard.CardNo, CustomerNo = dtoCreditCard.CustomerNo, TransactionType = (int)TransactionType.Installment, Description = $"{dtoCreditCard.TransactionCompany}||{dtoCreditCard.InstallmentCount}"});
-            
-            decimal overPrice = (decimal)(installmentAmount * dtoCreditCard.InstallmentCount!) - (decimal)dtoCreditCard.Amount!;
-            
+            requestMessage.Clear();
+            requestMessage.Add(new DTOTransactionHistory
+            {
+                Amount = dtoCreditCard.Amount, Currency = "INF", TransactionDate = DateTime.Today,
+                CreditCardNo = dtoCreditCard.CardNo, CustomerNo = dtoCreditCard.CustomerNo,
+                TransactionType = (int)TransactionType.Installment,
+                Description = $"{dtoCreditCard.TransactionCompany}||{dtoCreditCard.InstallmentCount}"
+            });
+            DTOTransactionHistory dtoTransactionHistory =
+                (await AddNewTransaction(requestMessage)).Get<DTOTransactionHistory>();
+
+            decimal overPrice = (decimal)(installmentAmount * dtoCreditCard.InstallmentCount!) -
+                                (decimal)dtoCreditCard.Amount!;
+
             for (int i = 0; i < dtoCreditCard.InstallmentCount; i++)
             {
                 if (i.Equals(dtoCreditCard.InstallmentCount - 1))
                 {
                     installmentAmount -= overPrice;
                 }
-                installmentList.Add(new DTOInstallment { Amount = installmentAmount, InstallmentNumber = i + 1, PaymentDate = DateTime.Today.AddMonths(i), Success = false, CreditCardNo = dtoCreditCard.CardNo, TransactionId = dtoTransactionHistory.Id });
+
+                installmentList.Add(new DTOInstallment
+                {
+                    Amount = installmentAmount, InstallmentNumber = i + 1, PaymentDate = DateTime.Today.AddMonths(i),
+                    Success = false, CreditCardNo = dtoCreditCard.CardNo, TransactionId = dtoTransactionHistory.Id
+                });
             }
 
             responseMessage.Add(await eInstallment.AddRange(installmentList));
@@ -45,12 +60,12 @@ namespace BankingApp.Service
 
         public async Task<MessageContainer> ExecuteInstallmentSchedule(MessageContainer requestMessage)
         {
-            EInstallment eInstallment = new EInstallment();
-            ECreditCard eCreditCard = new ECreditCard();
-            ETransactionHistory eTransactionHistory = new ETransactionHistory();
+            EInstallment eInstallment = new EInstallment(requestMessage.UnitOfWork);
+            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork);
             List<DTOCreditCard> dtoCreditCardList = new List<DTOCreditCard>();
             DTOCreditCard dtoCreditCard;
-            List<DTOInstallment> installmentList = await eInstallment.GetInstallmentsToExecute(new DTOInstallment { PaymentDate = DateTime.Today });
+            List<DTOInstallment> installmentList =
+                await eInstallment.GetInstallmentsToExecute(new DTOInstallment { PaymentDate = DateTime.Today });
             List<DTOTransactionHistory> transactionList = new List<DTOTransactionHistory>();
 
             string transactionCompany = string.Empty;
@@ -62,10 +77,18 @@ namespace BankingApp.Service
                 installmentCount = item.TransactionCompany!.Substring(item.TransactionCompany.Length - 1);
                 try
                 {
-                    dtoCreditCard = dtoCreditCardList.FirstOrDefault(x=> x.CardNo.Equals(item.CreditCardNo)) ?? await eCreditCard.Select(new DTOCreditCard { CardNo = item.CreditCardNo });
+                    dtoCreditCard = dtoCreditCardList.FirstOrDefault(x => x.CardNo.Equals(item.CreditCardNo)) ??
+                                    await eCreditCard.Select(new DTOCreditCard { CardNo = item.CreditCardNo });
                     dtoCreditCard.CurrentDebt += item.Amount;
                     dtoCreditCardList.Add(dtoCreditCard);
-                    transactionList.Add(new DTOTransactionHistory { CreditCardNo = item.CreditCardNo, TransactionType = (int)TransactionType.Installment, Amount = -item.Amount, Currency = CurrencyTypes.TURKISH_LIRA, CustomerNo = dtoCreditCard.CustomerNo, Description = $"{transactionCompany} {item.InstallmentNumber}/{installmentCount}", TransactionDate = DateTime.Now});
+                    transactionList.Add(new DTOTransactionHistory
+                    {
+                        CreditCardNo = item.CreditCardNo, TransactionType = (int)TransactionType.Installment,
+                        Amount = -item.Amount, Currency = CurrencyTypes.TURKISH_LIRA,
+                        CustomerNo = dtoCreditCard.CustomerNo,
+                        Description = $"{transactionCompany} {item.InstallmentNumber}/{installmentCount}",
+                        TransactionDate = DateTime.Now
+                    });
                     item.Success = true;
                 }
                 catch (Exception)
@@ -74,8 +97,11 @@ namespace BankingApp.Service
                 }
             }
 
+            requestMessage.Clear();
+            requestMessage.Add(transactionList);
+            await AddMultipleTransactions(requestMessage);
+
             await eCreditCard.UpdateRange(dtoCreditCardList);
-            await eTransactionHistory.AddRange(transactionList);
             await eInstallment.UpdateRange(installmentList);
 
             return new MessageContainer();

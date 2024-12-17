@@ -2,7 +2,7 @@ using System.Data;
 
 namespace BankingApp.Common.Interfaces;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork
 {
     IDbConnection Connection { get; }
     IDbTransaction Transaction { get; }
