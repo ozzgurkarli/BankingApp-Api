@@ -14,7 +14,7 @@ namespace BankingApp.Service
     {
         public async Task<MessageContainer> AddNewTransaction(MessageContainer requestMessage)
         {
-            ETransactionHistory eTransactionHistory = new ETransactionHistory();
+            ETransactionHistory eTransactionHistory = new ETransactionHistory(requestMessage.UnitOfWork);
             DTOTransactionHistory dtoTransactionHistory = requestMessage.Get<DTOTransactionHistory>();
             MessageContainer responseMessage = new MessageContainer();
             

@@ -33,7 +33,7 @@ namespace BankingApp.Service
 
         public async Task<MessageContainer> GetMultipleGroupCode(MessageContainer requestMessage)
         {
-            EParameter eParameter = new EParameter();
+            EParameter eParameter = new EParameter(requestMessage.UnitOfWork);
             MessageContainer response = new MessageContainer();
             List<DTOParameter> parList = requestMessage.Get<List<DTOParameter>>();
 

@@ -14,10 +14,8 @@ namespace BankingApp.Service
         public async Task<MessageContainer> CreateAccount(MessageContainer requestMessage)
         {
             MessageContainer response = new MessageContainer();
-            EAccount eAccount = new EAccount();
-            EParameter eParameter = new EParameter();
+            EAccount eAccount = new EAccount(requestMessage.UnitOfWork);
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
-
             dtoAccount.Active = true;
             dtoAccount.Balance = 0;
             
@@ -30,7 +28,7 @@ namespace BankingApp.Service
         public async Task<MessageContainer> GetAccountsByFilter(MessageContainer requestMessage)
         {
             MessageContainer response = new MessageContainer();
-            EAccount eAccount = new EAccount();
+            EAccount eAccount = new EAccount(requestMessage.UnitOfWork);
 
             DTOAccount dtoAccount = requestMessage.Get<DTOAccount>();
             

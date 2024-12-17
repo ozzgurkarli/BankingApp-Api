@@ -12,28 +12,22 @@ namespace BankingApp.Api.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class CreditCardController : ControllerBase
+    public class CreditCardController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
-        private readonly IService _proxy;
-
-        public CreditCardController(IService proxy)
-        {
-            _proxy = proxy;
-        }
-
         [HttpPost("GetCreditCards")]
         public async Task<IActionResult> GetCreditCards(MessageContainer requestMessage){
             DTOCreditCard dtoCreditCard = requestMessage.ToObject<DTOCreditCard>(requestMessage, "DTOCreditCard");
 
-            MessageContainer requestCCard = new MessageContainer();
+            MessageContainer requestCCard = new MessageContainer(unitOfWork);
 
             requestCCard.Add(dtoCreditCard);
 
-            MessageContainer responseCC = await _proxy.GetCreditCardsByFilter(requestCCard);
+            MessageContainer responseCC = await proxy.GetCreditCardsByFilter(requestCCard);
 
             MessageContainer response = new MessageContainer();
 
             response.Add("CCList", responseCC.Get<List<DTOCreditCard>>());
+            unitOfWork.Commit();
 
             return Ok(response);
         }
@@ -44,15 +38,16 @@ namespace BankingApp.Api.Controllers
 
             DTOCreditCard dtoCreditCard = requestMessage.ToObject<DTOCreditCard>(requestMessage, "DTOCreditCard");
 
-            MessageContainer requestCCard = new MessageContainer();
+            MessageContainer requestCCard = new MessageContainer(unitOfWork);
 
             requestCCard.Add(dtoCreditCard);
 
-            MessageContainer responseCC = await _proxy.CardExpensePayment(requestCCard);
+            MessageContainer responseCC = await proxy.CardExpensePayment(requestCCard);
 
             MessageContainer response = new MessageContainer();
 
             response.Add("CreditCard", responseCC.Get<List<DTOCreditCard>>());
+            unitOfWork.Commit();
 
             return Ok(response);
         }
@@ -62,15 +57,16 @@ namespace BankingApp.Api.Controllers
 
             DTOCreditCard dtoCreditCard = requestMessage.ToObject<DTOCreditCard>(requestMessage, "DTOCreditCard");
 
-            MessageContainer requestCCard = new MessageContainer();
+            MessageContainer requestCCard = new MessageContainer(unitOfWork);
 
             requestCCard.Add(dtoCreditCard);
 
-            MessageContainer responseCC = await _proxy.NewCardApplication(requestCCard);
+            MessageContainer responseCC = await proxy.NewCardApplication(requestCCard);
 
             MessageContainer response = new MessageContainer();
 
             response.Add("CreditCard", responseCC.Get<List<DTOCreditCard>>());
+            unitOfWork.Commit();
 
             return Ok(response);
         }
@@ -81,15 +77,16 @@ namespace BankingApp.Api.Controllers
 
             DTOCreditCard dtoCreditCard = requestMessage.ToObject<DTOCreditCard>(requestMessage, "DTOCreditCard");
 
-            MessageContainer requestCCard = new MessageContainer();
+            MessageContainer requestCCard = new MessageContainer(unitOfWork);
 
             requestCCard.Add(dtoCreditCard);
 
-            MessageContainer responseCC = await _proxy.SelectCreditCardWithDetails(requestCCard);
+            MessageContainer responseCC = await proxy.SelectCreditCardWithDetails(requestCCard);
 
             MessageContainer response = new MessageContainer();
 
             response.Add("CreditCard", responseCC.Get<DTOCreditCard>());
+            unitOfWork.Commit();
 
             return Ok(response);
         }

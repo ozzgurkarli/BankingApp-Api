@@ -4,12 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using BankingApp.Common.Interfaces;
 
 namespace BankingApp.Common.DataTransferObjects
 {
-    public class MessageContainer
+    public class MessageContainer()
     {
+        public MessageContainer(IUnitOfWork unitOfWork) : this()
+        {
+            UnitOfWork = unitOfWork;
+        }
         public Dictionary<string, object> Contents { get; set; } = new Dictionary<string, object>();
+        public IUnitOfWork UnitOfWork { get; set; }
 
         public void Add(object content)
         {

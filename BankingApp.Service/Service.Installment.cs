@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace BankingApp.Service
 {
-    public partial class Service : BaseService, IService
+    public partial class Service: IService
     {
         public async Task<MessageContainer> CreateInstallmentTransaction(MessageContainer requestMessage)
         {
             MessageContainer responseMessage = new MessageContainer();
-            EInstallment eInstallment = new EInstallment();
+            EInstallment eInstallment = new EInstallment(requestMessage.UnitOfWork);
             ETransactionHistory eTransactionHistory = new ETransactionHistory();
             DTOCreditCard dtoCreditCard = requestMessage.Get<DTOCreditCard>();
 

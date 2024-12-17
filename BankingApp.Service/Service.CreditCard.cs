@@ -15,13 +15,14 @@ namespace BankingApp.Service
     {
         public async Task<MessageContainer> CardRevenuePaymentSchedule(MessageContainer requestMessage)
         {
-            ECreditCard eCreditCard = new ECreditCard();
-            EParameter eParameter = new EParameter();
+            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork);
 
             List<DTOCreditCard> ccList = await eCreditCard.Get(new DTOCreditCard
                 { ExpirationDate = DateTime.Today.AddYears(-1) });
-            List<DTOParameter> parList =
-                await eParameter.GetByMultipleGroupCode(new DTOParameter { GroupCode = "'CardType'" });
+
+            MessageContainer requestParameter = new MessageContainer(requestMessage.UnitOfWork);
+            requestParameter.Add(new List<DTOParameter> { new DTOParameter { GroupCode = "'CardType'" } });
+            List<DTOParameter> parList = (await GetMultipleGroupCode(requestParameter)).Get<List<DTOParameter>>();
 
             decimal cardFee;
             for (int i = 0; i < ccList.Count; i++)
@@ -37,8 +38,7 @@ namespace BankingApp.Service
 
         public async Task<MessageContainer> CardExpensePayment(MessageContainer requestMessage)
         {
-            ECreditCard eCreditCard = new ECreditCard();
-            ETransactionHistory eTransactionHistory = new ETransactionHistory();
+            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork);
             DTOCreditCard cc = requestMessage.Get<DTOCreditCard>();
 
             DTOCreditCard dtoCreditCard = await eCreditCard.Select(cc);
@@ -63,7 +63,7 @@ namespace BankingApp.Service
 
             if (cc.InstallmentCount != null && cc.InstallmentCount > 0)
             {
-                MessageContainer requestInstallment = new MessageContainer();
+                MessageContainer requestInstallment = new MessageContainer(requestMessage.UnitOfWork);
                 dtoCreditCard.InstallmentCount = cc.InstallmentCount;
                 requestInstallment.Add(dtoCreditCard);
                 MessageContainer responseInstallment = await CreateInstallmentTransaction(requestInstallment);
@@ -77,7 +77,7 @@ namespace BankingApp.Service
                     CreditCardNo = dtoCreditCard.CardNo, Currency = CurrencyTypes.TURKISH_LIRA,
                     TransactionDate = DateTime.Today, TransactionType = (int?)TransactionType.Expense
                 };
-                MessageContainer requestTH = new MessageContainer();
+                MessageContainer requestTH = new MessageContainer(requestMessage.UnitOfWork);
                 requestTH.Add(dtoTH);
                 await AddNewTransaction(requestTH);
 
@@ -92,8 +92,7 @@ namespace BankingApp.Service
         public async Task<MessageContainer> GetCreditCardsByFilter(MessageContainer requestMessage)
         {
             MessageContainer response = new MessageContainer();
-            ECreditCard eCreditCard = new ECreditCard();
-            EParameter eParameter = new EParameter();
+            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork);
 
             DTOCreditCard dtoCard = requestMessage.Get<DTOCreditCard>();
 
@@ -106,7 +105,7 @@ namespace BankingApp.Service
         public async Task<MessageContainer> SelectCreditCardWithDetails(MessageContainer requestMessage)
         {
             MessageContainer response = new MessageContainer();
-            ECreditCard eCreditCard = new ECreditCard();
+            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork);
 
             DTOCreditCard dtoCard = requestMessage.Get<DTOCreditCard>();
 
@@ -135,7 +134,7 @@ namespace BankingApp.Service
         public async Task<MessageContainer> AccountClosingSchedule(MessageContainer requestMessage)
         {
             MessageContainer response = new MessageContainer();
-            ECreditCard eCreditCard = new ECreditCard();
+            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork);
             List<Task<List<DTOCreditCard>>> taskList = new List<Task<List<DTOCreditCard>>>();
 
             DTOCreditCard dtoCreditCard = new DTOCreditCard();
@@ -165,8 +164,8 @@ namespace BankingApp.Service
 
         public async Task<MessageContainer> NewCardApplication(MessageContainer requestMessage)
         {
-            ECreditCard eCreditCard = new ECreditCard();
-            EAccount eAccount = new EAccount();
+            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork);
+            EAccount eAccount = new EAccount(requestMessage.UnitOfWork);
             DTOCreditCard dtoCreditCard = requestMessage.Get<DTOCreditCard>();
 
             Random rnd = new Random();
