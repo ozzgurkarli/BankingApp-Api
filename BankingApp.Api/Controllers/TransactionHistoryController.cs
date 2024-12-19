@@ -22,6 +22,7 @@ namespace BankingApp.Api.Controllers
             requestMessage.Add(message.ToObject<DTOTransactionHistory>(message, "DTOTransactionHistory"));
 
             responseMessage = await proxy.GetHistoryByFilter(requestMessage);
+            unitOfWork.Commit();
 
             return Ok(responseMessage);
         }

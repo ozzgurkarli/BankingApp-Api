@@ -24,6 +24,7 @@ namespace BankingApp.Api.Controllers
             requestMessage.Add(dtoTransfer);
 
             MessageContainer responseMessage = await proxy.CheckRecipientCustomer(requestMessage);
+            unitOfWork.Commit();
 
             return Ok(responseMessage);
         }
@@ -38,6 +39,7 @@ namespace BankingApp.Api.Controllers
             requestMessage.Add(dtoTransfer);
 
             MessageContainer responseMessage = await proxy.StartTransfer(requestMessage);
+            unitOfWork.Commit();
 
             return Ok(responseMessage);
         }

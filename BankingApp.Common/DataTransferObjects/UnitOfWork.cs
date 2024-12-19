@@ -65,6 +65,7 @@ public class UnitOfWork : IUnitOfWork
         if (!_disposed)
         {
             _transaction?.Dispose();
+            _connection.Close();
             _connection?.Dispose();
             _disposed = true;
         }

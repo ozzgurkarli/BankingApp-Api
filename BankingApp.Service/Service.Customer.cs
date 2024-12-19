@@ -18,12 +18,13 @@ namespace BankingApp.Service
         {
             ECustomer eCustomer = new ECustomer(requestMessage.UnitOfWork);
             DTOCustomer dtoReqCustomer = requestMessage.Get<DTOCustomer>();
+            DTOLogin dtoLogin = requestMessage.Get<DTOLogin>();
             MessageContainer reqService = new MessageContainer(requestMessage.UnitOfWork);
 
             DTOCustomer dtoCustomer = await eCustomer.Add(dtoReqCustomer);
             string tempPassword = setTemporaryPassword();
-            DTOLogin dtoLogin = new DTOLogin
-                { IdentityNo = dtoCustomer.IdentityNo, Password = tempPassword, Temporary = true };
+            dtoLogin.Password = tempPassword;
+            dtoLogin.Temporary = true;
             reqService.Add("Login", dtoLogin);
             RegisterCustomer(reqService);
 

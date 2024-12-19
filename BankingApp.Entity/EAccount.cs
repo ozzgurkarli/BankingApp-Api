@@ -61,9 +61,11 @@ namespace BankingApp.Entity
 
         public async Task<List<DTOAccount>> UpdateRange(List<DTOAccount> accList)
         {
+            long now = DateTime.UtcNow.Ticks;
             List<DTOAccount> dtoAccountList = new List<DTOAccount>();
             foreach (var item in accList)
             {
+                now = DateTime.UtcNow.Ticks;
                 using (var command = (NpgsqlCommand)unitOfWork.CreateCommand(
                            "SELECT u_account(@refcursor, @p_recorddate, @p_recordscreen, @p_id, @p_customerid, @p_accountno, @p_branch, @p_balance, @p_currency, @p_active, @p_primary)"))
                 {
@@ -78,11 +80,11 @@ namespace BankingApp.Entity
                     command.Parameters.AddWithValue("p_active", true);
                     command.Parameters.AddWithValue("p_primary", item.Primary!);
                     command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor,
-                        $"ref{item.AccountNo}");
+                        $"ref{item.AccountNo}{now}");
 
                     await command.ExecuteNonQueryAsync();
 
-                    command.CommandText = $"fetch all in \"ref{item.AccountNo}\"";
+                    command.CommandText = $"fetch all in \"ref{item.AccountNo}{now}\"";
                     command.CommandType = CommandType.Text;
 
                     using (var reader = await command.ExecuteReaderAsync())
@@ -110,6 +112,7 @@ namespace BankingApp.Entity
 
         public async Task<List<DTOAccount>> Get(DTOAccount acc)
         {
+            long now = DateTime.UtcNow.Ticks;
             List<DTOAccount> accList = new List<DTOAccount>();
             using (var command =
                    (NpgsqlCommand)unitOfWork.CreateCommand(
@@ -124,11 +127,11 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_active", acc.Active ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("p_primary", acc.Primary ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor,
-                    $"ref{acc.AccountNo}");
+                    $"ref{acc.AccountNo}{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = $"fetch all in \"ref{acc.AccountNo}\"";
+                command.CommandText = $"fetch all in \"ref{acc.AccountNo}{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())

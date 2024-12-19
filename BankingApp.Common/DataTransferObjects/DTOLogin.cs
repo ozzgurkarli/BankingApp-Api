@@ -18,6 +18,10 @@ namespace BankingApp.Common.DataTransferObjects
 
         public string? Token { get; set; }
 
+        public string? CustomerNo { get; set; }
+
         public DateTime? TokenExpireDate { get; set; }
+
+        public string? NotificationToken { get; set; }
     }
 }
