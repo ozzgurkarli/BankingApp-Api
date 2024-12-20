@@ -17,8 +17,7 @@ namespace BankingApp.Common.DataTransferObjects
         }
         public Dictionary<string, object> Contents { get; set; } = new Dictionary<string, object>();
 
-        [Required(ErrorMessage = "The UnitOfWork field is required. ananısileyim")]
-        public IUnitOfWork UnitOfWork { get; set; } = new UnitOfWork();
+        public IUnitOfWork? UnitOfWork { get; set; }
 
         public void Add(object content)
         {
@@ -34,7 +33,7 @@ namespace BankingApp.Common.DataTransferObjects
             Contents = new Dictionary<string, object>();
         }
 
-        public T Get<T>()
+        public T? Get<T>()
         {
             foreach (var content in Contents.Values)
             {

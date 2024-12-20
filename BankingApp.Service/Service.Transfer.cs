@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.enums;
 using BankingApp.Entity;
+using FirebaseAdmin.Messaging;
 
 namespace BankingApp.Service
 {
@@ -97,6 +98,9 @@ namespace BankingApp.Service
             List<DTOTransactionHistory> recipientTransactions = new List<DTOTransactionHistory>();
             List<DTOTransfer> successTransfers = new List<DTOTransfer>();
             List<DTOTransfer> failedTransfers = new List<DTOTransfer>();
+            
+            List<Notification> notificationList = new List<Notification>();
+            List<DTOLogin> notificationUserList = new List<DTOLogin>();
 
             List<DTOTransfer> transfers = await eTransfer.GetOrdersToExecute(new DTOTransfer());
 
@@ -156,11 +160,14 @@ namespace BankingApp.Service
                     await AddMultipleTransactions(requestMessage);
 
                     await eTransfer.ExecuteTransfer(x);
+                    
 
                     sendMail([x.SenderMailAddress], "Para Transferi Başarılı",
                         $"Merhaba {x.SenderName},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
                     if (!string.IsNullOrWhiteSpace(x.RecipientAccountNo) && x.RecipientAccountNo != "0000000000000000")
                     {
+                        notificationList.Add(new Notification{Title = "Parbank", Body = $"{x.SenderName} size {x.Amount} {x.Currency} tutarında para gönderdi."});
+                        notificationUserList.Add(new DTOLogin { CustomerNo = x.RecipientCustomerNo });
                         sendMail([x.RecipientMailAddress], "Hesabınıza Para Geldi",
                             $"Merhaba {x.RecipientName},<br><br>{x.SenderName} tarafından size para gönderildi.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
                     }
@@ -170,7 +177,7 @@ namespace BankingApp.Service
                     failedTransfers.Add(x);
                 }
             }
-
+            await sendNotification(notificationList, notificationUserList, requestMessage.UnitOfWork);
             responseMessage.Add("SuccessTransfers", successTransfers);
             responseMessage.Add("FailedTransfers", failedTransfers);
             responseMessage.Add("SenderTransactions", senderTransactions);

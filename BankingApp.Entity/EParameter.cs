@@ -142,6 +142,7 @@ namespace BankingApp.Entity
 
         public async Task<List<DTOParameter>> UpdateRange(List<DTOParameter> dtoParameterList)
         {
+            long now = DateTime.UtcNow.Ticks;
             List<DTOParameter> parlist = new List<DTOParameter>();
             foreach (var dtoParameter in dtoParameterList)
             {
@@ -149,7 +150,7 @@ namespace BankingApp.Entity
                            "SELECT u_parameter(@refcursor, @p_recorddate, @p_recordscreen, @p_id, @p_groupcode, @p_code, @p_description, @p_detail1, @p_detail2, @p_detail3, @p_detail4, @p_detail5)"))
                 {
                     command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor,
-                        $"ref{dtoParameter.Code}");
+                        $"ref{dtoParameter.Code}{now}");
                     command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                     command.Parameters.AddWithValue("p_recordscreen", dtoParameter.RecordScreen);
                     command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
@@ -166,7 +167,7 @@ namespace BankingApp.Entity
 
                     await command.ExecuteNonQueryAsync();
 
-                    command.CommandText = $"fetch all in \"ref{dtoParameter.Code}\"";
+                    command.CommandText = $"fetch all in \"ref{dtoParameter.Code}{now}\"";
                     command.CommandType = CommandType.Text;
 
                     using (var reader = await command.ExecuteReaderAsync())

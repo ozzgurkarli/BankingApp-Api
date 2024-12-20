@@ -16,6 +16,7 @@ namespace BankingApp.Entity
     {
         public async Task<DTOAccount> Add(DTOAccount item)
         {
+            long now = DateTime.UtcNow.Ticks;
             DTOAccount dtoAccount = new DTOAccount();
             using (var command =
                    (NpgsqlCommand)unitOfWork.CreateCommand(
@@ -30,11 +31,11 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_currency", item.Currency!);
                 command.Parameters.AddWithValue("p_active", true);
                 command.Parameters.AddWithValue("p_primary", item.Primary!);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -198,15 +199,15 @@ namespace BankingApp.Entity
         public async Task<DTOAccount> GetFirstAvailableNoAndIncrease(DTOAccount acc)
         {
             DTOAccount dtoAccount = new DTOAccount();
-
+            long now = DateTime.UtcNow.Ticks;
             using (var command =
                    (NpgsqlCommand)unitOfWork.CreateCommand("SELECT u_accounttracker(@refcursor, @p_currencycode)"))
             {
-                command.Parameters.AddWithValue("p_currencycode", acc.Currency!);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("p_currencycode", acc.CurrencyCode!);
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())

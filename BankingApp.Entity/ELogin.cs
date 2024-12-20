@@ -16,6 +16,7 @@ namespace BankingApp.Entity
     {
         public async Task<DTOLogin> Add(DTOLogin item)
         {
+            long now = DateTime.UtcNow.Ticks;
             using (var command = (NpgsqlCommand)unitOfWork.CreateCommand(
                        "SELECT i_login(@refcursor, @p_recorddate, @p_recordscreen, @p_identityno, @p_password, @p_temporary, @p_notificationtoken)"))
             {
@@ -25,11 +26,11 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_password", item.Password!);
                 command.Parameters.AddWithValue("p_temporary", item.Temporary!);
                 command.Parameters.AddWithValue("p_notificationtoken", item.NotificationToken ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -90,17 +91,18 @@ namespace BankingApp.Entity
 
         public async Task<DTOLogin?> Select(DTOLogin item)
         {
+            long now = DateTime.UtcNow.Ticks;
             DTOLogin? dtoLogin = null;
             using (var command =
                    (NpgsqlCommand)unitOfWork.CreateCommand("SELECT s_login(@refcursor, @p_id, @p_identityno)"))
             {
                 command.Parameters.AddWithValue("p_id", item.Id ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("p_identityno", item.IdentityNo ?? (object)DBNull.Value);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())

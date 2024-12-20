@@ -15,6 +15,7 @@ namespace BankingApp.Entity
     {
         public async Task<DTOTransfer> Add(DTOTransfer transfer)
         {
+            long now = DateTime.UtcNow.Ticks;
             using (var command = (NpgsqlCommand)unitOfWork.CreateCommand(
                        "SELECT i_transfer(@refcursor, @p_recorddate, @p_recordscreen, @p_senderaccountno, @p_recipientaccountno, @p_currency, @p_status, @p_transactiondate, @p_orderdate, @p_amount)"))
             {
@@ -27,11 +28,11 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_currency", transfer.Currency!);
                 command.Parameters.AddWithValue("p_orderdate", transfer.OrderDate!);
                 command.Parameters.AddWithValue("p_amount", transfer.Amount!);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())

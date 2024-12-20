@@ -26,7 +26,7 @@ namespace BankingApp.Service
             dtoLogin.Password = tempPassword;
             dtoLogin.Temporary = true;
             reqService.Add("Login", dtoLogin);
-            RegisterCustomer(reqService);
+            await RegisterCustomer(reqService);
 
             reqService.Clear();
             DTOAccount dtoAccount = new DTOAccount
@@ -35,7 +35,7 @@ namespace BankingApp.Service
                 CustomerNo = dtoCustomer.CustomerNo
             };
             reqService.Add(dtoAccount);
-            CreateAccount(reqService);
+            await CreateAccount(reqService);
 
             DTOMailAddresses dtoMailAddress = new DTOMailAddresses
             {
@@ -48,7 +48,7 @@ namespace BankingApp.Service
             dtoLogin.Password = tempPassword;
             reqService.Add("Login", dtoLogin);
 
-            AddMailAddressWithTemporaryPassword(reqService);
+            await AddMailAddressWithTemporaryPassword(reqService);
 
             reqService.Clear();
             dtoCustomer.PrimaryMailAddress = dtoMailAddress.MailAddress;

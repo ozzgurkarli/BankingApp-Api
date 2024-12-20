@@ -57,7 +57,7 @@ namespace BankingApp.Api.Controllers
 
             DTOCreditCard dtoCreditCard = requestMessage.ToObject<DTOCreditCard>(requestMessage, "DTOCreditCard");
 
-            MessageContainer requestCCard = new MessageContainer();
+            MessageContainer requestCCard = new MessageContainer(unitOfWork);
 
             requestCCard.Add(dtoCreditCard);
 
@@ -77,7 +77,7 @@ namespace BankingApp.Api.Controllers
 
             DTOCreditCard dtoCreditCard = requestMessage.ToObject<DTOCreditCard>(requestMessage, "DTOCreditCard");
 
-            MessageContainer requestCCard = new MessageContainer();
+            MessageContainer requestCCard = new MessageContainer(unitOfWork);
 
             requestCCard.Add(dtoCreditCard);
 

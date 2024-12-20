@@ -16,5 +16,7 @@ namespace BankingApp.Common.Interfaces
         public Task<MessageContainer> GetLoginCredentials(MessageContainer requestMessage);
 
         public Task<MessageContainer> UpdatePassword(MessageContainer requestMessage);
+        
+        public Task<MessageContainer> GetNotificationToken(MessageContainer requestMessage);
     }
 }

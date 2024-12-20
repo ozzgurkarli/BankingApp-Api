@@ -46,8 +46,9 @@ namespace BankingApp.Api.Controllers
                 return BadRequest(ex.Message);
             }
 
-            message.Clear();
-            message.Add(customer);
+            requestMessage.Clear();
+            requestMessage.Add(login);
+            requestMessage.Add(customer);
 
             MessageContainer responseMessage = await proxy.CreateCustomer(requestMessage);
             unitOfWork.Commit();

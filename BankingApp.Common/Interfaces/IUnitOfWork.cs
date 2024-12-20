@@ -8,6 +8,6 @@ public interface IUnitOfWork: IDisposable
     IDbTransaction Transaction { get; }
     void Commit();
     void Rollback();
-    
+
     IDbCommand CreateCommand(string commandText);
 }

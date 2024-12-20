@@ -137,5 +137,17 @@ namespace BankingApp.Service
 
             return new MessageContainer();
         }
+
+        public async Task<MessageContainer> GetNotificationToken(MessageContainer requestMessage)
+        {
+            MessageContainer responseMessage = new MessageContainer();
+            ELogin eLogin = new ELogin(requestMessage.UnitOfWork!);
+            
+            DTOLogin dtoLogin = requestMessage.Get<DTOLogin>();
+            dtoLogin = await eLogin.GetNotificationToken(dtoLogin);
+            
+            responseMessage.Add(dtoLogin);
+            return responseMessage;
+        }
     }
 }
