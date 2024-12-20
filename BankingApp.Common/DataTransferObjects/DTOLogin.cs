@@ -10,7 +10,7 @@ namespace BankingApp.Common.DataTransferObjects
     public class DTOLogin : BaseDTO
     {
         [StringLength(11)]
-        public required string IdentityNo { get; set; }
+        public string? IdentityNo { get; set; }
 
         public string? Password { get; set; }
 
@@ -18,6 +18,10 @@ namespace BankingApp.Common.DataTransferObjects
 
         public string? Token { get; set; }
 
+        public string? CustomerNo { get; set; }
+
         public DateTime? TokenExpireDate { get; set; }
+
+        public string? NotificationToken { get; set; }
     }
 }

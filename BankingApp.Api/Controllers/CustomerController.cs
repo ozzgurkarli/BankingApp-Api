@@ -33,6 +33,7 @@ namespace BankingApp.Api.Controllers
             MessageContainer requestMessage = new MessageContainer(unitOfWork);
 
             DTOCustomer customer = message.ToObject<DTOCustomer>(message, "DTOCustomer");
+            DTOLogin login = message.ToObject<DTOLogin>(message, "DTOLogin");
             requestMessage.Add(new DTOMailAddresses { MailAddress = customer.PrimaryMailAddress!, CustomerNo = "1" });
             requestMessage.Add(new DTOLogin { IdentityNo = customer.IdentityNo! });
 
@@ -45,8 +46,9 @@ namespace BankingApp.Api.Controllers
                 return BadRequest(ex.Message);
             }
 
-            message.Clear();
-            message.Add(customer);
+            requestMessage.Clear();
+            requestMessage.Add(login);
+            requestMessage.Add(customer);
 
             MessageContainer responseMessage = await proxy.CreateCustomer(requestMessage);
             unitOfWork.Commit();

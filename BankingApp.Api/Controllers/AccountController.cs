@@ -25,6 +25,7 @@ namespace BankingApp.Api.Controllers
 
             MessageContainer responseAcc = await proxy.GetAccountsByFilter(requestAccount);
             MessageContainer response = new MessageContainer();
+            unitOfWork.Commit();
 
             response.Add("AccountList", responseAcc.Get<List<DTOAccount>>());
 

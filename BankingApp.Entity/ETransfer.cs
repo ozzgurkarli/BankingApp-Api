@@ -15,6 +15,7 @@ namespace BankingApp.Entity
     {
         public async Task<DTOTransfer> Add(DTOTransfer transfer)
         {
+            long now = DateTime.UtcNow.Ticks;
             using (var command = (NpgsqlCommand)unitOfWork.CreateCommand(
                        "SELECT i_transfer(@refcursor, @p_recorddate, @p_recordscreen, @p_senderaccountno, @p_recipientaccountno, @p_currency, @p_status, @p_transactiondate, @p_orderdate, @p_amount)"))
             {
@@ -27,11 +28,11 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_currency", transfer.Currency!);
                 command.Parameters.AddWithValue("p_orderdate", transfer.OrderDate!);
                 command.Parameters.AddWithValue("p_amount", transfer.Amount!);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -84,12 +85,28 @@ namespace BankingApp.Entity
                             SenderCustomerNo = ((Int64)reader["SenderCustomerId"]).ToString(),
                             SenderMailAddress = (string)reader["SenderMailAddress"],
                             SenderName = (string)reader["SenderCustomerName"],
-                            RecipientAccountActive = (bool)reader["RecipientAccountActive"],
-                            RecipientAccountNo = (string)reader["RecipientAccountNo"],
-                            RecipientCustomerActive = (bool)reader["RecipientCustomerActive"],
-                            RecipientCustomerNo = ((Int64)reader["RecipientCustomerId"]).ToString(),
-                            RecipientMailAddress = (string)reader["RecipientMailAddress"],
-                            RecipientName = (string)reader["RecipientCustomerName"],
+                            RecipientAccountActive = await reader.IsDBNullAsync("RecipientAccountActive")
+                                ? null
+                                : (bool)reader["RecipientAccountActive"],
+                            RecipientAccountNo = await reader.IsDBNullAsync("RecipientAccountNo")
+                                ? null
+                                : (string)reader["RecipientAccountNo"],
+                            RecipientCustomerActive =
+                                await reader.IsDBNullAsync("RecipientCustomerActive")
+                                    ? null
+                                    : (bool)reader["RecipientCustomerActive"],
+                            RecipientCustomerNo =
+                                await reader.IsDBNullAsync("RecipientCustomerId")
+                                    ? null
+                                    : ((Int64)reader["RecipientCustomerId"]).ToString(),
+                            RecipientMailAddress =
+                                await reader.IsDBNullAsync("RecipientMailAddress")
+                                    ? null
+                                    : (string)reader["RecipientMailAddress"],
+                            RecipientName =
+                                await reader.IsDBNullAsync("RecipientCustomerName")
+                                    ? null
+                                    : (string)reader["RecipientCustomerName"],
                             Amount = (decimal)reader["Amount"],
                             TransactionDate = (DateTime)reader["TransactionDate"],
                             OrderDate = (DateTime)reader["OrderDate"],
@@ -105,6 +122,7 @@ namespace BankingApp.Entity
 
         public async Task<DTOTransfer> ExecuteTransfer(DTOTransfer transfer)
         {
+            long now = DateTime.UtcNow.Ticks;
             DTOTransfer dtoTransfer = new DTOTransfer();
             using (var command = (NpgsqlCommand)unitOfWork.CreateCommand(
                        "SELECT u_transfer(@refcursor, @p_id, @p_recorddate, @p_recordscreen, @p_senderaccountno, @p_recipientaccountno, @p_currency, @p_status, @p_transactiondate, @p_orderdate, @p_amount)"))
@@ -113,17 +131,17 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                 command.Parameters.AddWithValue("p_recordscreen", transfer.RecordScreen);
                 command.Parameters.AddWithValue("p_senderaccountno", transfer.SenderAccountNo!);
-                command.Parameters.AddWithValue("p_recipientaccountno", transfer.RecipientAccountNo!);
+                command.Parameters.AddWithValue("p_recipientaccountno", transfer.RecipientAccountNo ?? "0000000000000000");
                 command.Parameters.AddWithValue("p_status", transfer.Status!);
                 command.Parameters.AddWithValue("p_transactiondate", transfer.TransactionDate!);
                 command.Parameters.AddWithValue("p_currency", transfer.Currency!);
                 command.Parameters.AddWithValue("p_orderdate", transfer.OrderDate!);
                 command.Parameters.AddWithValue("p_amount", transfer.Amount!);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())

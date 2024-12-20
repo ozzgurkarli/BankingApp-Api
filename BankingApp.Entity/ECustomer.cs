@@ -16,6 +16,7 @@ namespace BankingApp.Entity
     {
         public async Task<DTOCustomer> Add(DTOCustomer item)
         {
+            long now = DateTime.UtcNow.Ticks;
             using (var command = (NpgsqlCommand)unitOfWork.CreateCommand(
                        "SELECT i_customer(@refcursor, @p_recorddate, @p_recordscreen, @p_identityno, @p_name, @p_surname, @p_phoneno, @p_gender, @p_profession, @p_salary)"))
             {
@@ -28,11 +29,11 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_gender", item.Gender!);
                 command.Parameters.AddWithValue("p_profession", item.Profession!);
                 command.Parameters.AddWithValue("p_salary", item.Salary!);
-                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
+                command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
 
-                command.CommandText = "fetch all in \"ref\"";
+                command.CommandText = $"fetch all in \"ref{now}\"";
                 command.CommandType = CommandType.Text;
 
                 using (var reader = await command.ExecuteReaderAsync())

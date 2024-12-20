@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
 using BankingApp.Common.enums;
 using BankingApp.Entity;
+using FirebaseAdmin.Messaging;
 
 namespace BankingApp.Service
 {
@@ -54,7 +55,7 @@ namespace BankingApp.Service
             {
                 dtoTransfer.RecipientAccountNo = dtoTransfer.RecipientAccountNo.Replace(" ", "").Substring(10);
                 dtoRecipientAcc = (await eAccount.Get(new DTOAccount { AccountNo = dtoTransfer.RecipientAccountNo }))
-                    .First();
+                    .FirstOrDefault();
                 ;
 
                 if (dtoTransfer.RecipientAccountNo.Substring(2, 2) == "11" && dtoRecipientAcc == null)
@@ -81,7 +82,8 @@ namespace BankingApp.Service
             if (dtoTransfer.OrderDate == DateTime.Today)
             {
                 await item;
-                Task<MessageContainer> execute = ExecuteTransferSchedule(new MessageContainer());
+                MessageContainer execute =
+                    await ExecuteTransferSchedule(new MessageContainer(requestMessage.UnitOfWork));
             }
 
             return new MessageContainer();
@@ -96,14 +98,18 @@ namespace BankingApp.Service
             List<DTOTransactionHistory> recipientTransactions = new List<DTOTransactionHistory>();
             List<DTOTransfer> successTransfers = new List<DTOTransfer>();
             List<DTOTransfer> failedTransfers = new List<DTOTransfer>();
+            
+            List<Notification> notificationList = new List<Notification>();
+            List<DTOLogin> notificationUserList = new List<DTOLogin>();
 
             List<DTOTransfer> transfers = await eTransfer.GetOrdersToExecute(new DTOTransfer());
 
             foreach (DTOTransfer transfer in transfers)
             {
                 if (transfer.SenderAccountBalance < transfer.Amount || (bool)!transfer.SenderCustomerActive! ||
-                    (bool)!transfer.RecipientCustomerActive! || !(bool)transfer.SenderAccountActive! ||
-                    !(bool)transfer.RecipientAccountActive!)
+                    !(bool)transfer.SenderAccountActive! ||
+                    (transfer.RecipientCustomerActive != null && (bool)!transfer.RecipientCustomerActive!) ||
+                    (transfer.RecipientAccountActive != null && !(bool)transfer.RecipientAccountActive!))
                 {
                     transfer.Status = (int?)TransferStatus.Failed;
                     continue;
@@ -112,7 +118,7 @@ namespace BankingApp.Service
                 transfer.Status = (int?)TransferStatus.Success;
             }
 
-            transfers.ForEach(async x =>
+            foreach (DTOTransfer x in transfers)
             {
                 if (x.Status == (int)TransferStatus.Success)
                 {
@@ -126,7 +132,6 @@ namespace BankingApp.Service
                     senderAccount.Balance -= x.Amount;
                     recipientAccount.Balance += x.Amount;
                     accList.Add(senderAccount);
-                    accList.Add(recipientAccount);
 
                     tHistoryList.Add(new DTOTransactionHistory
                     {
@@ -135,8 +140,9 @@ namespace BankingApp.Service
                         Amount = -x.Amount, TransactionDate = DateTime.UtcNow
                     });
 
-                    if (x.RecipientAccountNo != "0000000000000000")
+                    if (!string.IsNullOrWhiteSpace(x.RecipientAccountNo) && x.RecipientAccountNo != "0000000000000000")
                     {
+                        accList.Add(recipientAccount);
                         tHistoryList.Add(new DTOTransactionHistory
                         {
                             Currency = x.Currency!, CustomerNo = x.RecipientCustomerNo,
@@ -154,11 +160,14 @@ namespace BankingApp.Service
                     await AddMultipleTransactions(requestMessage);
 
                     await eTransfer.ExecuteTransfer(x);
+                    
 
                     sendMail([x.SenderMailAddress], "Para Transferi Başarılı",
                         $"Merhaba {x.SenderName},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
-                    if (x.RecipientAccountNo != "0000000000000000")
+                    if (!string.IsNullOrWhiteSpace(x.RecipientAccountNo) && x.RecipientAccountNo != "0000000000000000")
                     {
+                        notificationList.Add(new Notification{Title = "Parbank", Body = $"{x.SenderName} size {x.Amount} {x.Currency} tutarında para gönderdi."});
+                        notificationUserList.Add(new DTOLogin { CustomerNo = x.RecipientCustomerNo });
                         sendMail([x.RecipientMailAddress], "Hesabınıza Para Geldi",
                             $"Merhaba {x.RecipientName},<br><br>{x.SenderName} tarafından size para gönderildi.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
                     }
@@ -167,8 +176,8 @@ namespace BankingApp.Service
                 {
                     failedTransfers.Add(x);
                 }
-            });
-
+            }
+            await sendNotification(notificationList, notificationUserList, requestMessage.UnitOfWork);
             responseMessage.Add("SuccessTransfers", successTransfers);
             responseMessage.Add("FailedTransfers", failedTransfers);
             responseMessage.Add("SenderTransactions", senderTransactions);
