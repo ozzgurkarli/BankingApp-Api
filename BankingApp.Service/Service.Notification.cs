@@ -11,8 +11,12 @@ public partial class Service : IService
     private async Task<bool> sendNotification(List<Notification> notifications, List<DTOLogin> customers,
         IUnitOfWork unitOfWork)
     {
-        FirebaseApp.Create(new AppOptions()
-            { Credential = GoogleCredential.FromJson(Environment.GetEnvironmentVariable("FIREBASE_ADMIN_JSON")) });
+        if (FirebaseApp.DefaultInstance == null)
+        {
+            FirebaseApp.Create(new AppOptions()
+                { Credential = GoogleCredential.FromJson(Environment.GetEnvironmentVariable("FIREBASE_ADMIN_JSON")) });
+        }
+
         List<Message> messageList = new List<Message>();
 
         MessageContainer requestNotificationToken = new MessageContainer(unitOfWork);
@@ -38,7 +42,7 @@ public partial class Service : IService
         {
             await FirebaseMessaging.DefaultInstance.SendEachAsync(messageList);
         }
-        
+
         return true;
     }
 }

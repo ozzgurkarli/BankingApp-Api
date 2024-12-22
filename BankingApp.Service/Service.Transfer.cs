@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
@@ -163,13 +164,13 @@ namespace BankingApp.Service
                     
 
                     sendMail([x.SenderMailAddress], "Para Transferi Başarılı",
-                        $"Merhaba {x.SenderName},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                        $"Merhaba {x.SenderName},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
                     if (!string.IsNullOrWhiteSpace(x.RecipientAccountNo) && x.RecipientAccountNo != "0000000000000000")
                     {
-                        notificationList.Add(new Notification{Title = "Parbank", Body = $"{x.SenderName} size {x.Amount} {x.Currency} tutarında para gönderdi."});
+                        notificationList.Add(new Notification{Title = "Parbank", Body = $"{x.SenderName} size {formatAmount((decimal)x.Amount!)} {x.Currency} tutarında para gönderdi."});
                         notificationUserList.Add(new DTOLogin { CustomerNo = x.RecipientCustomerNo });
                         sendMail([x.RecipientMailAddress], "Hesabınıza Para Geldi",
-                            $"Merhaba {x.RecipientName},<br><br>{x.SenderName} tarafından size para gönderildi.<br><br>İşlem Tutarı: {x.Amount}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                            $"Merhaba {x.RecipientName},<br><br>{x.SenderName} tarafından size para gönderildi.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
                     }
                 }
                 else if (x.Status == (int)TransferStatus.Failed)
@@ -184,6 +185,12 @@ namespace BankingApp.Service
             responseMessage.Add("RecipientTransactions", recipientTransactions);
 
             return responseMessage;
+        }
+
+        private string formatAmount(decimal amount)
+        {
+            CultureInfo cultureInfo = new CultureInfo("tr-TR");
+            return amount.ToString("N", cultureInfo);
         }
     }
 }

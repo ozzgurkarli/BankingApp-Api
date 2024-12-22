@@ -108,5 +108,31 @@ namespace BankingApp.Service
 
             return responseMessage;
         }
+
+
+        public async Task<MessageContainer> ScheduleManager(MessageContainer requestMessage)
+        {
+            EParameter eParameter = new EParameter(requestMessage.UnitOfWork);
+            MessageContainer reqPar = new MessageContainer(requestMessage.UnitOfWork);
+            reqPar.Add(new DTOParameter{ GroupCode = "ScheduleKey" });
+
+            DTOParameter dtoParameter = (await GetParametersByGroupCode(reqPar)).Get<List<DTOParameter>>().FirstOrDefault();
+
+            if (dtoParameter != null && dtoParameter.Code.Equals(1) && int.Parse(dtoParameter.Detail1) != DateTime.Today.Day)
+            {
+                
+                await AccountClosingSchedule(new MessageContainer(requestMessage.UnitOfWork));
+                await ExecuteInstallmentSchedule(new MessageContainer(requestMessage.UnitOfWork));
+                await CardRevenuePaymentSchedule(new MessageContainer(requestMessage.UnitOfWork));
+                await SetCurrencyValuesSchedule(new MessageContainer(requestMessage.UnitOfWork));
+                await ExecuteTransferSchedule(new MessageContainer(requestMessage.UnitOfWork));
+
+                dtoParameter.Detail1 = DateTime.Today.Day.ToString();
+
+                await eParameter.Update(dtoParameter);
+            }
+
+            return new MessageContainer();
+        }
     }
 }
