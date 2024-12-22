@@ -15,5 +15,7 @@ namespace BankingApp.Common.Interfaces
         public Task<MessageContainer> GetMultipleGroupCode(MessageContainer requestMessage);
 
         public Task<MessageContainer> SetCurrencyValuesSchedule(MessageContainer requestMessage);
+        
+        public Task<MessageContainer> ScheduleManager(MessageContainer requestMessage);
     }
 }
