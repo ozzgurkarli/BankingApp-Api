@@ -68,5 +68,29 @@ namespace BankingApp.Common.DataTransferObjects
             }
         }
 
+        public T? TryToObject<T>(MessageContainer msg, string key)
+        {
+            try
+            {
+                var jsonElement = msg.Get<JsonElement>(key);
+                var jsonString = jsonElement.GetRawText();
+
+                if (jsonElement.ValueKind == JsonValueKind.Array)
+                {
+                    var itemType = typeof(T).GetGenericArguments().FirstOrDefault();
+
+                    var listType = typeof(List<>).MakeGenericType(itemType);
+                    return (T)JsonSerializer.Deserialize(jsonString, listType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                }
+                else
+                {
+                    return JsonSerializer.Deserialize<T>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                }
+            }
+            catch (KeyNotFoundException e)
+            {
+                return default;
+            }
+        }
     }
 }

@@ -96,14 +96,16 @@ namespace BankingApp.Service
                     new SymmetricSecurityKey(
                         Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")));
                 DateTime dtNow = DateTime.UtcNow;
+                var claimsIdentity = new ClaimsIdentity(new List<Claim>
+                {
+                    new Claim("identityNo", dtoLogin.IdentityNo),
+                    new Claim("customerNo", dtoLogin.CustomerNo)
+                }, "Custom"); 
 
                 JwtSecurityToken jwt = new JwtSecurityToken(issuer: Environment.GetEnvironmentVariable("JWT_ISSUER"),
                     audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE"), notBefore: dtNow,
                     expires: dtNow.AddMinutes(60),
-                    claims: new List<Claim>
-                    {
-                        new Claim("identityNo", dtoLogin.IdentityNo)
-                    },
+                    claims: claimsIdentity.Claims,
                     signingCredentials: new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256));
 
                 dtoLogin.Token = new JwtSecurityTokenHandler().WriteToken(jwt);
