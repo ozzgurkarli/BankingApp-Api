@@ -117,7 +117,8 @@ namespace BankingApp.Entity
                             Temporary = (bool)reader["Temporary"],
                             NotificationToken = await reader.IsDBNullAsync("NotificationToken")
                                 ? null
-                                : (string?)reader["NotificationToken"]
+                                : (string?)reader["NotificationToken"],
+                            CustomerNo = ((Int64)reader["CustomerNo"]).ToString()
                         };
                     }
                 }
