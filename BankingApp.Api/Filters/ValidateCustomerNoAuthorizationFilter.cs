@@ -3,7 +3,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using BankingApp.Common.DataTransferObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BankingApp.Api.Filters;
@@ -12,7 +14,8 @@ public class ValidateCustomerNoAuthorizationFilter: IAsyncAuthorizationFilter
 {
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        if (context.HttpContext.User.Identity.IsAuthenticated)
+        long now = DateTime.Now.Millisecond;
+        if (context.HttpContext.User.Identity.IsAuthenticated && context.ActionDescriptor.EndpointMetadata.All(x => x.GetType() != typeof(AllowAnonymousAttribute)))
         {
             MessageContainer message = JsonSerializer.Deserialize<MessageContainer>(await getRequestBody(context.HttpContext.Request), new JsonSerializerOptions{PropertyNameCaseInsensitive = true});
             
