@@ -23,7 +23,7 @@ namespace BankingApp.Entity
             {
                 command.Parameters.AddWithValue("p_customerid",
                     cc.CustomerNo != null ? Int64.Parse(cc.CustomerNo) : (object)DBNull.Value);
-                command.Parameters.AddWithValue("p_expirationdate", cc.ExpirationDate ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("p_expirationdate", cc.ExpirationDate == null || cc.ExpirationDate == DateTime.MinValue ? (object)DBNull.Value : cc.ExpirationDate);
                 command.Parameters.AddWithValue("p_billingday", cc.BillingDay ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("p_active", cc.Active ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");

@@ -178,7 +178,7 @@ namespace BankingApp.Service
 
             dtoCreditCard.CardNo = "530129";
             string firstAvailableNo =
-                (await eAccount.GetFirstAvailableNoAndIncrease(new DTOAccount { Currency = "CC" })).AccountNo!;
+                (await eAccount.GetFirstAvailableNoAndIncrease(new DTOAccount { CurrencyCode = "CC" })).AccountNo!;
 
             for (int i = 0; i < 10 - int.Parse(firstAvailableNo); i++)
             {
