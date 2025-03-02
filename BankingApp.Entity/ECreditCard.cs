@@ -146,7 +146,7 @@ namespace BankingApp.Entity
         public async Task<DTOCreditCard> Add(DTOCreditCard cc)
         {
             using (var command = (NpgsqlCommand)_unitOfWork.CreateCommand(
-                       "SELECT i_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type)"))
+                       "SELECT i_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_transactionid)"))
             {
                 command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                 command.Parameters.AddWithValue("p_recordscreen", cc.RecordScreen);
@@ -157,6 +157,7 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_expirationdate", cc.ExpirationDate!);
                 command.Parameters.AddWithValue("p_billingday", cc.BillingDay!);
                 command.Parameters.AddWithValue("p_type", cc.Type!);
+                command.Parameters.AddWithValue("p_transactionid", _unitOfWork.TransactionId);
                 command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, "ref");
 
                 await command.ExecuteNonQueryAsync();
@@ -195,7 +196,7 @@ namespace BankingApp.Entity
         {
             long now = DateTime.UtcNow.Ticks;
             using (var command = (NpgsqlCommand)_unitOfWork.CreateCommand(
-                       "SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id, @p_endofcycledebt)"))
+                       "SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id, @p_endofcycledebt, @p_transactionid)"))
             {
                 command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                 command.Parameters.AddWithValue("p_recordscreen", cc.RecordScreen);
@@ -211,6 +212,7 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_totaldebt", cc.TotalDebt!);
                 command.Parameters.AddWithValue("p_endofcycledebt", cc.EndOfCycleDebt!);
                 command.Parameters.AddWithValue("p_id", cc.Id!);
+                command.Parameters.AddWithValue("p_transactionid", _unitOfWork.TransactionId);
                 command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
@@ -254,7 +256,7 @@ namespace BankingApp.Entity
             {
                 count++;
                 using (var command = (NpgsqlCommand)_unitOfWork.CreateCommand(
-                           "SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id, @p_endofcycledebt)"))
+                           "SELECT u_creditcard(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_cardno, @p_cvv, @p_limit, @p_expirationdate, @p_billingday, @p_type, @p_currentdebt, @p_outstandingbalance, @p_totaldebt, @p_id, @p_endofcycledebt, @p_transactionid)"))
                 {
                     command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                     command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
@@ -270,6 +272,7 @@ namespace BankingApp.Entity
                     command.Parameters.AddWithValue("p_totaldebt", item.TotalDebt!);
                     command.Parameters.AddWithValue("p_endofcycledebt", item.EndOfCycleDebt!);
                     command.Parameters.AddWithValue("p_id", item.Id!);
+                    command.Parameters.AddWithValue("p_transactionid", _unitOfWork.TransactionId);
                     command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor,
                         $"ref{count}{now}");
 

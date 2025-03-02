@@ -14,11 +14,10 @@ namespace BankingApp.Api.Controllers
     {
         [AllowAnonymous]
         [HttpPost("GetLoginCredentials")]
-        public async Task<IActionResult> GetLoginCredentials([FromBody] MessageContainer message)
+        public async Task<IActionResult> GetLoginCredentials(MessageContainer requestMessage)
         {
-            MessageContainer requestMessage = new MessageContainer(unitOfWork);
+            requestMessage.UnitOfWork = unitOfWork;
             MessageContainer responseMessage = new MessageContainer();
-            requestMessage.Add(message.ToObject<DTOLogin>(message, "DTOLogin"));
 
             responseMessage = await proxy.GetLoginCredentials(requestMessage);
             unitOfWork.Commit();
@@ -27,14 +26,10 @@ namespace BankingApp.Api.Controllers
         }
 
         [HttpPut("UpdatePassword")]
-        public async Task<IActionResult> UpdatePassword([FromBody] MessageContainer message)
+        public async Task<IActionResult> UpdatePassword(MessageContainer requestMessage)
         {
-            MessageContainer requestMessage = new MessageContainer(unitOfWork);
+            requestMessage.UnitOfWork = unitOfWork;
             MessageContainer response = new MessageContainer();
-
-            DTOLogin dtoLogin = message.ToObject<DTOLogin>(message, "DTOLogin");
-
-            requestMessage.Add(dtoLogin);
             response = await proxy.UpdatePassword(requestMessage);
             unitOfWork.Commit();
 

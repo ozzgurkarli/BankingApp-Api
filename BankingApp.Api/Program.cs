@@ -15,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
 {
+    options.Filters.Add<DTOCreatorFilter>();
     options.Filters.Add<ValidateCustomerNoAuthorizationFilter>();
 });
 
@@ -22,6 +23,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IService, Service>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<DTOCreatorFilter>();
 builder.Services.AddScoped<ValidateCustomerNoAuthorizationFilter>();
 
 builder.Services.AddAuthentication(options =>

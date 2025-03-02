@@ -15,14 +15,9 @@ namespace BankingApp.Api.Controllers
     public class TransferController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
         [HttpPost("CheckRecipientCustomer")]
-        public async Task<IActionResult> CheckRecipientCustomer(MessageContainer message)
+        public async Task<IActionResult> CheckRecipientCustomer(MessageContainer requestMessage)
         {
-            DTOTransfer dtoTransfer = message.ToObject<DTOTransfer>(message, "DTOTransfer");
-
-            MessageContainer requestMessage = new MessageContainer(unitOfWork);
-
-            requestMessage.Add(dtoTransfer);
-
+            requestMessage.UnitOfWork = unitOfWork;
             MessageContainer responseMessage = await proxy.CheckRecipientCustomer(requestMessage);
             unitOfWork.Commit();
 
@@ -30,14 +25,9 @@ namespace BankingApp.Api.Controllers
         }
 
         [HttpPost("StartTransfer")]
-        public async Task<IActionResult> StartTransfer(MessageContainer message)
+        public async Task<IActionResult> StartTransfer(MessageContainer requestMessage)
         {
-            DTOTransfer dtoTransfer = message.ToObject<DTOTransfer>(message, "DTOTransfer");
-
-            MessageContainer requestMessage = new MessageContainer(unitOfWork);
-
-            requestMessage.Add(dtoTransfer);
-
+            requestMessage.UnitOfWork = unitOfWork;
             MessageContainer responseMessage = await proxy.StartTransfer(requestMessage);
             unitOfWork.Commit();
 

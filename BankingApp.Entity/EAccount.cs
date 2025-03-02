@@ -20,7 +20,7 @@ namespace BankingApp.Entity
             DTOAccount dtoAccount = new DTOAccount();
             using (var command =
                    (NpgsqlCommand)unitOfWork.CreateCommand(
-                       "SELECT i_account(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_accountno, @p_branch, @p_balance, @p_currency, @p_active, @p_primary)"))
+                       "SELECT i_account(@refcursor, @p_recorddate, @p_recordscreen, @p_customerid, @p_accountno, @p_branch, @p_balance, @p_currency, @p_active, @p_primary, @p_transactionid)"))
             {
                 command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                 command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
@@ -31,6 +31,7 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_currency", item.Currency!);
                 command.Parameters.AddWithValue("p_active", true);
                 command.Parameters.AddWithValue("p_primary", item.Primary!);
+                command.Parameters.AddWithValue("p_transactionid", unitOfWork.TransactionId);
                 command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
@@ -68,7 +69,7 @@ namespace BankingApp.Entity
             {
                 now = DateTime.UtcNow.Ticks;
                 using (var command = (NpgsqlCommand)unitOfWork.CreateCommand(
-                           "SELECT u_account(@refcursor, @p_recorddate, @p_recordscreen, @p_id, @p_customerid, @p_accountno, @p_branch, @p_balance, @p_currency, @p_active, @p_primary)"))
+                           "SELECT u_account(@refcursor, @p_recorddate, @p_recordscreen, @p_id, @p_customerid, @p_accountno, @p_branch, @p_balance, @p_currency, @p_active, @p_primary, @p_transactionid)"))
                 {
                     command.Parameters.AddWithValue("p_id", item.Id!);
                     command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
@@ -80,6 +81,7 @@ namespace BankingApp.Entity
                     command.Parameters.AddWithValue("p_currency", item.Currency!);
                     command.Parameters.AddWithValue("p_active", true);
                     command.Parameters.AddWithValue("p_primary", item.Primary!);
+                    command.Parameters.AddWithValue("p_transactionid", unitOfWork.TransactionId);
                     command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor,
                         $"ref{item.AccountNo}{now}");
 
@@ -166,6 +168,7 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_currency", acc.Currency ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("p_active", acc.Active ?? (object)DBNull.Value);
                 command.Parameters.AddWithValue("p_primary", acc.Primary ?? (object)DBNull.Value);
+                command.Parameters.AddWithValue("p_transactionid", unitOfWork.TransactionId);
                 command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor,
                     $"ref{acc.AccountNo}");
 
