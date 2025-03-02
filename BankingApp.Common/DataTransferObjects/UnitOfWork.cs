@@ -12,12 +12,15 @@ public class UnitOfWork : IUnitOfWork
 
     public IDbConnection Connection => _connection;
     public IDbTransaction Transaction => _transaction;
+    
+    public Guid TransactionId { get; private set; }
 
     public UnitOfWork()
     {
         _connection = new NpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"));
         _connection.Open();
         _transaction = _connection.BeginTransaction();
+        TransactionId = Guid.NewGuid();
     }
 
     public void Commit()
