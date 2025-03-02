@@ -13,11 +13,10 @@ namespace BankingApp.Api.Controllers
     {
         [AllowAnonymous]
         [HttpPost("GetParametersByGroupCode")]
-        public async Task<IActionResult> GetParametersByGroupCode([FromBody] MessageContainer message)
+        public async Task<IActionResult> GetParametersByGroupCode([FromBody] MessageContainer requestMessage)
         {
-            MessageContainer requestMessage = new MessageContainer(unitOfWork);
+            requestMessage.UnitOfWork = unitOfWork;
             MessageContainer responseMessage = new MessageContainer();
-            requestMessage.Add(message.ToObject<DTOParameter>(message, "Parameter"));
 
             responseMessage = await proxy.GetParametersByGroupCode(requestMessage);
             unitOfWork.Commit();

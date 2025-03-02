@@ -17,13 +17,9 @@ namespace BankingApp.Api.Controllers
         [HttpPost("GetAccounts")]
         public async Task<IActionResult> GetAccounts(MessageContainer requestMessage)
         {
-            DTOAccount dtoAccount = requestMessage.ToObject<DTOAccount>(requestMessage, "DTOAccount");
-
-            MessageContainer requestAccount = new MessageContainer(unitOfWork);
-
-            requestAccount.Add(dtoAccount);
-
-            MessageContainer responseAcc = await proxy.GetAccountsByFilter(requestAccount);
+            requestMessage.UnitOfWork = unitOfWork;
+            
+            MessageContainer responseAcc = await proxy.GetAccountsByFilter(requestMessage);
             MessageContainer response = new MessageContainer();
             unitOfWork.Commit();
 
@@ -35,12 +31,9 @@ namespace BankingApp.Api.Controllers
         [HttpPost("AddAccount")]
         public async Task<IActionResult> AddAccount(MessageContainer requestMessage)
         {
-            DTOAccount dtoAccount = requestMessage.ToObject<DTOAccount>(requestMessage, "DTOAccount");
+            requestMessage.UnitOfWork = unitOfWork;
 
-            MessageContainer requestAccount = new MessageContainer(unitOfWork);
-            requestAccount.Add(dtoAccount);
-
-            MessageContainer responseAcc = await proxy.CreateAccount(requestAccount);
+            MessageContainer responseAcc = await proxy.CreateAccount(requestMessage);
             MessageContainer response = new MessageContainer();
 
             response.Add("Account", responseAcc.Get<DTOAccount>());

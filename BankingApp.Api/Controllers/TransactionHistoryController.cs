@@ -15,12 +15,10 @@ namespace BankingApp.Api.Controllers
     public class TransactionHistoryController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
         [HttpPost("GetTransactionHistory")]
-        public async Task<IActionResult> GetTransactionHistory([FromBody] MessageContainer message)
+        public async Task<IActionResult> GetTransactionHistory(MessageContainer requestMessage)
         {
-            MessageContainer requestMessage = new MessageContainer(unitOfWork);
+            requestMessage.UnitOfWork = unitOfWork;
             MessageContainer responseMessage = new MessageContainer();
-            requestMessage.Add(message.ToObject<DTOTransactionHistory>(message, "DTOTransactionHistory"));
-
             responseMessage = await proxy.GetHistoryByFilter(requestMessage);
             unitOfWork.Commit();
 

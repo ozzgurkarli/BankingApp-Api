@@ -13,12 +13,9 @@ namespace BankingApp.Api.Controllers
     public class CustomerController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
     {
         [HttpPost("GetCustomerByIdentityNo")]
-        public async Task<IActionResult> GetCustomerByIdentityNo(MessageContainer message)
+        public async Task<IActionResult> GetCustomerByIdentityNo(MessageContainer requestMessage)
         {
-            MessageContainer requestMessage = new MessageContainer(unitOfWork);
-            DTOCustomer dtoCustomer = message.ToObject<DTOCustomer>(message, "DTOCustomer");
-            requestMessage.Add(dtoCustomer);
-
+            requestMessage.UnitOfWork = unitOfWork;
             MessageContainer responseMessage = await proxy.GetCustomerByIdentityNo(requestMessage);
             unitOfWork.Commit();
 
@@ -28,12 +25,10 @@ namespace BankingApp.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("CreateCustomer")]
-        public async Task<IActionResult> CreateCustomer(MessageContainer message)
+        public async Task<IActionResult> CreateCustomer(MessageContainer requestMessage)
         {
-            MessageContainer requestMessage = new MessageContainer(unitOfWork);
-
-            DTOCustomer customer = message.ToObject<DTOCustomer>(message, "DTOCustomer");
-            DTOLogin login = message.ToObject<DTOLogin>(message, "DTOLogin");
+            requestMessage.UnitOfWork = unitOfWork;
+            DTOCustomer customer = requestMessage.Get<DTOCustomer>();
             requestMessage.Add(new DTOMailAddresses { MailAddress = customer.PrimaryMailAddress!, CustomerNo = "1" });
             requestMessage.Add(new DTOLogin { IdentityNo = customer.IdentityNo! });
 
@@ -45,10 +40,6 @@ namespace BankingApp.Api.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
-            requestMessage.Clear();
-            requestMessage.Add(login);
-            requestMessage.Add(customer);
 
             MessageContainer responseMessage = await proxy.CreateCustomer(requestMessage);
             unitOfWork.Commit();
