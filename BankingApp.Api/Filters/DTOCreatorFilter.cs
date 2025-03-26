@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text.Json;
 using BankingApp.Common.DataTransferObjects;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -15,13 +16,22 @@ public class DTOCreatorFilter: IActionFilter
             for (int i = 0; i < count; i++)
             {
                 KeyValuePair<string, object> value = requestMessage.Contents.ElementAt(i);
-                if(value.Key.Contains("List"))
-                    continue;
-                Type dtoType = Type.GetType($"BankingApp.Common.DataTransferObjects.{value.Key.Split('.').First()}, BankingApp.Common")!;
-                var dto = Activator.CreateInstance(dtoType)!;
-                dto = JsonSerializer.Deserialize(value.Value.ToString()!, dtoType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                requestMessage.Add(dto);
-                requestMessage.Contents.Remove(value.Key);
+                if((value.Value is JsonElement jsonElement) && jsonElement.ValueKind == JsonValueKind.Array)
+                {
+                    string dtoName = value.Key.Substring(5, value.Key.Length - 6);
+                    Type listType = typeof(List<>).MakeGenericType(Type.GetType($"BankingApp.Common.DataTransferObjects.{dtoName}, BankingApp.Common")!);
+                    var list = (IList)JsonSerializer.Deserialize(value.Value.ToString()!, listType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+                    
+                    requestMessage.Add(list);
+                }
+                else
+                {
+                    
+                    Type dtoType = Type.GetType($"BankingApp.Common.DataTransferObjects.{value.Key.Split('.').First()}, BankingApp.Common")!;
+                    var dto = JsonSerializer.Deserialize(value.Value.ToString()!, dtoType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+                    requestMessage.Add(dto);
+                    requestMessage.Contents.Remove(value.Key);
+                }
             }
         }
     }

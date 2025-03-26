@@ -26,11 +26,10 @@ namespace BankingApp.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("GetMultipleGroupCode")]
-        public async Task<IActionResult> GetMultipleGroupCode([FromBody] MessageContainer message)
+        public async Task<IActionResult> GetMultipleGroupCode([FromBody] MessageContainer requestMessage)
         {
-            MessageContainer requestMessage = new MessageContainer(unitOfWork);
+            requestMessage.UnitOfWork = unitOfWork;
             MessageContainer responseMessage = new MessageContainer();
-            requestMessage.Add(message.ToObject<List<DTOParameter>>(message, "ParameterList"));
 
             responseMessage = await proxy.GetMultipleGroupCode(requestMessage);
             unitOfWork.Commit();
