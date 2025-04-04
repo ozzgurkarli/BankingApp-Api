@@ -18,7 +18,7 @@ namespace BankingApp.Entity
         {
             long now = DateTime.UtcNow.Ticks;
             using (var command = (NpgsqlCommand)unitOfWork.CreateCommand(
-                       "SELECT i_customer(@refcursor, @p_recorddate, @p_recordscreen, @p_identityno, @p_name, @p_surname, @p_phoneno, @p_gender, @p_profession, @p_salary)"))
+                       "SELECT i_customer(@refcursor, @p_recorddate, @p_recordscreen, @p_identityno, @p_name, @p_surname, @p_phoneno, @p_gender, @p_profession, @p_salary, @p_transactionid)"))
             {
                 command.Parameters.AddWithValue("p_recorddate", DateTime.UtcNow);
                 command.Parameters.AddWithValue("p_recordscreen", item.RecordScreen);
@@ -29,6 +29,7 @@ namespace BankingApp.Entity
                 command.Parameters.AddWithValue("p_gender", item.Gender!);
                 command.Parameters.AddWithValue("p_profession", item.Profession!);
                 command.Parameters.AddWithValue("p_salary", item.Salary!);
+                command.Parameters.AddWithValue("p_transactionid", unitOfWork.TransactionId);
                 command.Parameters.AddWithValue("refcursor", NpgsqlTypes.NpgsqlDbType.Refcursor, $"ref{now}");
 
                 await command.ExecuteNonQueryAsync();
