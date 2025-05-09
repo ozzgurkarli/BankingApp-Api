@@ -10,13 +10,18 @@ namespace BankingApp.Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController(IService proxy, IUnitOfWork unitOfWork) : ControllerBase
+    public class CustomerController(IServiceProvider ServiceProvider, IUnitOfWork unitOfWork) : ControllerBase
     {
+        private IService reer = ServiceProvider.GetRequiredService<IService>();
         [HttpPost("GetCustomerByIdentityNo")]
         public async Task<IActionResult> GetCustomerByIdentityNo(MessageContainer requestMessage)
         {
             requestMessage.UnitOfWork = unitOfWork;
-            MessageContainer responseMessage = await proxy.GetCustomerByIdentityNo(requestMessage);
+            MessageContainer responseMessage;
+            using (var proxy = ServiceProvider.GetRequiredService<IService>())
+            {
+                responseMessage = await proxy.GetCustomerByIdentityNo(requestMessage);
+            }
             unitOfWork.Commit();
 
             return Ok(responseMessage);
@@ -32,16 +37,23 @@ namespace BankingApp.Api.Controllers
             requestMessage.Add(new DTOMailAddresses { MailAddress = customer.PrimaryMailAddress!, CustomerNo = "1" });
             requestMessage.Add(new DTOLogin { IdentityNo = customer.IdentityNo! });
 
+            MessageContainer responseMessage;
             try
             {
-                await proxy.RegisterCheckDataAlreadyInUse(requestMessage);
+                using (var proxy = ServiceProvider.GetRequiredService<IService>())
+                {
+                    await proxy.RegisterCheckDataAlreadyInUse(requestMessage);
+                }
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
 
-            MessageContainer responseMessage = await proxy.CreateCustomer(requestMessage);
+            using (var proxy = ServiceProvider.GetRequiredService<IService>())
+            {
+                responseMessage = await proxy.CreateCustomer(requestMessage);
+            }
             unitOfWork.Commit();
 
             return Ok(responseMessage);
