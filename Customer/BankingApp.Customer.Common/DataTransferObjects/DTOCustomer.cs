@@ -6,8 +6,9 @@ using System.Net.Mail;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using BankingApp.Common.DataTransferObjects;
 
-namespace BankingApp.Common.DataTransferObjects
+namespace BankingApp.Customer.Common.DataTransferObjects
 {
     public class DTOCustomer : BaseDTO
     {

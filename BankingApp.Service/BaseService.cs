@@ -9,7 +9,11 @@ using BankingApp.Common.Interfaces;
 
 namespace BankingApp.Service
 {
-    public class BaseService
+    public partial class Service: IService
     {
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

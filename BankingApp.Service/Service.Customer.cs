@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BankingApp.Service
 {
-    public partial class Service : BaseService, IService
+    public partial class Service : IService
     {
         public async Task<MessageContainer> CreateCustomer(MessageContainer requestMessage)
         {
