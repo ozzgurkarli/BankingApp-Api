@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Customer\BankingApp.Customer.Entity\BankingApp.Customer.Entity.csproj" />
+      <ProjectReference Include="..\BankingApp.Account.Common\BankingApp.Account.Common.csproj" />
+      <ProjectReference Include="..\BankingApp.Account.Entity\BankingApp.Account.Entity.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FirebaseAdmin" Version="3.1.0" />
+    </ItemGroup>
+
+</Project>

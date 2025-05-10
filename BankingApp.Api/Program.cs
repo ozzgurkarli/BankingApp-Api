@@ -3,8 +3,6 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using BankingApp.Api.Filters;
-using BankingApp.Common.Constants;
-using BankingApp.Common.Constants;
 using BankingApp.Common.Interfaces;
 using BankingApp.Service;
 using BankingApp.Common.DataTransferObjects;

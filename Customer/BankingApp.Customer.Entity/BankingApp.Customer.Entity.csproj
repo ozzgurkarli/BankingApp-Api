@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\BankingApp.Common\BankingApp.Common.csproj" />
+      <ProjectReference Include="..\BankingApp.Customer.Common\BankingApp.Customer.Common.csproj" />
+    </ItemGroup>
+
+</Project>
