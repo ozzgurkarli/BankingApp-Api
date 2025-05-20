@@ -7,7 +7,7 @@ using BankingApp.Account.Common.DataTransferObjects;
 using BankingApp.Account.Common.Interfaces;
 using BankingApp.Account.Entity;
 using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.enums;
+using BankingApp.Account.Common.Enums;
 using BankingApp.Customer.Common.DataTransferObjects;
 using BankingApp.Customer.Entity;
 using FirebaseAdmin.Messaging;

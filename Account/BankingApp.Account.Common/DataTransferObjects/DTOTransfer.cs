@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 
 namespace BankingApp.Account.Common.DataTransferObjects
 {

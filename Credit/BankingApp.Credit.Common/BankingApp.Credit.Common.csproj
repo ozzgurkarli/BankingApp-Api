@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\BankingApp.Common\BankingApp.Common.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\BankingApp.Infrastructure.Common\BankingApp.Infrastructure.Common.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,7 +1,4 @@
-﻿using BankingApp.Common.Constants;
-using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.Interfaces;
-using BankingApp.Entity;
+﻿using BankingApp.Common.DataTransferObjects;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -10,11 +7,14 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.Interfaces;
+using BankingApp.Infrastructure.Entity;
 using Npgsql;
 
-namespace BankingApp.Service
+namespace BankingApp.Infrastructure.Service
 {
-    public partial class Service : IService
+    public partial class SInfrastructure : ISInfrastructure
     {
         public async Task<MessageContainer> GetParametersByGroupCode(MessageContainer requestMessage)
         {
@@ -121,11 +121,11 @@ namespace BankingApp.Service
             if (dtoParameter != null && dtoParameter.Code.Equals(1) && int.Parse(dtoParameter.Detail1) != DateTime.Today.Day)
             {
                 
-                await AccountClosingSchedule(new MessageContainer(requestMessage.UnitOfWork));
-                await ExecuteInstallmentSchedule(new MessageContainer(requestMessage.UnitOfWork));
-                await CardRevenuePaymentSchedule(new MessageContainer(requestMessage.UnitOfWork));
-                await SetCurrencyValuesSchedule(new MessageContainer(requestMessage.UnitOfWork));
-                await ExecuteTransferSchedule(new MessageContainer(requestMessage.UnitOfWork));
+                // await AccountClosingSchedule(new MessageContainer(requestMessage.UnitOfWork));
+                // await ExecuteInstallmentSchedule(new MessageContainer(requestMessage.UnitOfWork));
+                // await CardRevenuePaymentSchedule(new MessageContainer(requestMessage.UnitOfWork));
+                // await SetCurrencyValuesSchedule(new MessageContainer(requestMessage.UnitOfWork));
+                // await ExecuteTransferSchedule(new MessageContainer(requestMessage.UnitOfWork));
 
                 dtoParameter.Detail1 = DateTime.Today.Day.ToString();
 

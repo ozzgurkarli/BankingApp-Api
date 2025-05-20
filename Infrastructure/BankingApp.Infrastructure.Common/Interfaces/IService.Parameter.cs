@@ -1,13 +1,13 @@
-﻿using BankingApp.Common.DataTransferObjects;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 
-namespace BankingApp.Common.Interfaces
+namespace BankingApp.Infrastructure.Common.Interfaces
 {
-    public partial interface IService
+    public partial interface ISInfrastructure
     {
         public Task<MessageContainer> GetParametersByGroupCode(MessageContainer requestMessage);
 

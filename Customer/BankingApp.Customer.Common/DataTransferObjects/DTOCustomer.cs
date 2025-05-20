@@ -7,6 +7,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 
 namespace BankingApp.Customer.Common.DataTransferObjects
 {

@@ -1,5 +1,5 @@
 using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.enums;
+using BankingApp.Account.Common.Enums;
 using BankingApp.Common.Interfaces;
 using System;
 using System.Collections.Generic;

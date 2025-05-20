@@ -1,16 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Npgsql;
 using System.Threading.Tasks;
-using BankingApp.Common.Constants;
-using BankingApp.Common.DataTransferObjects;
 using System.Data;
-using BankingApp.Common.Interfaces;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.Interfaces;
+using Npgsql;
 
-namespace BankingApp.Entity
+namespace BankingApp.Infrastructure.Entity
 {
     public class EParameter(IUnitOfWork unitOfWork)
     {
