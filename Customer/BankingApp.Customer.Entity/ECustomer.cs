@@ -6,11 +6,11 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BankingApp.Common.Interfaces;
+using BankingApp.Infrastructure.Common.Interfaces;
 
 namespace BankingApp.Customer.Entity
 {
-    public class ECustomer(IUnitOfWork unitOfWork)
+    public class ECustomer(IUnitOfWork? unitOfWork)
     {
         public async Task<DTOCustomer> Add(DTOCustomer item)
         {

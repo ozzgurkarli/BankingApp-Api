@@ -10,7 +10,10 @@ using BankingApp.Common.DataTransferObjects;
 using BankingApp.Account.Common.Enums;
 using BankingApp.Customer.Common.DataTransferObjects;
 using BankingApp.Customer.Entity;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.Interfaces;
 using FirebaseAdmin.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BankingApp.Account.Service
 {
@@ -182,7 +185,16 @@ namespace BankingApp.Account.Service
                     failedTransfers.Add(x);
                 }
             }
-            await sendNotification(notificationList, notificationUserList, requestMessage.UnitOfWork);
+
+            MessageContainer requestNotification = new MessageContainer(requestMessage.UnitOfWork);
+            requestNotification.Add(notificationList);
+            requestNotification.Add(notificationUserList);
+            
+            using (var proxy = _serviceProvider.GetRequiredService<ISInfrastructure>())
+            {
+                await proxy.SendNotification(requestNotification);
+            }
+            
             responseMessage.Add("SuccessTransfers", successTransfers);
             responseMessage.Add("FailedTransfers", failedTransfers);
             responseMessage.Add("SenderTransactions", senderTransactions);

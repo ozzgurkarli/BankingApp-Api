@@ -7,8 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\BankingApp.Common\BankingApp.Common.csproj" />
       <ProjectReference Include="..\BankingApp.Customer.Common\BankingApp.Customer.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Npgsql" Version="9.0.3" />
     </ItemGroup>
 
 </Project>

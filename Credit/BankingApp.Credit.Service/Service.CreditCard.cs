@@ -1,6 +1,5 @@
 ﻿using BankingApp.Common.DataTransferObjects;
 using BankingApp.Account.Common.Enums;
-using BankingApp.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,7 @@ using BankingApp.Credit.Common.DataTransferObjects;
 using BankingApp.Credit.Common.Interfaces;
 using BankingApp.Credit.Common.Constants;
 using BankingApp.Credit.Entity;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BankingApp.Credit.Service
@@ -21,12 +21,12 @@ namespace BankingApp.Credit.Service
     {
         public async Task<MessageContainer> CardRevenuePaymentSchedule(MessageContainer requestMessage)
         {
-            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork);
+            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork!);
 
             List<DTOCreditCard> ccList = await eCreditCard.Get(new DTOCreditCard
                 { ExpirationDate = DateTime.Today.AddYears(-1) });
 
-            MessageContainer requestParameter = new MessageContainer(requestMessage.UnitOfWork);
+            MessageContainer requestParameter = new MessageContainer(requestMessage.UnitOfWork!);
             requestParameter.Add(new List<DTOParameter> { new DTOParameter { GroupCode = "CardType" } });
             //OZZGUR FIXList<DTOParameter> parList = (await GetMultipleGroupCode(requestParameter)).Get<List<DTOParameter>>();
 
@@ -44,8 +44,8 @@ namespace BankingApp.Credit.Service
 
         public async Task<MessageContainer> CardExpensePayment(MessageContainer requestMessage)
         {
-            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork);
-            DTOCreditCard cc = requestMessage.Get<DTOCreditCard>();
+            ECreditCard eCreditCard = new ECreditCard(requestMessage.UnitOfWork!);
+            DTOCreditCard cc = requestMessage.Get<DTOCreditCard>()!;
 
             DTOCreditCard dtoCreditCard = await eCreditCard.Select(cc);
 

@@ -8,11 +8,9 @@ using BankingApp.Infrastructure.Common.Interfaces;
 
 namespace BankingApp.Infrastructure.Service
 {
-    public partial class SInfrastructure: ISInfrastructure
+    public partial class SInfrastructure(IServiceProvider _serviceProvider): ISInfrastructure
     {
         public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        { }
     }
 }

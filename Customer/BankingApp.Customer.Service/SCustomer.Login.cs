@@ -6,10 +6,10 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.Interfaces;
 using BankingApp.Customer.Common.DataTransferObjects;
 using BankingApp.Customer.Common.Interfaces;
 using BankingApp.Customer.Entity;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 

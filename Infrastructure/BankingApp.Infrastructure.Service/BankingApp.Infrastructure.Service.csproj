@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Customer\BankingApp.Customer.Common\BankingApp.Customer.Common.csproj" />
+      <ProjectReference Include="..\BankingApp.Infrastructure.Common\BankingApp.Infrastructure.Common.csproj" />
+      <ProjectReference Include="..\BankingApp.Infrastructure.Entity\BankingApp.Infrastructure.Entity.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FirebaseAdmin" Version="3.1.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
+</Project>

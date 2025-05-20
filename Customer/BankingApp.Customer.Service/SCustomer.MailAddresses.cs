@@ -1,5 +1,4 @@
 ﻿using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +9,7 @@ using System.Threading.Tasks;
 using BankingApp.Customer.Entity;
 using BankingApp.Customer.Common.Interfaces;
 using BankingApp.Customer.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 
 namespace BankingApp.Customer.Service
 {
