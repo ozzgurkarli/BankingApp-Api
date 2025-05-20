@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BankingApp.Common.DataTransferObjects
+namespace BankingApp.Infrastructure.Common.DataTransferObjects
 {
     public class DTOParameter : BaseDTO
     {

@@ -1,4 +1,4 @@
-namespace BankingApp.Common.enums
+namespace BankingApp.Account.Common.Enums
 {
     public enum CurrencyType: int
     {

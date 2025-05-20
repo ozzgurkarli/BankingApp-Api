@@ -1,6 +1,6 @@
 using System.Data;
 using BankingApp.Common;
-using BankingApp.Common.Interfaces;
+using BankingApp.Infrastructure.Common.Interfaces;
 using Npgsql;
 
 namespace BankingApp.Common.DataTransferObjects;

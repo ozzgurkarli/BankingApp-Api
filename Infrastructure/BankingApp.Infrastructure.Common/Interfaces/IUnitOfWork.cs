@@ -1,6 +1,6 @@
 using System.Data;
 
-namespace BankingApp.Common.Interfaces;
+namespace BankingApp.Infrastructure.Common.Interfaces;
 
 public interface IUnitOfWork: IDisposable
 {

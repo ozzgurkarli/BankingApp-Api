@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using BankingApp.Common.Interfaces;
+using BankingApp.Infrastructure.Common.Interfaces;
 
-namespace BankingApp.Common.DataTransferObjects
+namespace BankingApp.Infrastructure.Common.DataTransferObjects
 {
     public class MessageContainer()
     {

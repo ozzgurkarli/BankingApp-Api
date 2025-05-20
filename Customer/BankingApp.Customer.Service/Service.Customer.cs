@@ -1,5 +1,4 @@
 ﻿using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.enums;
 using BankingApp.Common.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System;
