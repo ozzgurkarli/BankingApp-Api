@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BankingApp.Customer.Service
 {
-    public partial class SCustomer(IServiceProvider _serviceProvider) : ISCustomer
+    public partial class SCustomer: ISCustomer
     {
         
         public async Task<MessageContainer> CreateCustomer(MessageContainer requestMessage)

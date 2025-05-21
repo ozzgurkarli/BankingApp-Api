@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Mail;
 using BankingApp.Common.DataTransferObjects;
 using BankingApp.Customer.Common.DataTransferObjects;
 using BankingApp.Customer.Common.Interfaces;
@@ -12,6 +14,32 @@ namespace BankingApp.Infrastructure.Service;
 
 public partial class SInfrastructure : ISInfrastructure
 {
+    public async Task<MessageContainer> SendMail(MessageContainer requestMessage)
+    {
+        DTOMail email = requestMessage.Get<DTOMail>()!;
+        
+        SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
+        {
+            Credentials = new NetworkCredential("ozzgur.parbnk@gmail.com",
+                Environment.GetEnvironmentVariable("MAIL_PASSWORD")),
+            EnableSsl = true
+        };
+
+        try
+        {
+            foreach (string to in email.To!)
+            {
+                MailMessage mailMessage = new MailMessage("ozzgur.parbnk@gmail.com", to, email.Subject, email.Body);
+                mailMessage.IsBodyHtml = true;
+                smtpClient.Send(mailMessage);
+            }
+        }
+        catch (Exception)
+        {
+        }
+
+        return new MessageContainer();
+    }
 
     public async Task<MessageContainer> SendNotification(MessageContainer requestMessage)
     {

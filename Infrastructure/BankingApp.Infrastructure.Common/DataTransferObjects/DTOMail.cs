@@ -4,7 +4,7 @@ namespace BankingApp.Infrastructure.Common.DataTransferObjects;
 
 public class DTOMail: BaseDTO
 {
-    public string? To { get; set; }
+    public List<string>? To { get; set; }
 
     public string? Subject { get; set; }
 

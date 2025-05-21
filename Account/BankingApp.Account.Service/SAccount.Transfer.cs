@@ -169,15 +169,26 @@ namespace BankingApp.Account.Service
 
                     await eTransfer.ExecuteTransfer(x);
                     
-
-                    sendMail([x.SenderMailAddress], "Para Transferi Başarılı",
-                        $"Merhaba {x.SenderName},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                    requestMessage.Clear();
+                    requestMessage.Add(new DTOMail() { To = new List<string> { x.SenderMailAddress! }, Subject = "Para Transferi Başarılı", Body = $"Merhaba {x.SenderName},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz."});
+                
+                    using (var proxy = _serviceProvider.GetRequiredService<ISInfrastructure>())
+                    {
+                        proxy.SendMail(requestMessage);
+                    }
+                    
                     if (!string.IsNullOrWhiteSpace(x.RecipientAccountNo) && x.RecipientAccountNo != "0000000000000000")
                     {
                         notificationList.Add(new Notification{Title = "Parbank", Body = $"{x.SenderName} size {formatAmount((decimal)x.Amount!)} {x.Currency} tutarında para gönderdi."});
                         notificationUserList.Add(new DTOLogin { CustomerNo = x.RecipientCustomerNo });
-                        sendMail([x.RecipientMailAddress], "Hesabınıza Para Geldi",
-                            $"Merhaba {x.RecipientName},<br><br>{x.SenderName} tarafından size para gönderildi.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                        
+                        requestMessage.Clear();
+                        requestMessage.Add(new DTOMail() { To = new List<string> { x.RecipientMailAddress! }, Subject = "Hesabınıza Para Geldi", Body = $"Merhaba {x.SenderName},<br><br>{x.SenderName} tarafından size para gönderildi.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz."});
+                
+                        using (var proxy = _serviceProvider.GetRequiredService<ISInfrastructure>())
+                        {
+                            proxy.SendMail(requestMessage);
+                        }
                     }
                 }
                 else if (x.Status == (int)TransferStatus.Failed)
