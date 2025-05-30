@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Text.Json;
 using BankingApp.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BankingApp.Api.Filters;

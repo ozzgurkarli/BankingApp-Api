@@ -2,13 +2,18 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using BankingApp.Account.Common.Interfaces;
+using BankingApp.Account.Service;
 using BankingApp.Api.Filters;
-using BankingApp.Common.Interfaces;
-using BankingApp.Service;
 using BankingApp.Common.DataTransferObjects;
+using BankingApp.Credit.Common.Interfaces;
+using BankingApp.Credit.Service;
+using BankingApp.Customer.Common.Interfaces;
+using BankingApp.Customer.Service;
+using BankingApp.Infrastructure.Common.Interfaces;
+using BankingApp.Infrastructure.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +25,10 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IService, Service>();
+builder.Services.AddTransient<ISAccount, SAccount>();
+builder.Services.AddTransient<ISCredit, SCredit>();
+builder.Services.AddTransient<ISCustomer, SCustomer>();
+builder.Services.AddTransient<ISInfrastructure, SInfrastructure>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<DTOCreatorFilter>();
 builder.Services.AddScoped<ValidateCustomerNoAuthorizationFilter>();

@@ -17,6 +17,8 @@ namespace BankingApp.Infrastructure.Common.DataTransferObjects
         }
         public Dictionary<string, object> Contents { get; set; } = new Dictionary<string, object>();
 
+        public CallerInformation CallerInformation { get; set; } = new CallerInformation();
+
         public IUnitOfWork? UnitOfWork { get; set; }
 
         public void Add(object content)
