@@ -7,8 +7,9 @@ namespace BankingApp.Infrastructure.Entity;
 
 public class ELog(IUnitOfWork unitOfWork)
 {
-    public async DTOLog Insert(DTOLog dto)
+    public async Task<DTOLog> Insert(DTOLog dto)
     {
+        DTOLog log = new DTOLog();
         long now = DateTime.UtcNow.Ticks;
 
         using (var command = (NpgsqlCommand)unitOfWork.CreateCommand("SELECT i_log(@refcursor, @p_recorddate, @p_recordscreen, @p_operation, @p_apicall, @p_request, @p_response, @p_errormessage, @p_callerip, @p_caller, @p_transactionid)"))
@@ -29,6 +30,20 @@ public class ELog(IUnitOfWork unitOfWork)
             
             command.CommandText = $"fetch all in \"ref{now}\"";
             command.CommandType = CommandType.Text;
+
+            using (var reader = await command.ExecuteReaderAsync())
+            {
+                log.Id = (int)reader["Id"];
+                log.Operation = (string)reader["Operation"];
+                log.Caller = (string)reader["Caller"];
+                log.APICall = (bool)reader["APICall"];
+                log.CallerIP = (string)reader["CallerIP"];
+                log.ErrorMessage = (string)reader["ErrorMessage"];
+                log.Request = (string)reader["Request"];
+                log.Response = (string)reader["Response"];
+            }
         }
+
+        return log;
     }
 }
