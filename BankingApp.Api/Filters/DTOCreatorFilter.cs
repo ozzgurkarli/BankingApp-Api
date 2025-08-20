@@ -27,11 +27,19 @@ public class DTOCreatorFilter: IActionFilter
                 }
                 else
                 {
-                    
-                    Type dtoType = Type.GetType($"BankingApp.Common.DataTransferObjects.{value.Key.Split('.').First()}, BankingApp.Common")!;
+                    string sad = $"{value.Key}, {string.Join(".", value.Key.Split('.')[..3])}";
+                    Type dtoType = Type.GetType($"{value.Key}, {string.Join(".", value.Key.Split('.')[..3])}")!;
                     var dto = JsonSerializer.Deserialize(value.Value.ToString()!, dtoType, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-                    requestMessage.Add(dto);
                     requestMessage.Contents.Remove(value.Key);
+
+                    if (value.Key == "BankingApp.Infrastructure.Common.DataTransferObjects.CallerInformation")
+                    {
+                        requestMessage.CallerInformation = (CallerInformation)dto;
+                    }
+                    else
+                    {
+                        requestMessage.Add(dto);
+                    }
                 }
             }
         }

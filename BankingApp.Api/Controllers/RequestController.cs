@@ -10,6 +10,7 @@ namespace BankingApp.Api.Controllers;
 [ApiController]
 public class RequestController(IUnitOfWork unitOfWork, IServiceProvider serviceProvider) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpPost("InvokeOperation")]
     public async Task<MessageContainer> InvokeOperation(MessageContainer requestMessage)
     {
@@ -20,6 +21,7 @@ public class RequestController(IUnitOfWork unitOfWork, IServiceProvider serviceP
             await proxy.LogAPICall(requestMessage);
         }
 
+        var xxs = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).Where(x => x.IsInterface);
         var interfaceType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
             .FirstOrDefault(x => x.IsInterface && x.Name == requestMessage.CallerInformation.ServiceName);
 
@@ -35,8 +37,14 @@ public class RequestController(IUnitOfWork unitOfWork, IServiceProvider serviceP
             throw new Exception($"I{requestMessage.CallerInformation.ServiceName}.{requestMessage.CallerInformation.OperationName} 'operasyonu bulunamadı.");
         }
 
-        MessageContainer responseMessage = (MessageContainer)method.Invoke(service, new object?[]{requestMessage})!;
-
+        using (var proxy = serviceProvider.GetRequiredService<ISInfrastructure>())
+        {
+            await proxy.SelectOperationWithName(requestMessage);
+        }
+        
+        Task<MessageContainer> task = (Task<MessageContainer>)method.Invoke(service, new object?[]{requestMessage})!;
+        MessageContainer responseMessage = await task;
+        
         return responseMessage;
     }
 }

@@ -17,8 +17,14 @@ public partial class SInfrastructure: ISInfrastructure
             
         };
 
-        
-        response.Add(await eLog.Insert(log));
+        try
+        {
+            response.Add(await eLog.Insert(log));
+        }
+        catch (Exception)
+        {
+            // xd
+        }
 
         return response;
     }

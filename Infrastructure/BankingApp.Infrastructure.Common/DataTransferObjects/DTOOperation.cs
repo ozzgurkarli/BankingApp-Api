@@ -6,5 +6,5 @@ public class DTOOperation: BaseDTO
 
     public string? OperationName { get; set; }
 
-    public bool Active { get; set; }
+    public bool? Active { get; set; }
 }
