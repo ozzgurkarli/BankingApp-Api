@@ -6,8 +6,8 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BankingApp.Common.Interfaces;
 using BankingApp.Credit.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.Interfaces;
 
 namespace BankingApp.Credit.Entity
 {

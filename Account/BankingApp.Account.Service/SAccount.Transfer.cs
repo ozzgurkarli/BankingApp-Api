@@ -10,7 +10,10 @@ using BankingApp.Common.DataTransferObjects;
 using BankingApp.Account.Common.Enums;
 using BankingApp.Customer.Common.DataTransferObjects;
 using BankingApp.Customer.Entity;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.Interfaces;
 using FirebaseAdmin.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BankingApp.Account.Service
 {
@@ -166,15 +169,26 @@ namespace BankingApp.Account.Service
 
                     await eTransfer.ExecuteTransfer(x);
                     
-
-                    sendMail([x.SenderMailAddress], "Para Transferi Başarılı",
-                        $"Merhaba {x.SenderName},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                    requestMessage.Clear();
+                    requestMessage.Add(new DTOMail() { To = new List<string> { x.SenderMailAddress! }, Subject = "Para Transferi Başarılı", Body = $"Merhaba {x.SenderName},<br><br>Gerçekleştirdiğin para transferi tamamlandı.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz."});
+                
+                    using (var proxy = _serviceProvider.GetRequiredService<ISInfrastructure>())
+                    {
+                        proxy.SendMail(requestMessage);
+                    }
+                    
                     if (!string.IsNullOrWhiteSpace(x.RecipientAccountNo) && x.RecipientAccountNo != "0000000000000000")
                     {
                         notificationList.Add(new Notification{Title = "Parbank", Body = $"{x.SenderName} size {formatAmount((decimal)x.Amount!)} {x.Currency} tutarında para gönderdi."});
                         notificationUserList.Add(new DTOLogin { CustomerNo = x.RecipientCustomerNo });
-                        sendMail([x.RecipientMailAddress], "Hesabınıza Para Geldi",
-                            $"Merhaba {x.RecipientName},<br><br>{x.SenderName} tarafından size para gönderildi.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz.");
+                        
+                        requestMessage.Clear();
+                        requestMessage.Add(new DTOMail() { To = new List<string> { x.RecipientMailAddress! }, Subject = "Hesabınıza Para Geldi", Body = $"Merhaba {x.SenderName},<br><br>{x.SenderName} tarafından size para gönderildi.<br><br>İşlem Tutarı: {formatAmount((decimal)x.Amount!)}<br>Döviz Cinsi: {x.Currency}<br><br>İyi Günler Dileriz."});
+                
+                        using (var proxy = _serviceProvider.GetRequiredService<ISInfrastructure>())
+                        {
+                            proxy.SendMail(requestMessage);
+                        }
                     }
                 }
                 else if (x.Status == (int)TransferStatus.Failed)
@@ -182,7 +196,16 @@ namespace BankingApp.Account.Service
                     failedTransfers.Add(x);
                 }
             }
-            await sendNotification(notificationList, notificationUserList, requestMessage.UnitOfWork);
+
+            MessageContainer requestNotification = new MessageContainer(requestMessage.UnitOfWork);
+            requestNotification.Add(notificationList);
+            requestNotification.Add(notificationUserList);
+            
+            using (var proxy = _serviceProvider.GetRequiredService<ISInfrastructure>())
+            {
+                await proxy.SendNotification(requestNotification);
+            }
+            
             responseMessage.Add("SuccessTransfers", successTransfers);
             responseMessage.Add("FailedTransfers", failedTransfers);
             responseMessage.Add("SenderTransactions", senderTransactions);

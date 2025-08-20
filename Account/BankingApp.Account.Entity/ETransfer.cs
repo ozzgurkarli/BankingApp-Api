@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BankingApp.Account.Common.DataTransferObjects;
 using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.Interfaces;
+using BankingApp.Infrastructure.Common.Interfaces;
 using Npgsql;
 
 namespace BankingApp.Account.Entity

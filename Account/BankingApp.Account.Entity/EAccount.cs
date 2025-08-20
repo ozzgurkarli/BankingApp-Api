@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BankingApp.Account.Common.DataTransferObjects;
-using BankingApp.Common.Interfaces;
+using BankingApp.Infrastructure.Common.Interfaces;
 
 namespace BankingApp.Account.Entity
 {

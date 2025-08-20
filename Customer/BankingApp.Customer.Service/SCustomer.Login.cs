@@ -6,11 +6,13 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.Interfaces;
 using BankingApp.Customer.Common.DataTransferObjects;
 using BankingApp.Customer.Common.Interfaces;
 using BankingApp.Customer.Entity;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BankingApp.Customer.Service
@@ -66,9 +68,13 @@ namespace BankingApp.Customer.Service
 
                 responseTask = await GetPrimaryMailAddressByCustomerNo(requestMessage);
 
-                sendMail(new List<string> { responseTask.Get<DTOMailAddresses>().MailAddress },
-                    "ParBank Parola Değişikliği",
-                    "Merhaba<br><br>Parolanız isteğiniz doğrultusunda güncellenmiştir. Bu işlemi siz gerçekleştirmediyseniz şubemize başvurun.");
+                requestMessage.Clear();
+                requestMessage.Add(new DTOMail() { To = new List<string> { responseTask.Get<DTOMailAddresses>().MailAddress }, Subject = "ParBank Parola Değişikliği", Body = "Merhaba<br><br>Parolanız isteğiniz doğrultusunda güncellenmiştir. Bu işlemi siz gerçekleştirmediyseniz şubemize başvurun."});
+                
+                using (var proxy = _serviceProvider.GetRequiredService<ISInfrastructure>())
+                {
+                    proxy.SendMail(requestMessage);
+                }
             });
 
             responseMessage.Add(dtoLogin);

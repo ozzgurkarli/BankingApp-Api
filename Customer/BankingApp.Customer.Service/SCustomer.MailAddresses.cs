@@ -1,5 +1,4 @@
 ﻿using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +9,9 @@ using System.Threading.Tasks;
 using BankingApp.Customer.Entity;
 using BankingApp.Customer.Common.Interfaces;
 using BankingApp.Customer.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BankingApp.Customer.Service
 {
@@ -23,9 +25,15 @@ namespace BankingApp.Customer.Service
             DTOLogin dtoLogin = reqMessage.Get<DTOLogin>("Login");
 
             await eMailAddress.Add(dtoMailAddress);
-            sendMail(new List<string> { dtoMailAddress.MailAddress! }, "ParBank Geçici Parola",
-                $"Merhaba {dtoCustomer.Name},<br><br>Bankamıza hoşgeldin. ParBank uygulamasına ilk girişinde kullanabileceğin geçici parola: <strong>{dtoLogin.Password}</strong><br><br>İyi Günler Dileriz.");
-
+            
+            reqMessage.Clear();
+            reqMessage.Add(new DTOMail() { To = new List<string> { dtoMailAddress.MailAddress! }, Subject = "ParBank Geçici Parola", Body = $"Merhaba {dtoCustomer.Name},<br><br>Bankamıza hoşgeldin. ParBank uygulamasına ilk girişinde kullanabileceğin geçici parola: <strong>{dtoLogin.Password}</strong><br><br>İyi Günler Dileriz."});
+                
+            using (var proxy = _serviceProvider.GetRequiredService<ISInfrastructure>())
+            {
+                proxy.SendMail(reqMessage);
+            }
+            
             return new MessageContainer();
         }
 
@@ -49,29 +57,6 @@ namespace BankingApp.Customer.Service
             reqService.Add(await eMailAddress.Get(dtoMailAddress));
 
             return reqService;
-        }
-
-        private void sendMail(List<string> toList, string subject, string body)
-        {
-            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587)
-            {
-                Credentials = new NetworkCredential("ozzgur.parbnk@gmail.com",
-                    Environment.GetEnvironmentVariable("MAIL_PASSWORD")),
-                EnableSsl = true
-            };
-
-            try
-            {
-                foreach (string to in toList)
-                {
-                    MailMessage mailMessage = new MailMessage("ozzgur.parbnk@gmail.com", to, subject, body);
-                    mailMessage.IsBodyHtml = true;
-                    smtpClient.Send(mailMessage);
-                }
-            }
-            catch (Exception)
-            {
-            }
         }
     }
 }

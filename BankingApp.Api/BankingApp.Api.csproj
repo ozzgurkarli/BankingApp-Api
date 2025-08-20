@@ -15,16 +15,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BankingApp.Common\BankingApp.Common.csproj" />
-    <ProjectReference Include="..\BankingApp.Infrastructure\BankingApp.Infrastructure.csproj" />
-    <ProjectReference Include="..\BankingApp.Service\BankingApp.Service.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="Properties\launchSettings.json">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Account\BankingApp.Account.Service\BankingApp.Account.Service.csproj" />
+    <ProjectReference Include="..\Credit\BankingApp.Credit.Common\BankingApp.Credit.Common.csproj" />
+    <ProjectReference Include="..\Credit\BankingApp.Credit.Service\BankingApp.Credit.Service.csproj" />
+    <ProjectReference Include="..\Customer\BankingApp.Customer.Service\BankingApp.Customer.Service.csproj" />
+    <ProjectReference Include="..\Infrastructure\BankingApp.Infrastructure.Service\BankingApp.Infrastructure.Service.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,5 @@
 using BankingApp.Common.DataTransferObjects;
 using BankingApp.Account.Common.Enums;
-using BankingApp.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +11,7 @@ using BankingApp.Credit.Common.Constants;
 using BankingApp.Credit.Common.DataTransferObjects;
 using BankingApp.Credit.Common.Interfaces;
 using BankingApp.Credit.Entity;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BankingApp.Credit.Service

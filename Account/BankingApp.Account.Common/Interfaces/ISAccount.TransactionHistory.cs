@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BankingApp.Common.DataTransferObjects;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 
 namespace BankingApp.Account.Common.Interfaces
 {

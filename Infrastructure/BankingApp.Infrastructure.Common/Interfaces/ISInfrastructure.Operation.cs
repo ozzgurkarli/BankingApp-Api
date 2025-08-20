@@ -4,6 +4,5 @@ namespace BankingApp.Infrastructure.Common.Interfaces;
 
 public partial interface ISInfrastructure
 {
-    
-    public Task<MessageContainer> SendNotification(MessageContainer requestMessage);
+    public Task<MessageContainer> SelectOperationWithName(MessageContainer requestMessage);
 }

@@ -1,5 +1,4 @@
 ﻿using BankingApp.Common.DataTransferObjects;
-using BankingApp.Common.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -11,11 +10,12 @@ using BankingApp.Account.Common.Interfaces;
 using BankingApp.Customer.Common.DataTransferObjects;
 using BankingApp.Customer.Common.Interfaces;
 using BankingApp.Customer.Entity;
+using BankingApp.Infrastructure.Common.DataTransferObjects;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BankingApp.Customer.Service
 {
-    public partial class SCustomer(IServiceProvider _serviceProvider) : ISCustomer
+    public partial class SCustomer: ISCustomer
     {
         
         public async Task<MessageContainer> CreateCustomer(MessageContainer requestMessage)
